@@ -18,7 +18,8 @@ class HotelReservationFactory extends Factory
             'check_in_date' => $this->faker->date(),
             'check_out_date' => $this->faker->date(),
             'adults' => $this->faker->numberBetween(1, 4),
-            'total_price' => $this->faker->randomFloat(2, 100, 500), // total price for the reservation
+            'currency' => 'IDR',
+            'total_price' => $this->faker->randomFloat(2, 100, 1000),
             'status' => 'pending',
         ];
     }

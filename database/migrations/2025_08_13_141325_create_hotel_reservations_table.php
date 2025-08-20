@@ -19,6 +19,7 @@ return new class extends Migration
             $table->date('check_in_date');
             $table->date('check_out_date');
             $table->integer('adults');
+            $table->string('currency')->default('IDR');
             $table->decimal('total_price', 15, 2)->nullable();
             $table->enum('status', ['pending', 'confirmed', 'cancelled'])->default('pending');
             $table->timestamps();

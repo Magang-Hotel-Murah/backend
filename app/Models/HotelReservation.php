@@ -14,9 +14,11 @@ class HotelReservation extends Model
     protected $fillable = [
         'user_id',
         'hotel_name',
-        'amadeus_hotel_id',
+        'hotel_id',
         'check_in_date',
         'check_out_date',
+        'currency',
+        'total_price',
         'adults',
         'status',
     ];

@@ -65,12 +65,11 @@ class TransactionController extends Controller
     // Hapus transaksi
     public function destroy($id)
     {
-        $transaction = Transaction::find($id);
-        if (!$transaction) {
-            return response()->json(['message' => 'Transaction not found'], 404);
-        }
-
+        $transaction = Transaction::findOrFail($id);
         $transaction->delete();
-        return response()->json(['message' => 'Transaction deleted'], 200);
+
+        return response()->json([
+            'message' => 'Transaction deleted successfully'
+        ]);
     }
 }

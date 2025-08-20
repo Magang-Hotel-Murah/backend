@@ -20,6 +20,7 @@ return new class extends Migration
             $table->enum('payment_status', ['unpaid', 'paid', 'failed'])->default('unpaid');
             $table->dateTime('transaction_date')->nullable(); // lebih konsisten dengan ERD
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index(['transactionable_id', 'transactionable_type']);
         });
