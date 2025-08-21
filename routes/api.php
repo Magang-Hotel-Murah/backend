@@ -14,12 +14,18 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])->middleware(['signed'])->name('verification.verify');
-    Route::apiResource('reservations', ReservationController::class);
-    Route::apiResource('transactions', TransactionController::class);
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/hotels/search', [HotelController::class, 'searchHotels']);
-    Route::get('/hotels/by-hotels', [HotelController::class, 'getHotelsByIds']);
+
     Route::middleware('role:admin')->group(function () {
         Route::apiResource('users', UserController::class);
     });
+
+    Route::get('/hotels/by-city', [HotelController::class, 'getHotelsByCity']);
+    Route::get('/hotels/by-hotels', [HotelController::class, 'getHotelsById']);
+    Route::get('/hotels/hotel-offers', [HotelController::class, 'getMultiHotelOffers']);
+    Route::get('/hotels/hotel-offers/{offerId}', [HotelController::class, 'getOfferPricing']);
+
+    Route::apiResource('reservations', ReservationController::class);
+
+    Route::apiResource('transactions', TransactionController::class);
 });

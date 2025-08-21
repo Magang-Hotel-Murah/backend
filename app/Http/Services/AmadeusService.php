@@ -32,7 +32,7 @@ class AmadeusService
         return $response->json()['access_token'] ?? null;
     }
 
-    public function searchHotels(array $params = [])
+    public function getHotelsByCity(array $params = [])
     {
         $token = $this->getAccessToken();
 
@@ -46,7 +46,7 @@ class AmadeusService
         return $response->json();
     }
 
-    public function getHotelsByIds(array $params = [])
+    public function getHotelsById(array $params = [])
     {
         $token = $this->getAccessToken();
 
@@ -55,6 +55,40 @@ class AmadeusService
 
         if ($response->failed()) {
             throw new \Exception('Failed to fetch hotel details: ' . $response->body());
+        }
+
+        return $response->json();
+    }
+
+    public function getMultiHotelOffers(array $params = [])
+    {
+        $token = $this->getAccessToken();
+
+        $response = Http::withToken($token)
+            ->get("{$this->baseUrl}/v3/shopping/hotel-offers", $params);
+
+        if ($response->failed()) {
+            throw new \Exception('Failed to fetch hotel offers: ' . $response->body());
+        }
+
+        return $response->json();
+    }
+
+    public function getOfferPricing(array $params = [])
+    {
+        $token = $this->getAccessToken();
+
+        if (!isset($params['offerId'])) {
+            throw new \InvalidArgumentException('offerId is required.');
+        }
+
+        $offerId = $params['offerId'];
+
+        $response = Http::withToken($token)
+            ->get("{$this->baseUrl}/v3/shopping/hotel-offers/{$offerId}");
+
+        if ($response->failed()) {
+            throw new \Exception('Failed to fetch offer pricing: ' . $response->body());
         }
 
         return $response->json();

@@ -17,7 +17,7 @@ class HotelController extends Controller
         $this->amadeusService = $amadeusService;
     }
 
-    public function searchHotels(Request $request)
+    public function getHotelsByCity(Request $request)
     {
         $allowedParams = [
             'cityCode' => ['required', 'string', 'size:3'],
@@ -45,13 +45,13 @@ class HotelController extends Controller
 
         $cacheKey = 'hotels_city_' . md5(json_encode($validated));
         $results = Cache::remember($cacheKey, 60 * 5, function () use ($validated) {
-            return $this->amadeusService->searchHotels($validated);
+            return $this->amadeusService->getHotelsByCity($validated);
         });
 
         return response()->json($results);
     }
 
-    public function getHotelsByIds(Request $request)
+    public function getHotelsById(Request $request)
     {
         $request->validate([
             'hotelIds' => 'required|string',
@@ -68,7 +68,57 @@ class HotelController extends Controller
         ]);
         $cacheKey = 'hotels_ids_' . md5(json_encode($params));
         $results = Cache::remember($cacheKey, 60 * 5, function () use ($params) {
-            return $this->amadeusService->getHotelsByIds($params);
+            return $this->amadeusService->getHotelsById($params);
+        });
+
+        return response()->json($results);
+    }
+
+    public function getMultiHotelOffers(Request $request)
+    {
+        $request->validate([
+            'hotelIds' => 'required|string',
+            'adults' => 'integer|min:1',
+            'checkInDate' => 'date',
+            'checkOutDate' => 'date|after_or_equal:checkInDate',
+            'countryOfResidence' => 'nullable|string|max:2',
+            'roomQuantity' => 'nullable|integer|min:1',
+            'priceRange' => 'nullable|string',
+            'currency' => 'nullable|string|max:3',
+            'paymentPolicy' => 'nullable|string|in:GUARANTEE, DEPOSIT, NONE|default:NONE',
+            'boardType' => 'nullable|string|in:ROOM_ONLY, BREAKFAST, HALF_BOARD, FULL_BOARD, ALL_INCLUSIVE',
+            'bestRateOnly' => 'nullable|boolean',
+
+        ]);
+        $params = $request->only([
+            'hotelIds',
+            'adults',
+            'checkInDate',
+            'checkOutDate',
+            'countryOfResidence',
+            'roomQuantity',
+            'priceRange',
+            'currency',
+            'paymentPolicy',
+            'boardType',
+            'bestRateOnly'
+        ]);
+
+        $cacheKey = 'hotels_offers_' . md5(json_encode($params));
+        $results = Cache::remember($cacheKey, 60 * 5, function () use ($params) {
+            return $this->amadeusService->getMultiHotelOffers($params);
+        });
+
+        return response()->json($results);
+    }
+
+    public function getOfferPricing(Request $request, $offerId)
+    {
+        $params = ['offerId' => $offerId];
+
+        $cacheKey = 'offer_pricing_' . md5(json_encode($params));
+        $results = Cache::remember($cacheKey, 60 * 5, function () use ($params) {
+            return $this->amadeusService->getOfferPricing($params);
         });
 
         return response()->json($results);
