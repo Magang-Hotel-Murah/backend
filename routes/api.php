@@ -11,9 +11,9 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])->middleware(['signed'])->name('verification.verify');
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])->middleware(['signed'])->name('verification.verify');
     Route::post('/logout', [AuthController::class, 'logout']);
 
     Route::middleware('role:admin')->group(function () {
@@ -26,6 +26,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/hotels/hotel-offers/{offerId}', [HotelController::class, 'getOfferPricing']);
 
     Route::apiResource('reservations', ReservationController::class);
-
     Route::apiResource('transactions', TransactionController::class);
 });
