@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('currency', 5)->default('USD');
             $table->string('payment_method')->nullable();
             $table->enum('payment_status', ['unpaid', 'paid', 'failed'])->default('unpaid');
-            $table->dateTime('transaction_date')->nullable(); // lebih konsisten dengan ERD
+            $table->dateTime('transaction_date')->nullable();
             $table->timestamps();
             $table->softDeletes();
 
