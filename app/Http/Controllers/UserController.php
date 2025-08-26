@@ -7,15 +7,17 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // return response()->json(User::withTrashed()->get());
+        if ($request->has('with_deleted') && $request->with_deleted) {
+            return response()->json(User::withTrashed()->get());
+        }
         return response()->json(User::all());
     }
 
     public function show($id)
     {
-        return response()->json(User::find($id));
+        return response()->json(User::withTrashed()->find($id));
     }
 
     public function update(Request $request, $id)
