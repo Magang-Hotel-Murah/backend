@@ -7,13 +7,11 @@ use Illuminate\Http\Request;
 
 class TransactionController extends Controller
 {
-    // List semua transaksi
     public function index()
     {
         return response()->json(Transaction::with('transactionable')->get(), 200);
     }
 
-    // Detail transaksi
     public function show($id)
     {
         $transaction = Transaction::with('transactionable')->find($id);
@@ -23,7 +21,6 @@ class TransactionController extends Controller
         return response()->json($transaction, 200);
     }
 
-    // Buat transaksi baru
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -37,11 +34,9 @@ class TransactionController extends Controller
         ]);
 
         $transaction = Transaction::create($validated);
-
         return response()->json($transaction, 201);
     }
 
-    // Update transaksi
     public function update(Request $request, $id)
     {
         $transaction = Transaction::find($id);
@@ -62,7 +57,6 @@ class TransactionController extends Controller
         return response()->json($transaction, 200);
     }
 
-    // Hapus transaksi
     public function destroy($id)
     {
         $transaction = Transaction::findOrFail($id);

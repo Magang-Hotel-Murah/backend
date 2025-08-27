@@ -16,10 +16,7 @@ class ReservationController extends Controller
     public function show($id)
     {
         $reservation = HotelReservation::with('user', 'transactions')->find($id);
-
-        if (!$reservation) {
-            return response()->json(['message' => 'Reservation not found'], 404);
-        }
+        $reservation->transactionable_type = 'hotel';
 
         return response()->json($reservation, 200);
     }
