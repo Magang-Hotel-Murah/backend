@@ -9,6 +9,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Division;
+use App\Models\Position;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -35,5 +36,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function division()
     {
         return $this->belongsTo(Division::class, 'division_id');
+    }
+
+    public function position()
+    {
+        return $this->belongsTo(Position::class, 'position_id');
     }
 }

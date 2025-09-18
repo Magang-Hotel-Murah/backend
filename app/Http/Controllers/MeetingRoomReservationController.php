@@ -12,8 +12,9 @@ class MeetingRoomReservationController extends Controller
     public function index()
     {
         $reservations = MeetingRoomReservation::with(
-            'user:id,name,division_id',
+            'user:id,name,division_id,position_id',
             'user.division:id,name',
+            'user.position:id,name',
             'room:id,name'
         )
             ->orderBy('start_time', 'asc')
@@ -25,8 +26,9 @@ class MeetingRoomReservationController extends Controller
     public function show($id)
     {
         $reservation = MeetingRoomReservation::with(
-            'user:id,name,division_id',
+            'user:id,name,division_id,position_id',
             'user.division:id,name',
+            'user.position:id,name',
             'room:id,name'
         )
             ->where('meeting_room_id', $id)

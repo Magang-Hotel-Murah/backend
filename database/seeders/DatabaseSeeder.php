@@ -8,6 +8,7 @@ use App\Models\HotelReservation;
 use App\Models\MeetingRoomReservation;
 use App\Models\MeetingRoom;
 use App\Models\Division;
+use App\Models\Position;
 
 class DatabaseSeeder extends Seeder
 {
@@ -19,8 +20,17 @@ class DatabaseSeeder extends Seeder
             Division::firstOrCreate(['name' => $division]);
         }
 
+        // 2. Seed positions
+        $positions = ['Manager', 'Staff', 'Intern', 'Director', 'Coordinator'];
+        foreach ($positions as $position) {
+            Position::firstOrCreate(['name' => $position]);
+        }
+
         // Ambil semua division id
         $divisionIds = Division::pluck('id')->toArray();
+
+        // Ambil semua position id
+        $positionIds = Position::pluck('id')->toArray();
 
         // 2. Seed admin user dengan division random
         User::factory()->create([
@@ -28,11 +38,13 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
             'role' => 'admin',
             'division_id' => $divisionIds[array_rand($divisionIds)],
+            'position_id' => $positionIds[array_rand($positionIds)],
         ]);
 
         // 3. Seed 10 user random dengan division random
         User::factory(10)->create([
             'division_id' => fn() => $divisionIds[array_rand($divisionIds)],
+            'position_id' => fn() => $positionIds[array_rand($positionIds)],
         ]);
 
         // 4. Seed hotel reservations

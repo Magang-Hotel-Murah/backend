@@ -11,7 +11,7 @@ class UserController extends Controller
     {
         if ($request->has('with_deleted') && $request->with_deleted) {
             return response()->json(User::withTrashed()
-                ->with(['division:id,name'])
+                ->with(['division:id,name', 'position:id,name'])
                 ->get());
         }
         return response()->json(User::with('division:id,name')->get());
