@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\User;
+use App\Models\UserProfile;
 use App\Models\HotelReservation;
 use App\Models\MeetingRoomReservation;
 use App\Models\MeetingRoom;
@@ -14,7 +15,7 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Seed divisions dulu
+        // 1. Seed divisions
         $divisions = ['IT', 'HR', 'Finance', 'Marketing', 'Operations', 'Support'];
         foreach ($divisions as $division) {
             Division::firstOrCreate(['name' => $division]);
@@ -26,28 +27,32 @@ class DatabaseSeeder extends Seeder
             Position::firstOrCreate(['name' => $position]);
         }
 
-        // Ambil semua division id
         $divisionIds = Division::pluck('id')->toArray();
-
-        // Ambil semua position id
         $positionIds = Position::pluck('id')->toArray();
 
-        // 2. Seed admin user dengan division random
-        User::factory()->create([
+        // 3. Seed admin user
+        $admin = User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
             'role' => 'admin',
+        ]);
+
+        UserProfile::factory()->create([
+            'user_id' => $admin->id,
             'division_id' => $divisionIds[array_rand($divisionIds)],
             'position_id' => $positionIds[array_rand($positionIds)],
         ]);
 
-        // 3. Seed 10 user random dengan division random
-        User::factory(10)->create([
-            'division_id' => fn() => $divisionIds[array_rand($divisionIds)],
-            'position_id' => fn() => $positionIds[array_rand($positionIds)],
-        ]);
+        // 4. Seed 10 user dengan profile
+        User::factory(10)->create()->each(function ($user) use ($divisionIds, $positionIds) {
+            UserProfile::factory()->create([
+                'user_id' => $user->id,
+                'division_id' => $divisionIds[array_rand($divisionIds)],
+                'position_id' => $positionIds[array_rand($positionIds)],
+            ]);
+        });
 
-        // 4. Seed hotel reservations
+        // 5. Seed hotel reservations
         HotelReservation::factory(5)->create();
 
         HotelReservation::factory()
@@ -55,10 +60,10 @@ class DatabaseSeeder extends Seeder
             ->hasTransactions(1)
             ->create();
 
-        // 5. Seed meeting rooms
+        // 6. Seed meeting rooms
         $rooms = MeetingRoom::factory()->count(2)->create();
 
-        // 6. Seed meeting room reservations
+        // 7. Seed meeting room reservations
         MeetingRoomReservation::factory(5)->create();
     }
 }

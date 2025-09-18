@@ -9,6 +9,9 @@ use App\Http\Controllers\ReservationController;
 use Illuminate\Container\Attributes\Auth;
 use App\Http\Controllers\MeetingRoomReservationController;
 use App\Http\Controllers\MeetingRoomController;
+use App\Http\Controllers\UserProfileController;
+use App\Http\Controllers\DivisionController;
+use App\Http\Controllers\PositionController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -22,6 +25,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:admin')->group(function () {
         Route::apiResource('users', UserController::class);
         Route::post('/meeting-room/{reservation}/status', [MeetingRoomReservationController::class, 'updateStatus']);
+        Route::apiResource('divisions', DivisionController::class, ['only' => ['store', 'update', 'destroy']]);
+        Route::apiResource('positions', PositionController::class, ['only' => ['store', 'update', 'destroy']]);
+        Route::apiResource('profiles', UserProfileController::class, ['only' => ['index']]);
     });
 
     Route::get('/hotels/by-city', [HotelController::class, 'getHotelsByCity']);
@@ -37,4 +43,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/meeting-room/{id}/reservations', [MeetingRoomReservationController::class, 'show']);
 
     Route::apiResource('meeting-room', MeetingRoomController::class);
+    Route::apiResource('user-profile', UserProfileController::class, ['only' => ['show', 'store', 'update']]);
+    Route::apiResource('divisions', DivisionController::class, ['only' => ['index', 'show']]);
+    Route::apiResource('positions', PositionController::class, ['only' => ['index', 'show']]);
 });

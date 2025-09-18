@@ -13,8 +13,8 @@ class Division extends Model
         'name',
     ];
 
-    public function users()
+    public function profiles()
     {
-        return $this->hasMany(User::class, 'division_id');
+        return $this->hasMany(UserProfile::class);
     }
 }

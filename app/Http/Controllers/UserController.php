@@ -11,7 +11,10 @@ class UserController extends Controller
     {
         if ($request->has('with_deleted') && $request->with_deleted) {
             return response()->json(User::withTrashed()
-                ->with(['division:id,name', 'position:id,name'])
+                ->with([
+                    'profile.division:id,name',
+                    'profile.position:id,name'
+                ])
                 ->get());
         }
         return response()->json(User::with('division:id,name')->get());
@@ -19,7 +22,12 @@ class UserController extends Controller
 
     public function show($id)
     {
-        return response()->json(User::withTrashed()->find($id));
+        return response()->json(User::withTrashed()
+            ->with([
+                'profile.division:id,name',
+                'profile.position:id,name'
+            ])
+            ->find($id));
     }
 
     public function update(Request $request, $id)

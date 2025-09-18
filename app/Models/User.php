@@ -8,8 +8,6 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\Division;
-use App\Models\Position;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -18,7 +16,6 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $fillable = [
         'name',
         'email',
-        'division_id',
         'password',
         'role',
     ];
@@ -33,13 +30,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'password' => 'hashed',
     ];
 
-    public function division()
+    public function profile()
     {
-        return $this->belongsTo(Division::class, 'division_id');
-    }
-
-    public function position()
-    {
-        return $this->belongsTo(Position::class, 'position_id');
+        return $this->hasOne(UserProfile::class);
     }
 }
