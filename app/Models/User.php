@@ -8,6 +8,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Division;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -16,6 +17,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $fillable = [
         'name',
         'email',
+        'division_id',
         'password',
         'role',
     ];
@@ -29,4 +31,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function division()
+    {
+        return $this->belongsTo(Division::class, 'division_id');
+    }
 }

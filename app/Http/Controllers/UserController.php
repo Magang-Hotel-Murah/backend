@@ -10,9 +10,11 @@ class UserController extends Controller
     public function index(Request $request)
     {
         if ($request->has('with_deleted') && $request->with_deleted) {
-            return response()->json(User::withTrashed()->get());
+            return response()->json(User::withTrashed()
+                ->with(['division:id,name'])
+                ->get());
         }
-        return response()->json(User::all());
+        return response()->json(User::with('division:id,name')->get());
     }
 
     public function show($id)
