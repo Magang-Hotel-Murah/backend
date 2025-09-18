@@ -58,11 +58,20 @@ class UserController extends Controller
 
     public function destroy($id)
     {
-        $user = User::findOrFail($id);
-        $user->delete();
+        $user = User::withTrashed()->findOrFail($id); // pastikan bisa restore juga
+        $message = '';
+
+        if ($user->trashed()) {
+            $user->restore();
+            $message = 'User restored successfully';
+        } else {
+            $user->delete();
+            $message = 'User deleted successfully';
+        }
 
         return response()->json([
-            'message' => 'User deleted successfully'
+            'message' => $message,
+            'user' => $user
         ]);
     }
 }
