@@ -16,12 +16,53 @@ use Carbon\Carbon;
 
 class AuthController extends Controller
 {
+    /**
+     * POST api/register
+     *
+     * This endpoint does not require authentication.
+     * @unauthenticated
+     * @bodyParam name string required User's name. Example: John Doe
+     * @bodyParam email string required User's email. Example: 4kV3b@example.com
+     * @bodyParam password string required User's password. Example: secret123
+     * @bodyParam password_confirmation string required Confirm user's password. Example: secret123
+     * @response 201 {
+     *   "success": true,
+     *   "message": "User registered successfully, please verify your email",
+     *   "user": {
+     *       "id": 1,
+     *       "name": "John Doe",
+     *       "email": "4kV3b@example.com",
+     *       "role": "user",
+     *       "email_verified_at": null,
+     *       "created_at": "2021-01-01T00:00:00.000000Z",
+     *       "updated_at": "2021-01-01T00:00:00.000000Z"
+     *   }
+     * }
+     * @response 400 {
+     *   "success": false,
+     *   "message": "The given data was invalid.",
+     *   "errors": {
+     *       "name": ["The name field is required."],
+     *       "email": ["The email field is required."],
+     *       "password": ["The password field is required."],
+     *       "password_confirmation": ["The password confirmation field is required."]
+     *   }
+     * }
+     * @response 400 {
+     *   "success": false,
+     *   "message": "The given data was invalid.",
+     *   "errors": {
+     *       "email": ["The email has already been taken."],
+     *       "password": ["The password confirmation does not match."]
+     *   }
+     * }
+     */
     public function register(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
+            'password' => 'required|string|min:6|confirmed',
         ]);
 
         $user = User::create([
@@ -45,6 +86,22 @@ class AuthController extends Controller
             'user' => $user,
         ], 201);
     }
+
+    /**
+     * GET api/email/verify/{id}/{hash}
+     *
+     * This endpoint does not require authentication.
+     *
+     * @unauthenticated
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @param  string  $hash
+     * @return \Illuminate\Http\Response
+     * @response 200 {
+     *  "success": true,
+     *  "message": "Email verified successfully."
+     * }
+     */
 
     public function verifyEmail(Request $request, $id, $hash)
     {
@@ -73,7 +130,56 @@ class AuthController extends Controller
         ], 200);
     }
 
-
+    /**
+     * POST api/login
+     *
+     * This endpoint does not require authentication.
+     *
+     * @unauthenticated
+     * @bodyParam email string required User's email. Example: john@example.com
+     * @bodyParam password string required User's password. Example: secret123
+     * @response 200 {
+     *   "success": true,
+     *   "user": {
+     *       "id": 1,
+     *       "name": "John Doe",
+     *       "email": "    john@example.com",
+     *       "profile": {
+     *           "id": 1,
+     *           "user_id": 1,
+     *           "division_id": 2,
+     *           "position_id": 3,
+     *           "address": "123 Main St",
+     *           "phone": "555-1234",
+     *           "photo": null,
+     *           "created_at": "2024-09-18T07:07:57.000000Z",
+     *           "updated_at": "2024-09-18T07:07:57.000000Z",
+     *           "division": {
+     *               "id": 2,
+     *               "name": "Marketing"
+     *           },
+     *           "position": {
+     *               "id": 3,
+     *               "name": "Manager"
+     *           }
+     *       }
+     *   },
+     *   "token": "1|qwertyuiopasdfghjklzxcvbnm1234567890"
+     * }
+     * @response 401 {
+     *   "success": false,
+     *   "message": "Incorrect email or password"
+     * }
+     * @response 403 {
+     *   "success": false,
+     *   "message": "Please verify your email address",
+     *   "token": "1|qwertyuiopasdfghjklzxcvbnm1234567890"
+     * }
+     * @response 500 {
+     *   "success": false,
+     *   "message": "An error occurred while processing your request."
+     * }
+     */
     public function login(Request $request)
     {
         $request->validate([
@@ -111,7 +217,17 @@ class AuthController extends Controller
         ], 200);
     }
 
-
+    /**
+     * POST api/logout
+     *
+     * This endpoint requires authentication.
+     *
+     * @authenticated
+     * @response 200 {
+     *   "success": true,
+     *   "message": "Logged out successfully"
+     * }
+     */
     public function logout(Request $request)
     {
         $request->user()->tokens()->delete();
@@ -121,6 +237,27 @@ class AuthController extends Controller
             'message' => 'Logged out successfully'
         ], 200);
     }
+
+    /**
+     * POST api/forgot-password
+     *
+     * This endpoint does not require authentication.
+     *
+     * @unauthenticated
+     * @bodyParam email string required User's email. Example: john@example.com
+     * @response 200 {
+     *   "success": true,
+     *   "message": "Kode OTP reset password sudah dikirim ke email."
+     * }
+     * @response 400 {
+     *   "success": false,
+     *   "message": "OTP tidak valid"
+     * }
+     * @response 400 {
+     *   "success": false,
+     *   "message": "OTP sudah kadaluarsa, silakan minta ulang."
+     * }
+     */
 
     public function forgotPassword(Request $request)
     {
@@ -149,7 +286,43 @@ class AuthController extends Controller
         ], 200);
     }
 
-
+    /**
+     * POST api/reset-password
+     *
+     * This endpoint does not require authentication.
+     *
+     * @unauthenticated
+     * @bodyParam email string required User's email. Example: john@example.com
+     * @bodyParam otp string required OTP code. Example: 123456
+     * @bodyParam password string required New password. Example: secret123
+     * @bodyParam password_confirmation string required Confirm new password. Example: secret123
+     * @response 200 {
+     *   "success": true,
+     *   "message": "Password berhasil direset."
+     * }
+     * @response 400 {
+     *   "success": false,
+     *   "message": "OTP tidak valid"
+     * }
+     * @response 400 {
+     *   "success": false,
+     *   "message": "OTP sudah kadaluarsa, silakan minta ulang."
+     * }
+     * @response 400 {
+     *   "success": false,
+     *   "message": "An error occurred while processing your request."
+     * }
+     * @response 400 {
+     *   "success": false,
+     *   "message": "The given data was invalid.",
+     *   "errors": {
+     *       "email": ["The email field is required."],
+     *       "otp": ["The otp field is required."],
+     *       "password": ["The password field is required."],
+     *       "password_confirmation": ["The password confirmation field is required."]
+     *   }
+     * }
+     */
     public function resetPassword(Request $request)
     {
         $request->validate([
