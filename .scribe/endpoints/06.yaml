@@ -1,0 +1,330 @@
+name: Hotels
+description: ''
+endpoints:
+  -
+    httpMethods:
+      - GET
+    uri: api/hotels/by-city
+    metadata:
+      groupName: Hotels
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+      custom: []
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_KEY}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+        custom: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|abcdeEXAMPLETOKEN12345'
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/hotels/by-hotels
+    metadata:
+      groupName: Hotels
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+      custom: []
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_KEY}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      hotelIds:
+        name: hotelIds
+        description: ''
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      hotelIds: architecto
+    fileParameters: []
+    responses:
+      -
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+        custom: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|abcdeEXAMPLETOKEN12345'
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/hotels/hotel-offers
+    metadata:
+      groupName: Hotels
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+      custom: []
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_KEY}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      hotelIds:
+        name: hotelIds
+        description: ''
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      adults:
+        name: adults
+        description: 'Must be at least 1.'
+        required: false
+        example: 22
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      checkInDate:
+        name: checkInDate
+        description: 'Must be a valid date.'
+        required: false
+        example: '2025-09-19T07:46:37'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      checkOutDate:
+        name: checkOutDate
+        description: 'Must be a valid date. Must be a date after or equal to <code>checkInDate</code>.'
+        required: false
+        example: '2051-10-13'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      countryOfResidence:
+        name: countryOfResidence
+        description: 'Must not be greater than 2 characters.'
+        required: false
+        example: ng
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        custom: []
+      roomQuantity:
+        name: roomQuantity
+        description: 'Must be at least 1.'
+        required: false
+        example: 66
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        custom: []
+      priceRange:
+        name: priceRange
+        description: ''
+        required: false
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        custom: []
+      currency:
+        name: currency
+        description: 'Must not be greater than 3 characters.'
+        required: false
+        example: 'n'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        custom: []
+      paymentPolicy:
+        name: paymentPolicy
+        description: ''
+        required: false
+        example: ' NONE'
+        type: string
+        enumValues:
+          - GUARANTEE
+          - ' DEPOSIT'
+          - ' NONE'
+        exampleWasSpecified: false
+        nullable: true
+        custom: []
+      boardType:
+        name: boardType
+        description: ''
+        required: false
+        example: ' BREAKFAST'
+        type: string
+        enumValues:
+          - ROOM_ONLY
+          - ' BREAKFAST'
+          - ' HALF_BOARD'
+          - ' FULL_BOARD'
+          - ' ALL_INCLUSIVE'
+        exampleWasSpecified: false
+        nullable: true
+        custom: []
+      bestRateOnly:
+        name: bestRateOnly
+        description: ''
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        custom: []
+    cleanBodyParameters:
+      hotelIds: architecto
+      adults: 22
+      checkInDate: '2025-09-19T07:46:37'
+      checkOutDate: '2051-10-13'
+      countryOfResidence: ng
+      roomQuantity: 66
+      priceRange: architecto
+      currency: 'n'
+      paymentPolicy: ' NONE'
+      boardType: ' BREAKFAST'
+      bestRateOnly: false
+    fileParameters: []
+    responses:
+      -
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+        custom: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|abcdeEXAMPLETOKEN12345'
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: 'api/hotels/hotel-offers/{offerId}'
+    metadata:
+      groupName: Hotels
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+      custom: []
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_KEY}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      offerId:
+        name: offerId
+        description: ''
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      offerId: architecto
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+        custom: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|abcdeEXAMPLETOKEN12345'
+    controller: null
+    method: null
+    route: null
+    custom: []

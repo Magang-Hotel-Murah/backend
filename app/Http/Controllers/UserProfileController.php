@@ -6,8 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\UserProfile;
 use Illuminate\Support\Facades\Auth;
 
-use App\Models\User;
-
+/**
+ * @group User Profiles
+ */
 class UserProfileController extends Controller
 {
     public function index()
@@ -16,14 +17,27 @@ class UserProfileController extends Controller
         return response()->json($profiles);
     }
 
-    public function show($id)
+    public function show($id = null)
     {
-        $profile = UserProfile::with(['user:id,name,email', 'division:id,name', 'position:id,name'])
-            ->where('user_id', $id)
-            ->firstOrFail();
+        $user = Auth::user();
+
+        if ($user->role !== 'admin') {
+            $id = $user->id;
+        } else {
+            if (!$id) {
+                $id = $user->id;
+            }
+        }
+
+        $profile = UserProfile::with([
+            'user:id,name,email',
+            'division:id,name',
+            'position:id,name'
+        ])->where('user_id', $id)->firstOrFail();
 
         return response()->json($profile);
     }
+
 
     public function store(Request $request)
     {

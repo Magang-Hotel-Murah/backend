@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 
+/**
+ * @group Transactions
+ */
 class TransactionController extends Controller
 {
     public function index()

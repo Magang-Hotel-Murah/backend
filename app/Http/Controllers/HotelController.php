@@ -8,6 +8,9 @@ use App\Models\HotelSearchLog;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * @group Hotels
+ */
 class HotelController extends Controller
 {
     protected $amadeusService;

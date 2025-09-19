@@ -20,6 +20,7 @@ class AuthController extends Controller
      * POST api/register
      *
      * This endpoint does not require authentication.
+     * @group Authentication
      * @unauthenticated
      * @bodyParam name string required User's name. Example: John Doe
      * @bodyParam email string required User's email. Example: 4kV3b@example.com
@@ -72,6 +73,14 @@ class AuthController extends Controller
             'role' => 'user'
         ]);
 
+        $user->profile()->create([
+            'division_id' => null,
+            'position_id' => null,
+            'address' => null,
+            'phone' => null,
+            'photo' => null,
+        ]);
+
         $verifyUrl = URL::temporarySignedRoute(
             'verification.verify',
             now()->addMinutes(60),
@@ -92,6 +101,7 @@ class AuthController extends Controller
      *
      * This endpoint does not require authentication.
      *
+     * @group Authentication
      * @unauthenticated
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
@@ -135,6 +145,7 @@ class AuthController extends Controller
      *
      * This endpoint does not require authentication.
      *
+     * @group Authentication
      * @unauthenticated
      * @bodyParam email string required User's email. Example: john@example.com
      * @bodyParam password string required User's password. Example: secret123
@@ -222,6 +233,7 @@ class AuthController extends Controller
      *
      * This endpoint requires authentication.
      *
+     * @group Authentication
      * @authenticated
      * @response 200 {
      *   "success": true,
@@ -243,6 +255,7 @@ class AuthController extends Controller
      *
      * This endpoint does not require authentication.
      *
+     * @group Authentication
      * @unauthenticated
      * @bodyParam email string required User's email. Example: john@example.com
      * @response 200 {
@@ -291,6 +304,7 @@ class AuthController extends Controller
      *
      * This endpoint does not require authentication.
      *
+     * @group Authentication
      * @unauthenticated
      * @bodyParam email string required User's email. Example: john@example.com
      * @bodyParam otp string required OTP code. Example: 123456

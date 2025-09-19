@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 
 use function Laravel\Prompts\select;
 
+/**
+ * @group Meeting Rooms
+ */
 class MeetingRoomController extends Controller
 {
     public function index()

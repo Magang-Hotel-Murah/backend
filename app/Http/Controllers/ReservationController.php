@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\HotelReservation;
 use Illuminate\Http\Request;
 
+/**
+ * @group Reservations
+ */
 class ReservationController extends Controller
 {
     public function index()

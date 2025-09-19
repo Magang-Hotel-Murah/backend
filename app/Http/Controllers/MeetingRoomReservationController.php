@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\MeetingRoomReservation;
 use Illuminate\Support\Facades\Auth;
 
-
+/**
+ * @group Meeting Room Reservations
+ */
 class MeetingRoomReservationController extends Controller
 {
     public function index()
