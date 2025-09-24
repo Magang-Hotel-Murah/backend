@@ -286,7 +286,7 @@
     </ul>
 
     <ul class="toc-footer" id="last-updated">
-        <li>Last updated: September 19, 2025</li>
+        <li>Last updated: September 24, 2025</li>
     </ul>
 </div>
 
@@ -2460,15 +2460,15 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --data "{
     \"hotelIds\": \"architecto\",
     \"adults\": 22,
-    \"checkInDate\": \"2025-09-19T07:46:37\",
-    \"checkOutDate\": \"2051-10-13\",
+    \"checkInDate\": \"2025-09-24T08:48:22\",
+    \"checkOutDate\": \"2051-10-18\",
     \"countryOfResidence\": \"ng\",
     \"roomQuantity\": 66,
     \"priceRange\": \"architecto\",
     \"currency\": \"n\",
-    \"paymentPolicy\": \" NONE\",
-    \"boardType\": \" BREAKFAST\",
-    \"bestRateOnly\": false
+    \"paymentPolicy\": \"GUARANTEE\",
+    \"boardType\": \" HALF_BOARD\",
+    \"bestRateOnly\": true
 }"
 </code></pre></div>
 
@@ -2487,15 +2487,15 @@ const headers = {
 let body = {
     "hotelIds": "architecto",
     "adults": 22,
-    "checkInDate": "2025-09-19T07:46:37",
-    "checkOutDate": "2051-10-13",
+    "checkInDate": "2025-09-24T08:48:22",
+    "checkOutDate": "2051-10-18",
     "countryOfResidence": "ng",
     "roomQuantity": 66,
     "priceRange": "architecto",
     "currency": "n",
-    "paymentPolicy": " NONE",
-    "boardType": " BREAKFAST",
-    "bestRateOnly": false
+    "paymentPolicy": "GUARANTEE",
+    "boardType": " HALF_BOARD",
+    "bestRateOnly": true
 };
 
 fetch(url, {
@@ -2633,10 +2633,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="checkInDate"                data-endpoint="GETapi-hotels-hotel-offers"
-               value="2025-09-19T07:46:37"
+               value="2025-09-24T08:48:22"
                data-component="body">
     <br>
-<p>Must be a valid date. Example: <code>2025-09-19T07:46:37</code></p>
+<p>Must be a valid date. Example: <code>2025-09-24T08:48:22</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>checkOutDate</code></b>&nbsp;&nbsp;
@@ -2644,10 +2644,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="checkOutDate"                data-endpoint="GETapi-hotels-hotel-offers"
-               value="2051-10-13"
+               value="2051-10-18"
                data-component="body">
     <br>
-<p>Must be a valid date. Must be a date after or equal to <code>checkInDate</code>. Example: <code>2051-10-13</code></p>
+<p>Must be a valid date. Must be a date after or equal to <code>checkInDate</code>. Example: <code>2051-10-18</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>countryOfResidence</code></b>&nbsp;&nbsp;
@@ -2699,10 +2699,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="paymentPolicy"                data-endpoint="GETapi-hotels-hotel-offers"
-               value=" NONE"
+               value="GUARANTEE"
                data-component="body">
     <br>
-<p>Example: <code>NONE</code></p>
+<p>Example: <code>GUARANTEE</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>GUARANTEE</code></li> <li><code> DEPOSIT</code></li> <li><code> NONE</code></li></ul>
         </div>
@@ -2712,10 +2712,10 @@ Must be one of:
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="boardType"                data-endpoint="GETapi-hotels-hotel-offers"
-               value=" BREAKFAST"
+               value=" HALF_BOARD"
                data-component="body">
     <br>
-<p>Example: <code>BREAKFAST</code></p>
+<p>Example: <code>HALF_BOARD</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>ROOM_ONLY</code></li> <li><code> BREAKFAST</code></li> <li><code> HALF_BOARD</code></li> <li><code> FULL_BOARD</code></li> <li><code> ALL_INCLUSIVE</code></li></ul>
         </div>
@@ -2738,7 +2738,7 @@ Must be one of:
             <code>false</code>
         </label>
     <br>
-<p>Example: <code>false</code></p>
+<p>Example: <code>true</code></p>
         </div>
         </form>
 
@@ -2915,7 +2915,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
-    \"status\": \"approved\"
+    \"status\": \"rejected\"
 }"
 </code></pre></div>
 
@@ -2932,7 +2932,7 @@ const headers = {
 };
 
 let body = {
-    "status": "approved"
+    "status": "rejected"
 };
 
 fetch(url, {
@@ -3044,10 +3044,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="status"                data-endpoint="PUTapi-meeting-room--reservation_id--status"
-               value="approved"
+               value="rejected"
                data-component="body">
     <br>
-<p>Example: <code>approved</code></p>
+<p>Example: <code>rejected</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>pending</code></li> <li><code>approved</code></li> <li><code>rejected</code></li></ul>
         </div>
@@ -3073,8 +3073,8 @@ Must be one of:
     --header "Accept: application/json" \
     --data "{
     \"meeting_room_id\": \"architecto\",
-    \"start_time\": \"2051-10-13\",
-    \"end_time\": \"2051-10-13\"
+    \"start_time\": \"2051-10-18\",
+    \"end_time\": \"2051-10-18\"
 }"
 </code></pre></div>
 
@@ -3092,8 +3092,8 @@ const headers = {
 
 let body = {
     "meeting_room_id": "architecto",
-    "start_time": "2051-10-13",
-    "end_time": "2051-10-13"
+    "start_time": "2051-10-18",
+    "end_time": "2051-10-18"
 };
 
 fetch(url, {
@@ -3204,10 +3204,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="start_time"                data-endpoint="POSTapi-meeting-room-reserve"
-               value="2051-10-13"
+               value="2051-10-18"
                data-component="body">
     <br>
-<p>Must be a valid date. Must be a date after <code>now</code>. Example: <code>2051-10-13</code></p>
+<p>Must be a valid date. Must be a date after <code>now</code>. Example: <code>2051-10-18</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>end_time</code></b>&nbsp;&nbsp;
@@ -3215,10 +3215,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="end_time"                data-endpoint="POSTapi-meeting-room-reserve"
-               value="2051-10-13"
+               value="2051-10-18"
                data-component="body">
     <br>
-<p>Must be a valid date. Must be a date after <code>start_time</code>. Example: <code>2051-10-13</code></p>
+<p>Must be a valid date. Must be a date after <code>start_time</code>. Example: <code>2051-10-18</code></p>
         </div>
         </form>
 
@@ -5156,11 +5156,11 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"user_id\": \"architecto\",
     \"hotel_name\": \"n\",
     \"hotel_id\": \"g\",
-    \"check_in_date\": \"2025-09-19T07:46:37\",
-    \"check_out_date\": \"2051-10-13\",
+    \"check_in_date\": \"2025-09-24T08:48:22\",
+    \"check_out_date\": \"2051-10-18\",
     \"adults\": 22,
     \"total_price\": 84,
-    \"status\": \"pending\"
+    \"status\": \"cancelled\"
 }"
 </code></pre></div>
 
@@ -5180,11 +5180,11 @@ let body = {
     "user_id": "architecto",
     "hotel_name": "n",
     "hotel_id": "g",
-    "check_in_date": "2025-09-19T07:46:37",
-    "check_out_date": "2051-10-13",
+    "check_in_date": "2025-09-24T08:48:22",
+    "check_out_date": "2051-10-18",
     "adults": 22,
     "total_price": 84,
-    "status": "pending"
+    "status": "cancelled"
 };
 
 fetch(url, {
@@ -5317,10 +5317,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="check_in_date"                data-endpoint="POSTapi-reservations"
-               value="2025-09-19T07:46:37"
+               value="2025-09-24T08:48:22"
                data-component="body">
     <br>
-<p>Must be a valid date. Example: <code>2025-09-19T07:46:37</code></p>
+<p>Must be a valid date. Example: <code>2025-09-24T08:48:22</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>check_out_date</code></b>&nbsp;&nbsp;
@@ -5328,10 +5328,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="check_out_date"                data-endpoint="POSTapi-reservations"
-               value="2051-10-13"
+               value="2051-10-18"
                data-component="body">
     <br>
-<p>Must be a valid date. Must be a date after or equal to <code>check_in_date</code>. Example: <code>2051-10-13</code></p>
+<p>Must be a valid date. Must be a date after or equal to <code>check_in_date</code>. Example: <code>2051-10-18</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>adults</code></b>&nbsp;&nbsp;
@@ -5361,10 +5361,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="status"                data-endpoint="POSTapi-reservations"
-               value="pending"
+               value="cancelled"
                data-component="body">
     <br>
-<p>Example: <code>pending</code></p>
+<p>Example: <code>cancelled</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>pending</code></li> <li><code>confirmed</code></li> <li><code>cancelled</code></li></ul>
         </div>
@@ -5541,11 +5541,11 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --data "{
     \"hotel_name\": \"b\",
     \"hotel_id\": \"n\",
-    \"check_in_date\": \"2025-09-19T07:46:37\",
-    \"check_out_date\": \"2051-10-13\",
+    \"check_in_date\": \"2025-09-24T08:48:22\",
+    \"check_out_date\": \"2051-10-18\",
     \"adults\": 22,
     \"total_price\": 84,
-    \"status\": \"pending\"
+    \"status\": \"confirmed\"
 }"
 </code></pre></div>
 
@@ -5564,11 +5564,11 @@ const headers = {
 let body = {
     "hotel_name": "b",
     "hotel_id": "n",
-    "check_in_date": "2025-09-19T07:46:37",
-    "check_out_date": "2051-10-13",
+    "check_in_date": "2025-09-24T08:48:22",
+    "check_out_date": "2051-10-18",
     "adults": 22,
     "total_price": 84,
-    "status": "pending"
+    "status": "confirmed"
 };
 
 fetch(url, {
@@ -5706,10 +5706,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="check_in_date"                data-endpoint="PUTapi-reservations--id-"
-               value="2025-09-19T07:46:37"
+               value="2025-09-24T08:48:22"
                data-component="body">
     <br>
-<p>Must be a valid date. Example: <code>2025-09-19T07:46:37</code></p>
+<p>Must be a valid date. Example: <code>2025-09-24T08:48:22</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>check_out_date</code></b>&nbsp;&nbsp;
@@ -5717,10 +5717,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="check_out_date"                data-endpoint="PUTapi-reservations--id-"
-               value="2051-10-13"
+               value="2051-10-18"
                data-component="body">
     <br>
-<p>Must be a valid date. Must be a date after or equal to <code>check_in_date</code>. Example: <code>2051-10-13</code></p>
+<p>Must be a valid date. Must be a date after or equal to <code>check_in_date</code>. Example: <code>2051-10-18</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>adults</code></b>&nbsp;&nbsp;
@@ -5750,10 +5750,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="status"                data-endpoint="PUTapi-reservations--id-"
-               value="pending"
+               value="confirmed"
                data-component="body">
     <br>
-<p>Example: <code>pending</code></p>
+<p>Example: <code>confirmed</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>pending</code></li> <li><code>confirmed</code></li> <li><code>cancelled</code></li></ul>
         </div>
@@ -6059,8 +6059,8 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"amount\": 4326.41688,
     \"currency\": \"m\",
     \"payment_method\": \"i\",
-    \"payment_status\": \"failed\",
-    \"transaction_date\": \"2025-09-19T07:46:37\"
+    \"payment_status\": \"paid\",
+    \"transaction_date\": \"2025-09-24T08:48:22\"
 }"
 </code></pre></div>
 
@@ -6082,8 +6082,8 @@ let body = {
     "amount": 4326.41688,
     "currency": "m",
     "payment_method": "i",
-    "payment_status": "failed",
-    "transaction_date": "2025-09-19T07:46:37"
+    "payment_status": "paid",
+    "transaction_date": "2025-09-24T08:48:22"
 };
 
 fetch(url, {
@@ -6238,10 +6238,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="payment_status"                data-endpoint="POSTapi-transactions"
-               value="failed"
+               value="paid"
                data-component="body">
     <br>
-<p>Example: <code>failed</code></p>
+<p>Example: <code>paid</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>unpaid</code></li> <li><code>paid</code></li> <li><code>failed</code></li></ul>
         </div>
@@ -6251,10 +6251,10 @@ Must be one of:
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="transaction_date"                data-endpoint="POSTapi-transactions"
-               value="2025-09-19T07:46:37"
+               value="2025-09-24T08:48:22"
                data-component="body">
     <br>
-<p>Must be a valid date. Example: <code>2025-09-19T07:46:37</code></p>
+<p>Must be a valid date. Example: <code>2025-09-24T08:48:22</code></p>
         </div>
         </form>
 
@@ -6430,8 +6430,8 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"amount\": 4326.41688,
     \"currency\": \"m\",
     \"payment_method\": \"i\",
-    \"payment_status\": \"unpaid\",
-    \"transaction_date\": \"2025-09-19T07:46:38\"
+    \"payment_status\": \"paid\",
+    \"transaction_date\": \"2025-09-24T08:48:22\"
 }"
 </code></pre></div>
 
@@ -6451,8 +6451,8 @@ let body = {
     "amount": 4326.41688,
     "currency": "m",
     "payment_method": "i",
-    "payment_status": "unpaid",
-    "transaction_date": "2025-09-19T07:46:38"
+    "payment_status": "paid",
+    "transaction_date": "2025-09-24T08:48:22"
 };
 
 fetch(url, {
@@ -6601,10 +6601,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="payment_status"                data-endpoint="PUTapi-transactions--id-"
-               value="unpaid"
+               value="paid"
                data-component="body">
     <br>
-<p>Example: <code>unpaid</code></p>
+<p>Example: <code>paid</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>unpaid</code></li> <li><code>paid</code></li> <li><code>failed</code></li></ul>
         </div>
@@ -6614,10 +6614,10 @@ Must be one of:
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="transaction_date"                data-endpoint="PUTapi-transactions--id-"
-               value="2025-09-19T07:46:38"
+               value="2025-09-24T08:48:22"
                data-component="body">
     <br>
-<p>Must be a valid date. Example: <code>2025-09-19T07:46:38</code></p>
+<p>Must be a valid date. Example: <code>2025-09-24T08:48:22</code></p>
         </div>
         </form>
 

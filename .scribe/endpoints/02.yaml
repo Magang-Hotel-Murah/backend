@@ -39,7 +39,7 @@ endpoints:
         name: status
         description: ''
         required: true
-        example: approved
+        example: rejected
         type: string
         enumValues:
           - pending
@@ -49,7 +49,7 @@ endpoints:
         nullable: false
         custom: []
     cleanBodyParameters:
-      status: approved
+      status: rejected
     fileParameters: []
     responses: []
     responseFields: []
@@ -98,7 +98,7 @@ endpoints:
         name: start_time
         description: 'Must be a valid date. Must be a date after <code>now</code>.'
         required: true
-        example: '2051-10-13'
+        example: '2051-10-18'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -108,7 +108,7 @@ endpoints:
         name: end_time
         description: 'Must be a valid date. Must be a date after <code>start_time</code>.'
         required: true
-        example: '2051-10-13'
+        example: '2051-10-18'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -116,8 +116,8 @@ endpoints:
         custom: []
     cleanBodyParameters:
       meeting_room_id: architecto
-      start_time: '2051-10-13'
-      end_time: '2051-10-13'
+      start_time: '2051-10-18'
+      end_time: '2051-10-18'
     fileParameters: []
     responses: []
     responseFields: []
