@@ -24,7 +24,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::middleware('role:admin')->group(function () {
         Route::apiResource('users', UserController::class);
-        Route::put('/meeting-room/{reservation}/status', [MeetingRoomReservationController::class, 'updateStatus']);
+        Route::put('/meeting-room/{id}/status', [MeetingRoomReservationController::class, 'updateStatus']);
         Route::apiResource('divisions', DivisionController::class, ['only' => ['store', 'update', 'destroy']]);
         Route::apiResource('positions', PositionController::class, ['only' => ['store', 'update', 'destroy']]);
         Route::apiResource('user-profiles', UserProfileController::class, ['only' => ['index']]);

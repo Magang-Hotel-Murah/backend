@@ -27,4 +27,16 @@ class MeetingRoomReservation extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function scopeConflict($query, $start, $end)
+    {
+        return $query->where(function ($q) use ($start, $end) {
+            $q->whereBetween('start_time', [$start, $end])
+                ->orWhereBetween('end_time', [$start, $end])
+                ->orWhere(function ($q) use ($start, $end) {
+                    $q->where('start_time', '<=', $start)
+                        ->where('end_time', '>=', $end);
+                });
+        });
+    }
 }
