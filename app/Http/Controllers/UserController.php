@@ -20,7 +20,10 @@ class UserController extends Controller
                 ])
                 ->get());
         }
-        return response()->json(User::with('division:id,name')->get());
+        return response()->json(User::with([
+            'profile.division:id,name',
+            'profile.position:id,name'
+        ])->get());
     }
 
     public function show($id)
