@@ -141,7 +141,7 @@ endpoints:
         name: role
         description: ''
         required: false
-        example: admin
+        example: user
         type: string
         enumValues:
           - user
@@ -173,16 +173,16 @@ endpoints:
         name: restore
         description: ''
         required: false
-        example: false
+        example: true
         type: boolean
         enumValues: []
         exampleWasSpecified: false
         nullable: true
         custom: []
     cleanBodyParameters:
-      role: admin
+      role: user
       name: b
-      restore: false
+      restore: true
     fileParameters: []
     responses: []
     responseFields: []

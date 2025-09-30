@@ -102,7 +102,7 @@ endpoints:
         name: check_in_date
         description: 'Must be a valid date.'
         required: true
-        example: '2025-09-24T08:48:22'
+        example: '2025-09-30T04:39:34'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -112,7 +112,7 @@ endpoints:
         name: check_out_date
         description: 'Must be a valid date. Must be a date after or equal to <code>check_in_date</code>.'
         required: true
-        example: '2051-10-18'
+        example: '2051-10-24'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -142,7 +142,7 @@ endpoints:
         name: status
         description: ''
         required: false
-        example: cancelled
+        example: confirmed
         type: string
         enumValues:
           - pending
@@ -155,11 +155,11 @@ endpoints:
       user_id: architecto
       hotel_name: 'n'
       hotel_id: g
-      check_in_date: '2025-09-24T08:48:22'
-      check_out_date: '2051-10-18'
+      check_in_date: '2025-09-30T04:39:34'
+      check_out_date: '2051-10-24'
       adults: 22
       total_price: 84
-      status: cancelled
+      status: confirmed
     fileParameters: []
     responses: []
     responseFields: []
@@ -285,7 +285,7 @@ endpoints:
         name: check_in_date
         description: 'Must be a valid date.'
         required: false
-        example: '2025-09-24T08:48:22'
+        example: '2025-09-30T04:39:34'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -295,7 +295,7 @@ endpoints:
         name: check_out_date
         description: 'Must be a valid date. Must be a date after or equal to <code>check_in_date</code>.'
         required: false
-        example: '2051-10-18'
+        example: '2051-10-24'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -325,7 +325,7 @@ endpoints:
         name: status
         description: ''
         required: false
-        example: confirmed
+        example: cancelled
         type: string
         enumValues:
           - pending
@@ -337,11 +337,11 @@ endpoints:
     cleanBodyParameters:
       hotel_name: b
       hotel_id: 'n'
-      check_in_date: '2025-09-24T08:48:22'
-      check_out_date: '2051-10-18'
+      check_in_date: '2025-09-30T04:39:34'
+      check_out_date: '2051-10-24'
       adults: 22
       total_price: 84
-      status: confirmed
+      status: cancelled
     fileParameters: []
     responses: []
     responseFields: []

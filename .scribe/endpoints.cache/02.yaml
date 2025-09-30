@@ -6,7 +6,7 @@ endpoints:
   -
     httpMethods:
       - PUT
-    uri: 'api/meeting-room/{reservation_id}/status'
+    uri: 'api/meeting-room/{id}/status'
     metadata:
       groupName: 'Meeting Room Reservations'
       groupDescription: ''
@@ -22,18 +22,18 @@ endpoints:
       Content-Type: application/json
       Accept: application/json
     urlParameters:
-      reservation_id:
-        name: reservation_id
-        description: 'The ID of the reservation.'
+      id:
+        name: id
+        description: 'The ID of the meeting room.'
         required: true
-        example: 1
-        type: integer
+        example: architecto
+        type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanUrlParameters:
-      reservation_id: 1
+      id: architecto
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
@@ -100,7 +100,7 @@ endpoints:
         name: start_time
         description: 'Must be a valid date. Must be a date after <code>now</code>.'
         required: true
-        example: '2051-10-18'
+        example: '2051-10-24'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -110,7 +110,7 @@ endpoints:
         name: end_time
         description: 'Must be a valid date. Must be a date after <code>start_time</code>.'
         required: true
-        example: '2051-10-18'
+        example: '2051-10-24'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -118,8 +118,8 @@ endpoints:
         custom: []
     cleanBodyParameters:
       meeting_room_id: architecto
-      start_time: '2051-10-18'
-      end_time: '2051-10-18'
+      start_time: '2051-10-24'
+      end_time: '2051-10-24'
     fileParameters: []
     responses: []
     responseFields: []

@@ -137,8 +137,8 @@
                     <a href="#meeting-room-reservations">Meeting Room Reservations</a>
                 </li>
                                     <ul id="tocify-subheader-meeting-room-reservations" class="tocify-subheader">
-                                                    <li class="tocify-item level-2" data-unique="meeting-room-reservations-PUTapi-meeting-room--reservation_id--status">
-                                <a href="#meeting-room-reservations-PUTapi-meeting-room--reservation_id--status">PUT api/meeting-room/{reservation_id}/status</a>
+                                                    <li class="tocify-item level-2" data-unique="meeting-room-reservations-PUTapi-meeting-room--id--status">
+                                <a href="#meeting-room-reservations-PUTapi-meeting-room--id--status">PUT api/meeting-room/{id}/status</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="meeting-room-reservations-POSTapi-meeting-room-reserve">
                                 <a href="#meeting-room-reservations-POSTapi-meeting-room-reserve">POST api/meeting-room/reserve</a>
@@ -223,7 +223,7 @@
                 </li>
                                     <ul id="tocify-subheader-transactions" class="tocify-subheader">
                                                     <li class="tocify-item level-2" data-unique="transactions-GETapi-transactions">
-                                <a href="#transactions-GETapi-transactions">GET api/transactions</a>
+                                <a href="#transactions-GETapi-transactions">Get all transactions</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="transactions-POSTapi-transactions">
                                 <a href="#transactions-POSTapi-transactions">POST api/transactions</a>
@@ -286,7 +286,7 @@
     </ul>
 
     <ul class="toc-footer" id="last-updated">
-        <li>Last updated: September 24, 2025</li>
+        <li>Last updated: September 30, 2025</li>
     </ul>
 </div>
 
@@ -2460,14 +2460,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --data "{
     \"hotelIds\": \"architecto\",
     \"adults\": 22,
-    \"checkInDate\": \"2025-09-24T08:48:22\",
-    \"checkOutDate\": \"2051-10-18\",
+    \"checkInDate\": \"2025-09-30T04:39:34\",
+    \"checkOutDate\": \"2051-10-24\",
     \"countryOfResidence\": \"ng\",
     \"roomQuantity\": 66,
     \"priceRange\": \"architecto\",
     \"currency\": \"n\",
-    \"paymentPolicy\": \"GUARANTEE\",
-    \"boardType\": \" HALF_BOARD\",
+    \"paymentPolicy\": \" DEPOSIT\",
+    \"boardType\": \" BREAKFAST\",
     \"bestRateOnly\": true
 }"
 </code></pre></div>
@@ -2487,14 +2487,14 @@ const headers = {
 let body = {
     "hotelIds": "architecto",
     "adults": 22,
-    "checkInDate": "2025-09-24T08:48:22",
-    "checkOutDate": "2051-10-18",
+    "checkInDate": "2025-09-30T04:39:34",
+    "checkOutDate": "2051-10-24",
     "countryOfResidence": "ng",
     "roomQuantity": 66,
     "priceRange": "architecto",
     "currency": "n",
-    "paymentPolicy": "GUARANTEE",
-    "boardType": " HALF_BOARD",
+    "paymentPolicy": " DEPOSIT",
+    "boardType": " BREAKFAST",
     "bestRateOnly": true
 };
 
@@ -2633,10 +2633,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="checkInDate"                data-endpoint="GETapi-hotels-hotel-offers"
-               value="2025-09-24T08:48:22"
+               value="2025-09-30T04:39:34"
                data-component="body">
     <br>
-<p>Must be a valid date. Example: <code>2025-09-24T08:48:22</code></p>
+<p>Must be a valid date. Example: <code>2025-09-30T04:39:34</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>checkOutDate</code></b>&nbsp;&nbsp;
@@ -2644,10 +2644,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="checkOutDate"                data-endpoint="GETapi-hotels-hotel-offers"
-               value="2051-10-18"
+               value="2051-10-24"
                data-component="body">
     <br>
-<p>Must be a valid date. Must be a date after or equal to <code>checkInDate</code>. Example: <code>2051-10-18</code></p>
+<p>Must be a valid date. Must be a date after or equal to <code>checkInDate</code>. Example: <code>2051-10-24</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>countryOfResidence</code></b>&nbsp;&nbsp;
@@ -2699,10 +2699,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="paymentPolicy"                data-endpoint="GETapi-hotels-hotel-offers"
-               value="GUARANTEE"
+               value=" DEPOSIT"
                data-component="body">
     <br>
-<p>Example: <code>GUARANTEE</code></p>
+<p>Example: <code>DEPOSIT</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>GUARANTEE</code></li> <li><code> DEPOSIT</code></li> <li><code> NONE</code></li></ul>
         </div>
@@ -2712,10 +2712,10 @@ Must be one of:
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="boardType"                data-endpoint="GETapi-hotels-hotel-offers"
-               value=" HALF_BOARD"
+               value=" BREAKFAST"
                data-component="body">
     <br>
-<p>Example: <code>HALF_BOARD</code></p>
+<p>Example: <code>BREAKFAST</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>ROOM_ONLY</code></li> <li><code> BREAKFAST</code></li> <li><code> HALF_BOARD</code></li> <li><code> FULL_BOARD</code></li> <li><code> ALL_INCLUSIVE</code></li></ul>
         </div>
@@ -2896,7 +2896,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
     
 
-                                <h2 id="meeting-room-reservations-PUTapi-meeting-room--reservation_id--status">PUT api/meeting-room/{reservation_id}/status</h2>
+                                <h2 id="meeting-room-reservations-PUTapi-meeting-room--id--status">PUT api/meeting-room/{id}/status</h2>
 
 <p>
 <small class="badge badge-darkred">requires authentication</small>
@@ -2904,13 +2904,13 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 
 
-<span id="example-requests-PUTapi-meeting-room--reservation_id--status">
+<span id="example-requests-PUTapi-meeting-room--id--status">
 <blockquote>Example request:</blockquote>
 
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost:8000/api/meeting-room/1/status" \
+    "http://localhost:8000/api/meeting-room/architecto/status" \
     --header "Authorization: Bearer {YOUR_AUTH_KEY}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
@@ -2922,7 +2922,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/meeting-room/1/status"
+    "http://localhost:8000/api/meeting-room/architecto/status"
 );
 
 const headers = {
@@ -2943,45 +2943,45 @@ fetch(url, {
 
 </span>
 
-<span id="example-responses-PUTapi-meeting-room--reservation_id--status">
+<span id="example-responses-PUTapi-meeting-room--id--status">
 </span>
-<span id="execution-results-PUTapi-meeting-room--reservation_id--status" hidden>
+<span id="execution-results-PUTapi-meeting-room--id--status" hidden>
     <blockquote>Received response<span
-                id="execution-response-status-PUTapi-meeting-room--reservation_id--status"></span>:
+                id="execution-response-status-PUTapi-meeting-room--id--status"></span>:
     </blockquote>
-    <pre class="json"><code id="execution-response-content-PUTapi-meeting-room--reservation_id--status"
+    <pre class="json"><code id="execution-response-content-PUTapi-meeting-room--id--status"
       data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
 </span>
-<span id="execution-error-PUTapi-meeting-room--reservation_id--status" hidden>
+<span id="execution-error-PUTapi-meeting-room--id--status" hidden>
     <blockquote>Request failed with error:</blockquote>
-    <pre><code id="execution-error-message-PUTapi-meeting-room--reservation_id--status">
+    <pre><code id="execution-error-message-PUTapi-meeting-room--id--status">
 
 Tip: Check that you&#039;re properly connected to the network.
 If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
 You can check the Dev Tools console for debugging information.</code></pre>
 </span>
-<form id="form-PUTapi-meeting-room--reservation_id--status" data-method="PUT"
-      data-path="api/meeting-room/{reservation_id}/status"
+<form id="form-PUTapi-meeting-room--id--status" data-method="PUT"
+      data-path="api/meeting-room/{id}/status"
       data-authed="1"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('PUTapi-meeting-room--reservation_id--status', this);">
+      onsubmit="event.preventDefault(); executeTryOut('PUTapi-meeting-room--id--status', this);">
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
                     style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-tryout-PUTapi-meeting-room--reservation_id--status"
-                    onclick="tryItOut('PUTapi-meeting-room--reservation_id--status');">Try it out ⚡
+                    id="btn-tryout-PUTapi-meeting-room--id--status"
+                    onclick="tryItOut('PUTapi-meeting-room--id--status');">Try it out ⚡
             </button>
             <button type="button"
                     style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-canceltryout-PUTapi-meeting-room--reservation_id--status"
-                    onclick="cancelTryOut('PUTapi-meeting-room--reservation_id--status');" hidden>Cancel 🛑
+                    id="btn-canceltryout-PUTapi-meeting-room--id--status"
+                    onclick="cancelTryOut('PUTapi-meeting-room--id--status');" hidden>Cancel 🛑
             </button>&nbsp;&nbsp;
             <button type="submit"
                     style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-executetryout-PUTapi-meeting-room--reservation_id--status"
+                    id="btn-executetryout-PUTapi-meeting-room--id--status"
                     data-initial-text="Send Request 💥"
                     data-loading-text="⏱ Sending..."
                     hidden>Send Request 💥
@@ -2989,7 +2989,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
             </h3>
             <p>
             <small class="badge badge-darkblue">PUT</small>
-            <b><code>api/meeting-room/{reservation_id}/status</code></b>
+            <b><code>api/meeting-room/{id}/status</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
@@ -2997,7 +2997,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 &nbsp;
  &nbsp;
                 <input type="text" style="display: none"
-                              name="Authorization" class="auth-value"               data-endpoint="PUTapi-meeting-room--reservation_id--status"
+                              name="Authorization" class="auth-value"               data-endpoint="PUTapi-meeting-room--id--status"
                value="Bearer {YOUR_AUTH_KEY}"
                data-component="header">
     <br>
@@ -3008,7 +3008,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 &nbsp;
  &nbsp;
                 <input type="text" style="display: none"
-                              name="Content-Type"                data-endpoint="PUTapi-meeting-room--reservation_id--status"
+                              name="Content-Type"                data-endpoint="PUTapi-meeting-room--id--status"
                value="application/json"
                data-component="header">
     <br>
@@ -3019,7 +3019,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 &nbsp;
  &nbsp;
                 <input type="text" style="display: none"
-                              name="Accept"                data-endpoint="PUTapi-meeting-room--reservation_id--status"
+                              name="Accept"                data-endpoint="PUTapi-meeting-room--id--status"
                value="application/json"
                data-component="header">
     <br>
@@ -3027,15 +3027,15 @@ You can check the Dev Tools console for debugging information.</code></pre>
             </div>
                         <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
                     <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>reservation_id</code></b>&nbsp;&nbsp;
-<small>integer</small>&nbsp;
+                <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
  &nbsp;
-                <input type="number" style="display: none"
-               step="any"               name="reservation_id"                data-endpoint="PUTapi-meeting-room--reservation_id--status"
-               value="1"
+                <input type="text" style="display: none"
+                              name="id"                data-endpoint="PUTapi-meeting-room--id--status"
+               value="architecto"
                data-component="url">
     <br>
-<p>The ID of the reservation. Example: <code>1</code></p>
+<p>The ID of the meeting room. Example: <code>architecto</code></p>
             </div>
                             <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
         <div style=" padding-left: 28px;  clear: unset;">
@@ -3043,7 +3043,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <small>string</small>&nbsp;
  &nbsp;
                 <input type="text" style="display: none"
-                              name="status"                data-endpoint="PUTapi-meeting-room--reservation_id--status"
+                              name="status"                data-endpoint="PUTapi-meeting-room--id--status"
                value="rejected"
                data-component="body">
     <br>
@@ -3073,8 +3073,8 @@ Must be one of:
     --header "Accept: application/json" \
     --data "{
     \"meeting_room_id\": \"architecto\",
-    \"start_time\": \"2051-10-18\",
-    \"end_time\": \"2051-10-18\"
+    \"start_time\": \"2051-10-24\",
+    \"end_time\": \"2051-10-24\"
 }"
 </code></pre></div>
 
@@ -3092,8 +3092,8 @@ const headers = {
 
 let body = {
     "meeting_room_id": "architecto",
-    "start_time": "2051-10-18",
-    "end_time": "2051-10-18"
+    "start_time": "2051-10-24",
+    "end_time": "2051-10-24"
 };
 
 fetch(url, {
@@ -3204,10 +3204,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="start_time"                data-endpoint="POSTapi-meeting-room-reserve"
-               value="2051-10-18"
+               value="2051-10-24"
                data-component="body">
     <br>
-<p>Must be a valid date. Must be a date after <code>now</code>. Example: <code>2051-10-18</code></p>
+<p>Must be a valid date. Must be a date after <code>now</code>. Example: <code>2051-10-24</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>end_time</code></b>&nbsp;&nbsp;
@@ -3215,10 +3215,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="end_time"                data-endpoint="POSTapi-meeting-room-reserve"
-               value="2051-10-18"
+               value="2051-10-24"
                data-component="body">
     <br>
-<p>Must be a valid date. Must be a date after <code>start_time</code>. Example: <code>2051-10-18</code></p>
+<p>Must be a valid date. Must be a date after <code>start_time</code>. Example: <code>2051-10-24</code></p>
         </div>
         </form>
 
@@ -5156,11 +5156,11 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"user_id\": \"architecto\",
     \"hotel_name\": \"n\",
     \"hotel_id\": \"g\",
-    \"check_in_date\": \"2025-09-24T08:48:22\",
-    \"check_out_date\": \"2051-10-18\",
+    \"check_in_date\": \"2025-09-30T04:39:34\",
+    \"check_out_date\": \"2051-10-24\",
     \"adults\": 22,
     \"total_price\": 84,
-    \"status\": \"cancelled\"
+    \"status\": \"confirmed\"
 }"
 </code></pre></div>
 
@@ -5180,11 +5180,11 @@ let body = {
     "user_id": "architecto",
     "hotel_name": "n",
     "hotel_id": "g",
-    "check_in_date": "2025-09-24T08:48:22",
-    "check_out_date": "2051-10-18",
+    "check_in_date": "2025-09-30T04:39:34",
+    "check_out_date": "2051-10-24",
     "adults": 22,
     "total_price": 84,
-    "status": "cancelled"
+    "status": "confirmed"
 };
 
 fetch(url, {
@@ -5317,10 +5317,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="check_in_date"                data-endpoint="POSTapi-reservations"
-               value="2025-09-24T08:48:22"
+               value="2025-09-30T04:39:34"
                data-component="body">
     <br>
-<p>Must be a valid date. Example: <code>2025-09-24T08:48:22</code></p>
+<p>Must be a valid date. Example: <code>2025-09-30T04:39:34</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>check_out_date</code></b>&nbsp;&nbsp;
@@ -5328,10 +5328,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="check_out_date"                data-endpoint="POSTapi-reservations"
-               value="2051-10-18"
+               value="2051-10-24"
                data-component="body">
     <br>
-<p>Must be a valid date. Must be a date after or equal to <code>check_in_date</code>. Example: <code>2051-10-18</code></p>
+<p>Must be a valid date. Must be a date after or equal to <code>check_in_date</code>. Example: <code>2051-10-24</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>adults</code></b>&nbsp;&nbsp;
@@ -5361,10 +5361,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="status"                data-endpoint="POSTapi-reservations"
-               value="cancelled"
+               value="confirmed"
                data-component="body">
     <br>
-<p>Example: <code>cancelled</code></p>
+<p>Example: <code>confirmed</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>pending</code></li> <li><code>confirmed</code></li> <li><code>cancelled</code></li></ul>
         </div>
@@ -5541,11 +5541,11 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --data "{
     \"hotel_name\": \"b\",
     \"hotel_id\": \"n\",
-    \"check_in_date\": \"2025-09-24T08:48:22\",
-    \"check_out_date\": \"2051-10-18\",
+    \"check_in_date\": \"2025-09-30T04:39:34\",
+    \"check_out_date\": \"2051-10-24\",
     \"adults\": 22,
     \"total_price\": 84,
-    \"status\": \"confirmed\"
+    \"status\": \"cancelled\"
 }"
 </code></pre></div>
 
@@ -5564,11 +5564,11 @@ const headers = {
 let body = {
     "hotel_name": "b",
     "hotel_id": "n",
-    "check_in_date": "2025-09-24T08:48:22",
-    "check_out_date": "2051-10-18",
+    "check_in_date": "2025-09-30T04:39:34",
+    "check_out_date": "2051-10-24",
     "adults": 22,
     "total_price": 84,
-    "status": "confirmed"
+    "status": "cancelled"
 };
 
 fetch(url, {
@@ -5706,10 +5706,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="check_in_date"                data-endpoint="PUTapi-reservations--id-"
-               value="2025-09-24T08:48:22"
+               value="2025-09-30T04:39:34"
                data-component="body">
     <br>
-<p>Must be a valid date. Example: <code>2025-09-24T08:48:22</code></p>
+<p>Must be a valid date. Example: <code>2025-09-30T04:39:34</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>check_out_date</code></b>&nbsp;&nbsp;
@@ -5717,10 +5717,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="check_out_date"                data-endpoint="PUTapi-reservations--id-"
-               value="2051-10-18"
+               value="2051-10-24"
                data-component="body">
     <br>
-<p>Must be a valid date. Must be a date after or equal to <code>check_in_date</code>. Example: <code>2051-10-18</code></p>
+<p>Must be a valid date. Must be a date after or equal to <code>check_in_date</code>. Example: <code>2051-10-24</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>adults</code></b>&nbsp;&nbsp;
@@ -5750,10 +5750,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="status"                data-endpoint="PUTapi-reservations--id-"
-               value="confirmed"
+               value="cancelled"
                data-component="body">
     <br>
-<p>Example: <code>confirmed</code></p>
+<p>Example: <code>cancelled</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>pending</code></li> <li><code>confirmed</code></li> <li><code>cancelled</code></li></ul>
         </div>
@@ -5897,7 +5897,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
     
 
-                                <h2 id="transactions-GETapi-transactions">GET api/transactions</h2>
+                                <h2 id="transactions-GETapi-transactions">Get all transactions</h2>
 
 <p>
 <small class="badge badge-darkred">requires authentication</small>
@@ -5911,7 +5911,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost:8000/api/transactions" \
+    --get "http://localhost:8000/api/transactions?type=hotel" \
     --header "Authorization: Bearer {YOUR_AUTH_KEY}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -5921,6 +5921,12 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <pre><code class="language-javascript">const url = new URL(
     "http://localhost:8000/api/transactions"
 );
+
+const params = {
+    "type": "hotel",
+};
+Object.keys(params)
+    .forEach(key =&gt; url.searchParams.append(key, params[key]));
 
 const headers = {
     "Authorization": "Bearer {YOUR_AUTH_KEY}",
@@ -6033,7 +6039,19 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>application/json</code></p>
             </div>
-                        </form>
+                            <h4 class="fancy-heading-panel"><b>Query Parameters</b></h4>
+                                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>type</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+                <input type="text" style="display: none"
+                              name="type"                data-endpoint="GETapi-transactions"
+               value="hotel"
+               data-component="query">
+    <br>
+<p>Optional. Filter transactions by type. Available: hotel, flight, ppob. Example: <code>hotel</code></p>
+            </div>
+                </form>
 
                     <h2 id="transactions-POSTapi-transactions">POST api/transactions</h2>
 
@@ -6060,7 +6078,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"currency\": \"m\",
     \"payment_method\": \"i\",
     \"payment_status\": \"paid\",
-    \"transaction_date\": \"2025-09-24T08:48:22\"
+    \"transaction_date\": \"2025-09-30T04:39:34\"
 }"
 </code></pre></div>
 
@@ -6083,7 +6101,7 @@ let body = {
     "currency": "m",
     "payment_method": "i",
     "payment_status": "paid",
-    "transaction_date": "2025-09-24T08:48:22"
+    "transaction_date": "2025-09-30T04:39:34"
 };
 
 fetch(url, {
@@ -6251,10 +6269,10 @@ Must be one of:
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="transaction_date"                data-endpoint="POSTapi-transactions"
-               value="2025-09-24T08:48:22"
+               value="2025-09-30T04:39:34"
                data-component="body">
     <br>
-<p>Must be a valid date. Example: <code>2025-09-24T08:48:22</code></p>
+<p>Must be a valid date. Example: <code>2025-09-30T04:39:34</code></p>
         </div>
         </form>
 
@@ -6430,8 +6448,8 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"amount\": 4326.41688,
     \"currency\": \"m\",
     \"payment_method\": \"i\",
-    \"payment_status\": \"paid\",
-    \"transaction_date\": \"2025-09-24T08:48:22\"
+    \"payment_status\": \"unpaid\",
+    \"transaction_date\": \"2025-09-30T04:39:34\"
 }"
 </code></pre></div>
 
@@ -6451,8 +6469,8 @@ let body = {
     "amount": 4326.41688,
     "currency": "m",
     "payment_method": "i",
-    "payment_status": "paid",
-    "transaction_date": "2025-09-24T08:48:22"
+    "payment_status": "unpaid",
+    "transaction_date": "2025-09-30T04:39:34"
 };
 
 fetch(url, {
@@ -6601,10 +6619,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="payment_status"                data-endpoint="PUTapi-transactions--id-"
-               value="paid"
+               value="unpaid"
                data-component="body">
     <br>
-<p>Example: <code>paid</code></p>
+<p>Example: <code>unpaid</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>unpaid</code></li> <li><code>paid</code></li> <li><code>failed</code></li></ul>
         </div>
@@ -6614,10 +6632,10 @@ Must be one of:
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="transaction_date"                data-endpoint="PUTapi-transactions--id-"
-               value="2025-09-24T08:48:22"
+               value="2025-09-30T04:39:34"
                data-component="body">
     <br>
-<p>Must be a valid date. Example: <code>2025-09-24T08:48:22</code></p>
+<p>Must be a valid date. Example: <code>2025-09-30T04:39:34</code></p>
         </div>
         </form>
 
@@ -7678,9 +7696,9 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
-    \"role\": \"admin\",
+    \"role\": \"user\",
     \"name\": \"b\",
-    \"restore\": false
+    \"restore\": true
 }"
 </code></pre></div>
 
@@ -7697,9 +7715,9 @@ const headers = {
 };
 
 let body = {
-    "role": "admin",
+    "role": "user",
     "name": "b",
-    "restore": false
+    "restore": true
 };
 
 fetch(url, {
@@ -7815,10 +7833,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="role"                data-endpoint="PUTapi-users--id-"
-               value="admin"
+               value="user"
                data-component="body">
     <br>
-<p>Example: <code>admin</code></p>
+<p>Example: <code>user</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>user</code></li> <li><code>admin</code></li></ul>
         </div>
@@ -7863,7 +7881,7 @@ Must be one of:
             <code>false</code>
         </label>
     <br>
-<p>Example: <code>false</code></p>
+<p>Example: <code>true</code></p>
         </div>
         </form>
 

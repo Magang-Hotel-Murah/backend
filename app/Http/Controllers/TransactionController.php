@@ -12,6 +12,13 @@ use function PHPSTORM_META\type;
  */
 class TransactionController extends Controller
 {
+    /**
+     * Get all transactions
+     *
+     * @group Transactions
+     *
+     * @queryParam type string Optional. Filter transactions by type. Available: hotel, flight, ppob. Example: hotel
+     */
     public function index(Request $request)
     {
         $query = Transaction::with('transactionable');

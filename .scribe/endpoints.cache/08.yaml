@@ -12,7 +12,7 @@ endpoints:
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: ''
+      title: 'Get all transactions'
       description: ''
       authenticated: true
       deprecated: false
@@ -23,8 +23,19 @@ endpoints:
       Accept: application/json
     urlParameters: []
     cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
+    queryParameters:
+      type:
+        name: type
+        description: 'Optional. Filter transactions by type. Available: hotel, flight, ppob.'
+        required: false
+        example: hotel
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanQueryParameters:
+      type: hotel
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
@@ -137,7 +148,7 @@ endpoints:
         name: transaction_date
         description: 'Must be a valid date.'
         required: false
-        example: '2025-09-24T08:48:22'
+        example: '2025-09-30T04:39:34'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -150,7 +161,7 @@ endpoints:
       currency: m
       payment_method: i
       payment_status: paid
-      transaction_date: '2025-09-24T08:48:22'
+      transaction_date: '2025-09-30T04:39:34'
     fileParameters: []
     responses: []
     responseFields: []
@@ -286,7 +297,7 @@ endpoints:
         name: payment_status
         description: ''
         required: false
-        example: paid
+        example: unpaid
         type: string
         enumValues:
           - unpaid
@@ -299,7 +310,7 @@ endpoints:
         name: transaction_date
         description: 'Must be a valid date.'
         required: false
-        example: '2025-09-24T08:48:22'
+        example: '2025-09-30T04:39:34'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -309,8 +320,8 @@ endpoints:
       amount: 4326.41688
       currency: m
       payment_method: i
-      payment_status: paid
-      transaction_date: '2025-09-24T08:48:22'
+      payment_status: unpaid
+      transaction_date: '2025-09-30T04:39:34'
     fileParameters: []
     responses: []
     responseFields: []
