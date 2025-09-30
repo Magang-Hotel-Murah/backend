@@ -5,15 +5,26 @@ namespace App\Http\Controllers;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 
+use function PHPSTORM_META\type;
+
 /**
  * @group Transactions
  */
 class TransactionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(Transaction::with('transactionable')->get(), 200);
+        $query = Transaction::with('transactionable');
+        $type = $request->query('type');
+
+        if ($type && in_array($type, ['hotel', 'flight', 'ppob'])) {
+            $query->where('transactionable_type', $type);
+        }
+
+        return response()->json($query->get(), 200);
     }
+
+
 
     public function show($id)
     {

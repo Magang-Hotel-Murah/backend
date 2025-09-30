@@ -19,7 +19,8 @@ class AppServiceProvider extends ServiceProvider
     {
         Relation::morphMap([
             'hotel' => \App\Models\HotelReservation::class,
-            // 'flight' => \App\Models\FlightReservation::class,
+            'flight' => \App\Models\FlightReservation::class,
+            'ppob' => \App\Models\PPOBTransaction::class,
         ]);
 
         Transaction::observe(TransactionObserver::class);

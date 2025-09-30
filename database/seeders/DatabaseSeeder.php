@@ -10,6 +10,8 @@ use App\Models\MeetingRoomReservation;
 use App\Models\MeetingRoom;
 use App\Models\Division;
 use App\Models\Position;
+use App\Models\FlightReservation;
+use App\Models\PPOBTransaction;
 
 class DatabaseSeeder extends Seeder
 {
@@ -50,14 +52,26 @@ class DatabaseSeeder extends Seeder
         HotelReservation::factory(5)->create();
 
         HotelReservation::factory()
-            ->count(10)
+            ->count(100)
             ->hasTransactions(1)
             ->create();
 
-        // 6. Seed meeting rooms
+        // 6. Seed flight reservations
+        FlightReservation::factory()
+            ->count(100)
+            ->hasTransactions(1)
+            ->create();
+
+        // 7. Seed PPOB transactions
+        PPOBTransaction::factory()
+            ->count(100)
+            ->hasTransactions(1)
+            ->create();
+
+        // 8. Seed meeting rooms
         $rooms = MeetingRoom::factory()->count(2)->create();
 
-        // 7. Seed meeting room reservations
+        // 9. Seed meeting room reservations
         MeetingRoomReservation::factory(5)->create();
     }
 }
