@@ -16,29 +16,23 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // 1. Seed divisions
-        $divisions = ['IT', 'HR', 'Finance', 'Marketing', 'Operations', 'Support'];
-        foreach ($divisions as $division) {
-            Division::firstOrCreate(['name' => $division]);
-        }
+        Division::factory()->count(6)->create();
 
         // 2. Seed positions
-        $positions = ['Manager', 'Staff', 'Intern', 'Director', 'Coordinator'];
-        foreach ($positions as $position) {
-            Position::firstOrCreate(['name' => $position]);
-        }
+        Position::factory()->count(5)->create();
 
         $divisionIds = Division::pluck('id')->toArray();
         $positionIds = Position::pluck('id')->toArray();
 
         // 3. Seed admin user
         $admin = User::factory()->create([
-            'name' => 'Test User',
+            'name'  => 'Test User',
             'email' => 'test@example.com',
-            'role' => 'admin',
+            'role'  => 'admin',
         ]);
 
         UserProfile::factory()->create([
-            'user_id' => $admin->id,
+            'user_id'     => $admin->id,
             'division_id' => $divisionIds[array_rand($divisionIds)],
             'position_id' => $positionIds[array_rand($positionIds)],
         ]);
@@ -46,7 +40,7 @@ class DatabaseSeeder extends Seeder
         // 4. Seed 10 user dengan profile
         User::factory(10)->create()->each(function ($user) use ($divisionIds, $positionIds) {
             UserProfile::factory()->create([
-                'user_id' => $user->id,
+                'user_id'     => $user->id,
                 'division_id' => $divisionIds[array_rand($divisionIds)],
                 'position_id' => $positionIds[array_rand($positionIds)],
             ]);
