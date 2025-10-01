@@ -16,6 +16,7 @@ class PPOBTransaction extends Model
         'service_type',
         'invoice_number',
         'customer_number',
+        'item_name',
         'total_price',
         'currency',
         'status',

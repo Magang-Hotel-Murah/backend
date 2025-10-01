@@ -19,6 +19,7 @@ class FlightReservation extends Model
         'user_id',
         'booking_code',
         'flight_number',
+        'airline',
         'origin',
         'destination',
         'departure_time',

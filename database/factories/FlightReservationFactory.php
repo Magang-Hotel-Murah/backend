@@ -17,6 +17,7 @@ class FlightReservationFactory extends Factory
             'user_id' => User::factory(),
             'booking_code' => 'FLIGHT-' . Str::upper(Str::random(8)),
             'flight_number' => fake()->randomElement(['GA', 'QZ', 'JT', 'ID']) . fake()->numerify('###'),
+            'airline' => fake()->randomElement(['Garuda Indonesia', 'Lion Air', 'Batik Air', 'Citilink']),
             'origin' => $this->faker->city(),
             'destination' => $this->faker->city(),
             'departure_time' => $departure,

@@ -45,6 +45,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('booking_code')->unique();
+            $table->string('airline')->comment('Contoh: Garuda Indonesia, Lion Air');
             $table->string('flight_number');
             $table->string('origin');
             $table->string('destination');
@@ -64,6 +65,7 @@ return new class extends Migration
             $table->string('invoice_number')->unique();
             $table->string('service_type')->comment('Contoh: PLN, PULSA_TELKOMSEL, PDAM');
             $table->string('customer_number')->comment('Nomor pelanggan/HP');
+            $table->string('item_name')->nullable()->comment('Nama item, misal untuk voucher game');
             $table->decimal('total_price', 15, 2);
             $table->string('currency', 5)->default('IDR');
             $table->enum('status', ['pending', 'success', 'failed'])->default('pending');
