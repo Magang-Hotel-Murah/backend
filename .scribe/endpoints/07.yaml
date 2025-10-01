@@ -102,7 +102,7 @@ endpoints:
         name: check_in_date
         description: 'Must be a valid date.'
         required: true
-        example: '2025-09-30T04:39:34'
+        example: '2025-10-01T08:11:48'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -112,7 +112,7 @@ endpoints:
         name: check_out_date
         description: 'Must be a valid date. Must be a date after or equal to <code>check_in_date</code>.'
         required: true
-        example: '2051-10-24'
+        example: '2051-10-25'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -155,8 +155,8 @@ endpoints:
       user_id: architecto
       hotel_name: 'n'
       hotel_id: g
-      check_in_date: '2025-09-30T04:39:34'
-      check_out_date: '2051-10-24'
+      check_in_date: '2025-10-01T08:11:48'
+      check_out_date: '2051-10-25'
       adults: 22
       total_price: 84
       status: confirmed
@@ -285,7 +285,7 @@ endpoints:
         name: check_in_date
         description: 'Must be a valid date.'
         required: false
-        example: '2025-09-30T04:39:34'
+        example: '2025-10-01T08:11:48'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -295,7 +295,7 @@ endpoints:
         name: check_out_date
         description: 'Must be a valid date. Must be a date after or equal to <code>check_in_date</code>.'
         required: false
-        example: '2051-10-24'
+        example: '2051-10-25'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -325,7 +325,7 @@ endpoints:
         name: status
         description: ''
         required: false
-        example: cancelled
+        example: pending
         type: string
         enumValues:
           - pending
@@ -337,11 +337,11 @@ endpoints:
     cleanBodyParameters:
       hotel_name: b
       hotel_id: 'n'
-      check_in_date: '2025-09-30T04:39:34'
-      check_out_date: '2051-10-24'
+      check_in_date: '2025-10-01T08:11:48'
+      check_out_date: '2051-10-25'
       adults: 22
       total_price: 84
-      status: cancelled
+      status: pending
     fileParameters: []
     responses: []
     responseFields: []

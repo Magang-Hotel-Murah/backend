@@ -14,8 +14,10 @@ class PPOBTransaction extends Model
     protected $fillable = [
         'user_id',
         'service_type',
+        'invoice_number',
         'customer_number',
-        'amount',
+        'total_price',
+        'currency',
         'status',
     ];
 

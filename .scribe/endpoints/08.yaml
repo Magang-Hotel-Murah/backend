@@ -133,7 +133,7 @@ endpoints:
         name: payment_status
         description: ''
         required: false
-        example: paid
+        example: failed
         type: string
         enumValues:
           - unpaid
@@ -146,7 +146,7 @@ endpoints:
         name: transaction_date
         description: 'Must be a valid date.'
         required: false
-        example: '2025-09-30T04:39:34'
+        example: '2025-10-01T08:11:48'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -158,8 +158,8 @@ endpoints:
       amount: 4326.41688
       currency: m
       payment_method: i
-      payment_status: paid
-      transaction_date: '2025-09-30T04:39:34'
+      payment_status: failed
+      transaction_date: '2025-10-01T08:11:48'
     fileParameters: []
     responses: []
     responseFields: []
@@ -180,7 +180,7 @@ endpoints:
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: ''
+      title: 'Get /api/transactions/{id}'
       description: ''
       authenticated: true
       deprecated: false
@@ -192,16 +192,16 @@ endpoints:
     urlParameters:
       id:
         name: id
-        description: 'The ID of the transaction.'
-        required: true
-        example: 1
-        type: integer
+        description: 'ID, external ID, booking code, or invoice number of the transaction.'
+        required: false
+        example: '1'
+        type: string
         enumValues: []
-        exampleWasSpecified: false
+        exampleWasSpecified: true
         nullable: false
         custom: []
     cleanUrlParameters:
-      id: 1
+      id: '1'
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -308,7 +308,7 @@ endpoints:
         name: transaction_date
         description: 'Must be a valid date.'
         required: false
-        example: '2025-09-30T04:39:34'
+        example: '2025-10-01T08:11:48'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -319,7 +319,7 @@ endpoints:
       currency: m
       payment_method: i
       payment_status: unpaid
-      transaction_date: '2025-09-30T04:39:34'
+      transaction_date: '2025-10-01T08:11:48'
     fileParameters: []
     responses: []
     responseFields: []

@@ -9,17 +9,22 @@ class HotelReservation extends Model
 {
     use HasFactory;
 
+    protected $casts = [
+        'guest_details' => 'array',
+    ];
+
     protected $table = 'hotel_reservations';
 
     protected $fillable = [
         'user_id',
+        'booking_code',
         'hotel_name',
         'hotel_id',
         'check_in_date',
         'check_out_date',
+        'guest_details',
         'currency',
         'total_price',
-        'adults',
         'status',
     ];
 

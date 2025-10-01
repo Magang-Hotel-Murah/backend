@@ -19,7 +19,7 @@ class Transaction extends Model
         'currency',
         'payment_method',
         'payment_status',
-        'transaction_date',
+        'paid_at',
     ];
 
     public function transactionable()

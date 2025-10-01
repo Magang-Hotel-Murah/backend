@@ -9,15 +9,24 @@ class FlightReservation extends Model
 {
     use HasFactory;
 
+    protected $casts = [
+        'passenger_details' => 'array',
+    ];
+
+    protected $table = 'flight_reservations';
+
     protected $fillable = [
         'user_id',
+        'booking_code',
         'flight_number',
         'origin',
         'destination',
         'departure_time',
         'arrival_time',
-        'passenger_count',
-        'price',
+        'passenger_details',
+        'total_price',
+        'currency',
+        'status',
     ];
 
     public function user()

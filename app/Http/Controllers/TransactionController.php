@@ -30,15 +30,41 @@ class TransactionController extends Controller
 
         return response()->json($query->get(), 200);
     }
-
-
-
-    public function show($id)
+    /**
+     * Get /api/transactions/{id}
+     *
+     * @group Transactions
+     *
+     * @urlParam id string ID, external ID, booking code, or invoice number of the transaction. Example: 1
+     */
+    public function show($key, Request $request)
     {
-        $transaction = Transaction::with('transactionable')->find($id);
+        $transaction = Transaction::with([
+            'transactionable',
+            'transactionable.user'
+        ])
+            ->where('id', $key)
+            ->orWhere('external_id', $key)
+            ->orWhereHasMorph(
+                'transactionable',
+                ['hotel', 'flight'],
+                function ($query) use ($key) {
+                    $query->where('booking_code', $key);
+                }
+            )
+            ->orWhereHasMorph(
+                'transactionable',
+                ['ppob'],
+                function ($query) use ($key) {
+                    $query->where('invoice_number', $key);
+                }
+            )
+            ->first();
+
         if (!$transaction) {
             return response()->json(['message' => 'Transaction not found'], 404);
         }
+
         return response()->json($transaction, 200);
     }
 

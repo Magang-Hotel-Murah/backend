@@ -12,6 +12,7 @@ use App\Models\Division;
 use App\Models\Position;
 use App\Models\FlightReservation;
 use App\Models\PPOBTransaction;
+use App\Models\Transaction;
 
 class DatabaseSeeder extends Seeder
 {
@@ -48,24 +49,42 @@ class DatabaseSeeder extends Seeder
             ]);
         });
 
+        User::factory(10)->create()->each(function ($user) use ($divisionIds, $positionIds) {
+            UserProfile::factory()->create([
+                'user_id'     => $user->id,
+                'division_id' => $divisionIds[array_rand($divisionIds)],
+                'position_id' => $positionIds[array_rand($positionIds)],
+            ]);
+        });
+
+        // Kumpulkan semua user yang sudah dibuat untuk digunakan kembali
+        $users = User::all();
+
         // 5. Seed hotel reservations
         HotelReservation::factory(5)->create();
 
-        HotelReservation::factory()
-            ->count(100)
-            ->hasTransactions(1)
+        HotelReservation::factory(100)
+            ->recycle($users) // Gunakan user yang ada secara acak
+            ->has(Transaction::factory()->state(function (array $attributes, HotelReservation $reservation) {
+                // Sinkronkan jumlah transaksi dengan harga reservasi
+                return ['amount' => $reservation->total_price];
+            }))
             ->create();
 
-        // 6. Seed flight reservations
-        FlightReservation::factory()
-            ->count(100)
-            ->hasTransactions(1)
+        // 4. Seed flight reservations
+        FlightReservation::factory(100)
+            ->recycle($users)
+            ->has(Transaction::factory()->state(function (array $attributes, FlightReservation $reservation) {
+                return ['amount' => $reservation->total_price];
+            }))
             ->create();
 
-        // 7. Seed PPOB transactions
-        PPOBTransaction::factory()
-            ->count(100)
-            ->hasTransactions(1)
+        // 5. Seed PPOB Bills
+        PPOBTransaction::factory(100)
+            ->recycle($users)
+            ->has(Transaction::factory()->state(function (array $attributes, PPOBTransaction $bill) {
+                return ['amount' => $bill->total_price];
+            }))
             ->create();
 
         // 8. Seed meeting rooms

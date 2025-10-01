@@ -3,23 +3,22 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Models\Transaction;
+use Illuminate\Support\Str;
 
 class TransactionFactory extends Factory
 {
-    protected $model = Transaction::class;
-
     public function definition(): array
     {
-        $paymentStatus = ['unpaid', 'paid', 'failed'];
-        $paymentMethods = ['credit_card', 'paypal', 'bank_transfer', null];
+        $status = fake()->randomElement(['pending', 'paid', 'failed', 'expired']);
 
         return [
-            'amount' => $this->faker->randomFloat(2, 50, 1000),
-            'currency' => 'USD',
-            'payment_method' => $this->faker->randomElement($paymentMethods),
-            'payment_status' => $this->faker->randomElement($paymentStatus),
-            'transaction_date' => $this->faker->dateTimeBetween('-1 year', 'now'),
+            // transactionable_id & transactionable_type akan diisi otomatis oleh relasi
+            'external_id' => 'TRX-' . Str::uuid(),
+            'amount' => fake()->randomFloat(2, 50000, 1000000), // Sebaiknya disesuaikan dengan parent
+            'currency' => 'IDR',
+            'payment_method' => fake()->randomElement(['credit_card', 'bank_transfer', 'gopay', 'ovo']),
+            'payment_status' => $status,
+            'paid_at' => $status === 'paid' ? now() : null,
         ];
     }
 }

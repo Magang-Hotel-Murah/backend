@@ -2,22 +2,22 @@
 
 namespace Database\Factories;
 
-use App\Models\PPOBTransaction;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 class PPOBTransactionFactory extends Factory
 {
-    protected $model = PPOBTransaction::class;
-
     public function definition(): array
     {
         return [
             'user_id' => User::factory(),
-            'service_type' => $this->faker->randomElement(['pulsa', 'listrik', 'air', 'internet']),
-            'customer_number' => $this->faker->numerify('##########'),
-            'amount' => $this->faker->randomFloat(2, 20000, 500000),
-            'status' => $this->faker->randomElement(['pending', 'success', 'failed']),
+            'invoice_number' => 'INV-' . now()->timestamp . '-' . Str::upper(Str::random(6)),
+            'service_type' => fake()->randomElement(['PLN_PASCABAYAR', 'PULSA_TELKOMSEL', 'PDAM_KOTA_A']),
+            'customer_number' => fake()->numerify('0812########'),
+            'total_price' => fake()->randomElement([50000, 100000, 200000, 500000]),
+            'currency' => 'IDR',
+            'status' => fake()->randomElement(['pending', 'success', 'failed']),
         ];
     }
 }

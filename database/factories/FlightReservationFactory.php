@@ -2,25 +2,32 @@
 
 namespace Database\Factories;
 
-use App\Models\FlightReservation;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 class FlightReservationFactory extends Factory
 {
-    protected $model = FlightReservation::class;
-
     public function definition(): array
     {
+        $departure = fake()->dateTimeBetween('+3 days', '+3 months');
+        $arrival = (clone $departure)->modify('+' . fake()->numberBetween(1, 12) . ' hours');
+
         return [
             'user_id' => User::factory(),
-            'flight_number' => strtoupper($this->faker->bothify('GA###')),
+            'booking_code' => 'FLIGHT-' . Str::upper(Str::random(8)),
+            'flight_number' => fake()->randomElement(['GA', 'QZ', 'JT', 'ID']) . fake()->numerify('###'),
             'origin' => $this->faker->city(),
             'destination' => $this->faker->city(),
-            'departure_time' => $this->faker->dateTimeBetween('+1 days', '+5 days'),
-            'arrival_time' => $this->faker->dateTimeBetween('+5 days', '+10 days'),
-            'passenger_count' => $this->faker->numberBetween(1, 5),
-            'price' => $this->faker->randomFloat(2, 500000, 3000000),
+            'departure_time' => $departure,
+            'arrival_time' => $arrival,
+            'passenger_details' => [ // <-- Hapus fungsi json_encode()
+                ['name' => fake()->name(), 'type' => 'adult'],
+                ['name' => fake()->name(), 'type' => 'adult'],
+            ],
+            'total_price' => fake()->randomFloat(2, 1000000, 15000000),
+            'currency' => 'IDR',
+            'status' => fake()->randomElement(['pending', 'ticketed', 'cancelled']),
         ];
     }
 }
