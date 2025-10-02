@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\UserProfile;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Services\CloudinaryService;
 
 /**
  * @group User Profiles
@@ -70,21 +71,52 @@ class UserProfileController extends Controller
         ], 201);
     }
 
-    public function update(Request $request, $id)
+
+    /**
+     * Update the specified user profile.
+     *
+     * This endpoint allows you to update user profile information such as
+     * division, position, address, phone, and optionally profile photo.
+     *
+     * @group User Profiles
+     * @urlParam id integer required The ID of the user whose profile will be updated. Example: 1
+     *
+     * @bodyParam division_id integer The ID of the division. Example: 2
+     * @bodyParam position_id integer The ID of the position. Example: 5
+     * @bodyParam address string The address of the user. Example: "Jl. Merdeka No. 123"
+     * @bodyParam phone string The phone number of the user. Example: "08123456789"
+     * @bodyParam photo file The profile photo (image file: jpg, jpeg, png, max 2MB).
+     *
+     */
+    public function update(Request $request, $id, CloudinaryService $cloudinary)
     {
         $profile = UserProfile::where('user_id', $id)->firstOrFail();
 
-        $profile->update($request->only([
+        $request->validate([
+            'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+        $data = array_filter($request->only([
             'division_id',
             'position_id',
             'address',
             'phone',
-            'photo'
-        ]));
+        ]), fn($value) => $value !== null && $value !== '' && $value !== 'NaN');
+
+
+        if ($request->hasFile('photo')) {
+            if ($profile->photo) {
+                $cloudinary->destroy($profile->photo);
+            }
+
+            $upload = $cloudinary->upload($request->file('photo'), 'profiles');
+            $data['photo'] = $upload['url'];
+        }
+
+        $profile->update($data);
 
         return response()->json([
             'message' => 'Profile updated successfully',
-            'profile' => $profile->load(['division:id,name', 'position:id,name'])
+            'profile' => $profile->load(['division:id,name', 'position:id,name']),
         ]);
     }
 }

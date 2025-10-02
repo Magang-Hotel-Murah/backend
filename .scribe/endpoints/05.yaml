@@ -189,33 +189,90 @@ endpoints:
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: ''
-      description: ''
+      title: 'Update the specified user profile.'
+      description: |-
+        This endpoint allows you to update user profile information such as
+        division, position, address, phone, and optionally profile photo.
       authenticated: true
       deprecated: false
       custom: []
     headers:
       Authorization: 'Bearer {YOUR_AUTH_KEY}'
-      Content-Type: application/json
+      Content-Type: multipart/form-data
       Accept: application/json
     urlParameters:
       id:
         name: id
-        description: 'The ID of the user profile.'
+        description: 'The ID of the user whose profile will be updated.'
         required: true
-        example: architecto
-        type: string
+        example: 1
+        type: integer
         enumValues: []
-        exampleWasSpecified: false
+        exampleWasSpecified: true
         nullable: false
         custom: []
     cleanUrlParameters:
-      id: architecto
+      id: 1
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
+    bodyParameters:
+      photo:
+        name: photo
+        description: 'The profile photo (image file: jpg, jpeg, png, max 2MB).'
+        required: false
+        example: null
+        type: file
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        custom: []
+      division_id:
+        name: division_id
+        description: 'The ID of the division.'
+        required: false
+        example: 2
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      position_id:
+        name: position_id
+        description: 'The ID of the position.'
+        required: false
+        example: 5
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      address:
+        name: address
+        description: 'The address of the user.'
+        required: false
+        example: '"Jl. Merdeka No. 123"'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      phone:
+        name: phone
+        description: 'The phone number of the user.'
+        required: false
+        example: '"08123456789"'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      division_id: 2
+      position_id: 5
+      address: '"Jl. Merdeka No. 123"'
+      phone: '"08123456789"'
+    fileParameters:
+      photo: null
     responses: []
     responseFields: []
     auth:

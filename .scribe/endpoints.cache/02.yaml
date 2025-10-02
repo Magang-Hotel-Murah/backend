@@ -100,7 +100,7 @@ endpoints:
         name: start_time
         description: 'Must be a valid date. Must be a date after <code>now</code>.'
         required: true
-        example: '2051-10-25'
+        example: '2051-10-26'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -110,7 +110,7 @@ endpoints:
         name: end_time
         description: 'Must be a valid date. Must be a date after <code>start_time</code>.'
         required: true
-        example: '2051-10-25'
+        example: '2051-10-26'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -118,8 +118,8 @@ endpoints:
         custom: []
     cleanBodyParameters:
       meeting_room_id: architecto
-      start_time: '2051-10-25'
-      end_time: '2051-10-25'
+      start_time: '2051-10-26'
+      end_time: '2051-10-26'
     fileParameters: []
     responses: []
     responseFields: []

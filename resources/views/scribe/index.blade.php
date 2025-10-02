@@ -254,7 +254,7 @@
                                 <a href="#user-profiles-POSTapi-user-profiles">POST api/user-profiles</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="user-profiles-PUTapi-user-profiles--id-">
-                                <a href="#user-profiles-PUTapi-user-profiles--id-">PUT api/user-profiles/{id}</a>
+                                <a href="#user-profiles-PUTapi-user-profiles--id-">Update the specified user profile.</a>
                             </li>
                                                                         </ul>
                             </ul>
@@ -286,7 +286,7 @@
     </ul>
 
     <ul class="toc-footer" id="last-updated">
-        <li>Last updated: October 1, 2025</li>
+        <li>Last updated: October 2, 2025</li>
     </ul>
 </div>
 
@@ -2460,8 +2460,8 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --data "{
     \"hotelIds\": \"architecto\",
     \"adults\": 22,
-    \"checkInDate\": \"2025-10-01T10:32:29\",
-    \"checkOutDate\": \"2051-10-25\",
+    \"checkInDate\": \"2025-10-02T06:59:59\",
+    \"checkOutDate\": \"2051-10-26\",
     \"countryOfResidence\": \"ng\",
     \"roomQuantity\": 66,
     \"priceRange\": \"architecto\",
@@ -2487,8 +2487,8 @@ const headers = {
 let body = {
     "hotelIds": "architecto",
     "adults": 22,
-    "checkInDate": "2025-10-01T10:32:29",
-    "checkOutDate": "2051-10-25",
+    "checkInDate": "2025-10-02T06:59:59",
+    "checkOutDate": "2051-10-26",
     "countryOfResidence": "ng",
     "roomQuantity": 66,
     "priceRange": "architecto",
@@ -2633,10 +2633,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="checkInDate"                data-endpoint="GETapi-hotels-hotel-offers"
-               value="2025-10-01T10:32:29"
+               value="2025-10-02T06:59:59"
                data-component="body">
     <br>
-<p>Must be a valid date. Example: <code>2025-10-01T10:32:29</code></p>
+<p>Must be a valid date. Example: <code>2025-10-02T06:59:59</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>checkOutDate</code></b>&nbsp;&nbsp;
@@ -2644,10 +2644,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="checkOutDate"                data-endpoint="GETapi-hotels-hotel-offers"
-               value="2051-10-25"
+               value="2051-10-26"
                data-component="body">
     <br>
-<p>Must be a valid date. Must be a date after or equal to <code>checkInDate</code>. Example: <code>2051-10-25</code></p>
+<p>Must be a valid date. Must be a date after or equal to <code>checkInDate</code>. Example: <code>2051-10-26</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>countryOfResidence</code></b>&nbsp;&nbsp;
@@ -3073,8 +3073,8 @@ Must be one of:
     --header "Accept: application/json" \
     --data "{
     \"meeting_room_id\": \"architecto\",
-    \"start_time\": \"2051-10-25\",
-    \"end_time\": \"2051-10-25\"
+    \"start_time\": \"2051-10-26\",
+    \"end_time\": \"2051-10-26\"
 }"
 </code></pre></div>
 
@@ -3092,8 +3092,8 @@ const headers = {
 
 let body = {
     "meeting_room_id": "architecto",
-    "start_time": "2051-10-25",
-    "end_time": "2051-10-25"
+    "start_time": "2051-10-26",
+    "end_time": "2051-10-26"
 };
 
 fetch(url, {
@@ -3204,10 +3204,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="start_time"                data-endpoint="POSTapi-meeting-room-reserve"
-               value="2051-10-25"
+               value="2051-10-26"
                data-component="body">
     <br>
-<p>Must be a valid date. Must be a date after <code>now</code>. Example: <code>2051-10-25</code></p>
+<p>Must be a valid date. Must be a date after <code>now</code>. Example: <code>2051-10-26</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>end_time</code></b>&nbsp;&nbsp;
@@ -3215,10 +3215,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="end_time"                data-endpoint="POSTapi-meeting-room-reserve"
-               value="2051-10-25"
+               value="2051-10-26"
                data-component="body">
     <br>
-<p>Must be a valid date. Must be a date after <code>start_time</code>. Example: <code>2051-10-25</code></p>
+<p>Must be a valid date. Must be a date after <code>start_time</code>. Example: <code>2051-10-26</code></p>
         </div>
         </form>
 
@@ -5156,11 +5156,11 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"user_id\": \"architecto\",
     \"hotel_name\": \"n\",
     \"hotel_id\": \"g\",
-    \"check_in_date\": \"2025-10-01T10:32:29\",
-    \"check_out_date\": \"2051-10-25\",
+    \"check_in_date\": \"2025-10-02T06:59:59\",
+    \"check_out_date\": \"2051-10-26\",
     \"adults\": 22,
     \"total_price\": 84,
-    \"status\": \"pending\"
+    \"status\": \"cancelled\"
 }"
 </code></pre></div>
 
@@ -5180,11 +5180,11 @@ let body = {
     "user_id": "architecto",
     "hotel_name": "n",
     "hotel_id": "g",
-    "check_in_date": "2025-10-01T10:32:29",
-    "check_out_date": "2051-10-25",
+    "check_in_date": "2025-10-02T06:59:59",
+    "check_out_date": "2051-10-26",
     "adults": 22,
     "total_price": 84,
-    "status": "pending"
+    "status": "cancelled"
 };
 
 fetch(url, {
@@ -5317,10 +5317,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="check_in_date"                data-endpoint="POSTapi-reservations"
-               value="2025-10-01T10:32:29"
+               value="2025-10-02T06:59:59"
                data-component="body">
     <br>
-<p>Must be a valid date. Example: <code>2025-10-01T10:32:29</code></p>
+<p>Must be a valid date. Example: <code>2025-10-02T06:59:59</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>check_out_date</code></b>&nbsp;&nbsp;
@@ -5328,10 +5328,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="check_out_date"                data-endpoint="POSTapi-reservations"
-               value="2051-10-25"
+               value="2051-10-26"
                data-component="body">
     <br>
-<p>Must be a valid date. Must be a date after or equal to <code>check_in_date</code>. Example: <code>2051-10-25</code></p>
+<p>Must be a valid date. Must be a date after or equal to <code>check_in_date</code>. Example: <code>2051-10-26</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>adults</code></b>&nbsp;&nbsp;
@@ -5361,10 +5361,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="status"                data-endpoint="POSTapi-reservations"
-               value="pending"
+               value="cancelled"
                data-component="body">
     <br>
-<p>Example: <code>pending</code></p>
+<p>Example: <code>cancelled</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>pending</code></li> <li><code>confirmed</code></li> <li><code>cancelled</code></li></ul>
         </div>
@@ -5541,8 +5541,8 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --data "{
     \"hotel_name\": \"b\",
     \"hotel_id\": \"n\",
-    \"check_in_date\": \"2025-10-01T10:32:29\",
-    \"check_out_date\": \"2051-10-25\",
+    \"check_in_date\": \"2025-10-02T06:59:59\",
+    \"check_out_date\": \"2051-10-26\",
     \"adults\": 22,
     \"total_price\": 84,
     \"status\": \"confirmed\"
@@ -5564,8 +5564,8 @@ const headers = {
 let body = {
     "hotel_name": "b",
     "hotel_id": "n",
-    "check_in_date": "2025-10-01T10:32:29",
-    "check_out_date": "2051-10-25",
+    "check_in_date": "2025-10-02T06:59:59",
+    "check_out_date": "2051-10-26",
     "adults": 22,
     "total_price": 84,
     "status": "confirmed"
@@ -5706,10 +5706,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="check_in_date"                data-endpoint="PUTapi-reservations--id-"
-               value="2025-10-01T10:32:29"
+               value="2025-10-02T06:59:59"
                data-component="body">
     <br>
-<p>Must be a valid date. Example: <code>2025-10-01T10:32:29</code></p>
+<p>Must be a valid date. Example: <code>2025-10-02T06:59:59</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>check_out_date</code></b>&nbsp;&nbsp;
@@ -5717,10 +5717,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="check_out_date"                data-endpoint="PUTapi-reservations--id-"
-               value="2051-10-25"
+               value="2051-10-26"
                data-component="body">
     <br>
-<p>Must be a valid date. Must be a date after or equal to <code>check_in_date</code>. Example: <code>2051-10-25</code></p>
+<p>Must be a valid date. Must be a date after or equal to <code>check_in_date</code>. Example: <code>2051-10-26</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>adults</code></b>&nbsp;&nbsp;
@@ -6077,8 +6077,8 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"amount\": 4326.41688,
     \"currency\": \"m\",
     \"payment_method\": \"i\",
-    \"payment_status\": \"paid\",
-    \"transaction_date\": \"2025-10-01T10:32:29\"
+    \"payment_status\": \"unpaid\",
+    \"transaction_date\": \"2025-10-02T06:59:59\"
 }"
 </code></pre></div>
 
@@ -6100,8 +6100,8 @@ let body = {
     "amount": 4326.41688,
     "currency": "m",
     "payment_method": "i",
-    "payment_status": "paid",
-    "transaction_date": "2025-10-01T10:32:29"
+    "payment_status": "unpaid",
+    "transaction_date": "2025-10-02T06:59:59"
 };
 
 fetch(url, {
@@ -6256,10 +6256,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="payment_status"                data-endpoint="POSTapi-transactions"
-               value="paid"
+               value="unpaid"
                data-component="body">
     <br>
-<p>Example: <code>paid</code></p>
+<p>Example: <code>unpaid</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>unpaid</code></li> <li><code>paid</code></li> <li><code>failed</code></li></ul>
         </div>
@@ -6269,10 +6269,10 @@ Must be one of:
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="transaction_date"                data-endpoint="POSTapi-transactions"
-               value="2025-10-01T10:32:29"
+               value="2025-10-02T06:59:59"
                data-component="body">
     <br>
-<p>Must be a valid date. Example: <code>2025-10-01T10:32:29</code></p>
+<p>Must be a valid date. Example: <code>2025-10-02T06:59:59</code></p>
         </div>
         </form>
 
@@ -6448,8 +6448,8 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"amount\": 4326.41688,
     \"currency\": \"m\",
     \"payment_method\": \"i\",
-    \"payment_status\": \"failed\",
-    \"transaction_date\": \"2025-10-01T10:32:29\"
+    \"payment_status\": \"paid\",
+    \"transaction_date\": \"2025-10-02T06:59:59\"
 }"
 </code></pre></div>
 
@@ -6469,8 +6469,8 @@ let body = {
     "amount": 4326.41688,
     "currency": "m",
     "payment_method": "i",
-    "payment_status": "failed",
-    "transaction_date": "2025-10-01T10:32:29"
+    "payment_status": "paid",
+    "transaction_date": "2025-10-02T06:59:59"
 };
 
 fetch(url, {
@@ -6619,10 +6619,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="payment_status"                data-endpoint="PUTapi-transactions--id-"
-               value="failed"
+               value="paid"
                data-component="body">
     <br>
-<p>Example: <code>failed</code></p>
+<p>Example: <code>paid</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>unpaid</code></li> <li><code>paid</code></li> <li><code>failed</code></li></ul>
         </div>
@@ -6632,10 +6632,10 @@ Must be one of:
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="transaction_date"                data-endpoint="PUTapi-transactions--id-"
-               value="2025-10-01T10:32:29"
+               value="2025-10-02T06:59:59"
                data-component="body">
     <br>
-<p>Must be a valid date. Example: <code>2025-10-01T10:32:29</code></p>
+<p>Must be a valid date. Example: <code>2025-10-02T06:59:59</code></p>
         </div>
         </form>
 
@@ -7247,13 +7247,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </div>
         </form>
 
-                    <h2 id="user-profiles-PUTapi-user-profiles--id-">PUT api/user-profiles/{id}</h2>
+                    <h2 id="user-profiles-PUTapi-user-profiles--id-">Update the specified user profile.</h2>
 
 <p>
 <small class="badge badge-darkred">requires authentication</small>
 </p>
 
-
+<p>This endpoint allows you to update user profile information such as
+division, position, address, phone, and optionally profile photo.</p>
 
 <span id="example-requests-PUTapi-user-profiles--id-">
 <blockquote>Example request:</blockquote>
@@ -7261,26 +7262,39 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost:8000/api/user-profiles/architecto" \
+    "http://localhost:8000/api/user-profiles/1" \
     --header "Authorization: Bearer {YOUR_AUTH_KEY}" \
-    --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Content-Type: multipart/form-data" \
+    --header "Accept: application/json" \
+    --form "division_id=2"\
+    --form "position_id=5"\
+    --form "address="Jl. Merdeka No. 123""\
+    --form "phone="08123456789""\
+    --form "photo=@C:\Users\Lenovo\AppData\Local\Temp\php411B.tmp" </code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/user-profiles/architecto"
+    "http://localhost:8000/api/user-profiles/1"
 );
 
 const headers = {
     "Authorization": "Bearer {YOUR_AUTH_KEY}",
-    "Content-Type": "application/json",
+    "Content-Type": "multipart/form-data",
     "Accept": "application/json",
 };
+
+const body = new FormData();
+body.append('division_id', '2');
+body.append('position_id', '5');
+body.append('address', '"Jl. Merdeka No. 123"');
+body.append('phone', '"08123456789"');
+body.append('photo', document.querySelector('input[name="photo"]').files[0]);
 
 fetch(url, {
     method: "PUT",
     headers,
+    body,
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
@@ -7305,7 +7319,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <form id="form-PUTapi-user-profiles--id-" data-method="PUT"
       data-path="api/user-profiles/{id}"
       data-authed="1"
-      data-hasfiles="0"
+      data-hasfiles="1"
       data-isarraybody="0"
       autocomplete="off"
       onsubmit="event.preventDefault(); executeTryOut('PUTapi-user-profiles--id-', this);">
@@ -7355,10 +7369,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="Content-Type"                data-endpoint="PUTapi-user-profiles--id-"
-               value="application/json"
+               value="multipart/form-data"
                data-component="header">
     <br>
-<p>Example: <code>application/json</code></p>
+<p>Example: <code>multipart/form-data</code></p>
             </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
@@ -7374,16 +7388,72 @@ You can check the Dev Tools console for debugging information.</code></pre>
                         <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
                     <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
-<small>string</small>&nbsp;
+<small>integer</small>&nbsp;
  &nbsp;
-                <input type="text" style="display: none"
-                              name="id"                data-endpoint="PUTapi-user-profiles--id-"
-               value="architecto"
+                <input type="number" style="display: none"
+               step="any"               name="id"                data-endpoint="PUTapi-user-profiles--id-"
+               value="1"
                data-component="url">
     <br>
-<p>The ID of the user profile. Example: <code>architecto</code></p>
+<p>The ID of the user whose profile will be updated. Example: <code>1</code></p>
             </div>
-                    </form>
+                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>photo</code></b>&nbsp;&nbsp;
+<small>file</small>&nbsp;
+<i>optional</i> &nbsp;
+                <input type="file" style="display: none"
+                              name="photo"                data-endpoint="PUTapi-user-profiles--id-"
+               value=""
+               data-component="body">
+    <br>
+<p>The profile photo (image file: jpg, jpeg, png, max 2MB). Example: <code>C:\Users\Lenovo\AppData\Local\Temp\php411B.tmp</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>division_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="division_id"                data-endpoint="PUTapi-user-profiles--id-"
+               value="2"
+               data-component="body">
+    <br>
+<p>The ID of the division. Example: <code>2</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>position_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="position_id"                data-endpoint="PUTapi-user-profiles--id-"
+               value="5"
+               data-component="body">
+    <br>
+<p>The ID of the position. Example: <code>5</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>address</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+                <input type="text" style="display: none"
+                              name="address"                data-endpoint="PUTapi-user-profiles--id-"
+               value=""Jl. Merdeka No. 123""
+               data-component="body">
+    <br>
+<p>The address of the user. Example: <code>"Jl. Merdeka No. 123"</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>phone</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+                <input type="text" style="display: none"
+                              name="phone"                data-endpoint="PUTapi-user-profiles--id-"
+               value=""08123456789""
+               data-component="body">
+    <br>
+<p>The phone number of the user. Example: <code>"08123456789"</code></p>
+        </div>
+        </form>
 
                 <h1 id="users">Users</h1>
 

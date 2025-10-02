@@ -102,7 +102,7 @@ endpoints:
         name: check_in_date
         description: 'Must be a valid date.'
         required: true
-        example: '2025-10-01T10:32:29'
+        example: '2025-10-02T06:59:59'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -112,7 +112,7 @@ endpoints:
         name: check_out_date
         description: 'Must be a valid date. Must be a date after or equal to <code>check_in_date</code>.'
         required: true
-        example: '2051-10-25'
+        example: '2051-10-26'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -142,7 +142,7 @@ endpoints:
         name: status
         description: ''
         required: false
-        example: pending
+        example: cancelled
         type: string
         enumValues:
           - pending
@@ -155,11 +155,11 @@ endpoints:
       user_id: architecto
       hotel_name: 'n'
       hotel_id: g
-      check_in_date: '2025-10-01T10:32:29'
-      check_out_date: '2051-10-25'
+      check_in_date: '2025-10-02T06:59:59'
+      check_out_date: '2051-10-26'
       adults: 22
       total_price: 84
-      status: pending
+      status: cancelled
     fileParameters: []
     responses: []
     responseFields: []
@@ -285,7 +285,7 @@ endpoints:
         name: check_in_date
         description: 'Must be a valid date.'
         required: false
-        example: '2025-10-01T10:32:29'
+        example: '2025-10-02T06:59:59'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -295,7 +295,7 @@ endpoints:
         name: check_out_date
         description: 'Must be a valid date. Must be a date after or equal to <code>check_in_date</code>.'
         required: false
-        example: '2051-10-25'
+        example: '2051-10-26'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -337,8 +337,8 @@ endpoints:
     cleanBodyParameters:
       hotel_name: b
       hotel_id: 'n'
-      check_in_date: '2025-10-01T10:32:29'
-      check_out_date: '2051-10-25'
+      check_in_date: '2025-10-02T06:59:59'
+      check_out_date: '2051-10-26'
       adults: 22
       total_price: 84
       status: confirmed

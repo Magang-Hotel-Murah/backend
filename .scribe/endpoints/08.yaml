@@ -133,7 +133,7 @@ endpoints:
         name: payment_status
         description: ''
         required: false
-        example: paid
+        example: unpaid
         type: string
         enumValues:
           - unpaid
@@ -146,7 +146,7 @@ endpoints:
         name: transaction_date
         description: 'Must be a valid date.'
         required: false
-        example: '2025-10-01T10:32:29'
+        example: '2025-10-02T06:59:59'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -158,8 +158,8 @@ endpoints:
       amount: 4326.41688
       currency: m
       payment_method: i
-      payment_status: paid
-      transaction_date: '2025-10-01T10:32:29'
+      payment_status: unpaid
+      transaction_date: '2025-10-02T06:59:59'
     fileParameters: []
     responses: []
     responseFields: []
@@ -295,7 +295,7 @@ endpoints:
         name: payment_status
         description: ''
         required: false
-        example: failed
+        example: paid
         type: string
         enumValues:
           - unpaid
@@ -308,7 +308,7 @@ endpoints:
         name: transaction_date
         description: 'Must be a valid date.'
         required: false
-        example: '2025-10-01T10:32:29'
+        example: '2025-10-02T06:59:59'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -318,8 +318,8 @@ endpoints:
       amount: 4326.41688
       currency: m
       payment_method: i
-      payment_status: failed
-      transaction_date: '2025-10-01T10:32:29'
+      payment_status: paid
+      transaction_date: '2025-10-02T06:59:59'
     fileParameters: []
     responses: []
     responseFields: []
