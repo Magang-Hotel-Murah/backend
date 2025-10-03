@@ -1,12 +1,67 @@
-name: Hotels
+name: Transactions
 description: ''
 endpoints:
   -
     httpMethods:
       - GET
-    uri: api/hotels/by-city
+    uri: api/transactions
     metadata:
-      groupName: Hotels
+      groupName: Transactions
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get all transactions'
+      description: ''
+      authenticated: true
+      deprecated: false
+      custom: []
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_KEY}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters:
+      type:
+        name: type
+        description: 'Optional. Filter transactions by type. Available: hotel, flight, ppob.'
+        required: false
+        example: hotel
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanQueryParameters:
+      type: hotel
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+        custom: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|abcdeEXAMPLETOKEN12345'
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/transactions
+    metadata:
+      groupName: Transactions
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
@@ -21,6 +76,132 @@ endpoints:
       Accept: application/json
     urlParameters: []
     cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      transactionable_id:
+        name: transactionable_id
+        description: ''
+        required: true
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      transactionable_type:
+        name: transactionable_type
+        description: ''
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      amount:
+        name: amount
+        description: ''
+        required: true
+        example: 4326.41688
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      currency:
+        name: currency
+        description: 'Must not be greater than 5 characters.'
+        required: true
+        example: m
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      payment_method:
+        name: payment_method
+        description: 'Must not be greater than 50 characters.'
+        required: false
+        example: i
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        custom: []
+      payment_status:
+        name: payment_status
+        description: ''
+        required: false
+        example: paid
+        type: string
+        enumValues:
+          - paid
+          - failed
+          - expired
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      paid_at:
+        name: paid_at
+        description: 'Must be a valid date.'
+        required: false
+        example: '2025-10-03T07:27:49'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        custom: []
+    cleanBodyParameters:
+      transactionable_id: 16
+      transactionable_type: architecto
+      amount: 4326.41688
+      currency: m
+      payment_method: i
+      payment_status: paid
+      paid_at: '2025-10-03T07:27:49'
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|abcdeEXAMPLETOKEN12345'
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: 'api/transactions/{id}'
+    metadata:
+      groupName: Transactions
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get /api/transactions/{id}'
+      description: ''
+      authenticated: true
+      deprecated: false
+      custom: []
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_KEY}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        name: id
+        description: 'ID, external ID, booking code, or invoice number of the transaction.'
+        required: false
+        example: '1'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id: '1'
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -47,238 +228,11 @@ endpoints:
     custom: []
   -
     httpMethods:
-      - GET
-    uri: api/hotels/by-hotels
+      - PUT
+      - PATCH
+    uri: 'api/transactions/{id}'
     metadata:
-      groupName: Hotels
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: ''
-      description: ''
-      authenticated: true
-      deprecated: false
-      custom: []
-    headers:
-      Authorization: 'Bearer {YOUR_AUTH_KEY}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      hotelIds:
-        name: hotelIds
-        description: ''
-        required: true
-        example: architecto
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        custom: []
-    cleanBodyParameters:
-      hotelIds: architecto
-    fileParameters: []
-    responses:
-      -
-        status: 401
-        content: '{"message":"Unauthenticated."}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-        custom: []
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer 1|abcdeEXAMPLETOKEN12345'
-    controller: null
-    method: null
-    route: null
-    custom: []
-  -
-    httpMethods:
-      - GET
-    uri: api/hotels/hotel-offers
-    metadata:
-      groupName: Hotels
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: ''
-      description: ''
-      authenticated: true
-      deprecated: false
-      custom: []
-    headers:
-      Authorization: 'Bearer {YOUR_AUTH_KEY}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      hotelIds:
-        name: hotelIds
-        description: ''
-        required: true
-        example: architecto
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        custom: []
-      adults:
-        name: adults
-        description: 'Must be at least 1.'
-        required: false
-        example: 22
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        custom: []
-      checkInDate:
-        name: checkInDate
-        description: 'Must be a valid date.'
-        required: false
-        example: '2025-10-03T07:21:09'
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        custom: []
-      checkOutDate:
-        name: checkOutDate
-        description: 'Must be a valid date. Must be a date after or equal to <code>checkInDate</code>.'
-        required: false
-        example: '2051-10-27'
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        custom: []
-      countryOfResidence:
-        name: countryOfResidence
-        description: 'Must not be greater than 2 characters.'
-        required: false
-        example: ng
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        custom: []
-      roomQuantity:
-        name: roomQuantity
-        description: 'Must be at least 1.'
-        required: false
-        example: 66
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        custom: []
-      priceRange:
-        name: priceRange
-        description: ''
-        required: false
-        example: architecto
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        custom: []
-      currency:
-        name: currency
-        description: 'Must not be greater than 3 characters.'
-        required: false
-        example: 'n'
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        custom: []
-      paymentPolicy:
-        name: paymentPolicy
-        description: ''
-        required: false
-        example: GUARANTEE
-        type: string
-        enumValues:
-          - GUARANTEE
-          - ' DEPOSIT'
-          - ' NONE'
-        exampleWasSpecified: false
-        nullable: true
-        custom: []
-      boardType:
-        name: boardType
-        description: ''
-        required: false
-        example: ' HALF_BOARD'
-        type: string
-        enumValues:
-          - ROOM_ONLY
-          - ' BREAKFAST'
-          - ' HALF_BOARD'
-          - ' FULL_BOARD'
-          - ' ALL_INCLUSIVE'
-        exampleWasSpecified: false
-        nullable: true
-        custom: []
-      bestRateOnly:
-        name: bestRateOnly
-        description: ''
-        required: false
-        example: true
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        custom: []
-    cleanBodyParameters:
-      hotelIds: architecto
-      adults: 22
-      checkInDate: '2025-10-03T07:21:09'
-      checkOutDate: '2051-10-27'
-      countryOfResidence: ng
-      roomQuantity: 66
-      priceRange: architecto
-      currency: 'n'
-      paymentPolicy: GUARANTEE
-      boardType: ' HALF_BOARD'
-      bestRateOnly: true
-    fileParameters: []
-    responses:
-      -
-        status: 401
-        content: '{"message":"Unauthenticated."}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-        custom: []
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer 1|abcdeEXAMPLETOKEN12345'
-    controller: null
-    method: null
-    route: null
-    custom: []
-  -
-    httpMethods:
-      - GET
-    uri: 'api/hotels/hotel-offers/{offerId}'
-    metadata:
-      groupName: Hotels
+      groupName: Transactions
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
@@ -292,33 +246,128 @@ endpoints:
       Content-Type: application/json
       Accept: application/json
     urlParameters:
-      offerId:
-        name: offerId
-        description: ''
+      id:
+        name: id
+        description: 'The ID of the transaction.'
         required: true
-        example: architecto
-        type: string
+        example: 1
+        type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanUrlParameters:
-      offerId: architecto
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      amount:
+        name: amount
+        description: ''
+        required: false
+        example: 4326.41688
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      currency:
+        name: currency
+        description: 'Must not be greater than 5 characters.'
+        required: false
+        example: m
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      payment_method:
+        name: payment_method
+        description: 'Must not be greater than 50 characters.'
+        required: false
+        example: i
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        custom: []
+      payment_status:
+        name: payment_status
+        description: ''
+        required: false
+        example: expired
+        type: string
+        enumValues:
+          - paid
+          - failed
+          - expired
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      paid_at:
+        name: paid_at
+        description: 'Must be a valid date.'
+        required: false
+        example: '2025-10-03T07:27:49'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        custom: []
+    cleanBodyParameters:
+      amount: 4326.41688
+      currency: m
+      payment_method: i
+      payment_status: expired
+      paid_at: '2025-10-03T07:27:49'
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|abcdeEXAMPLETOKEN12345'
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - DELETE
+    uri: 'api/transactions/{id}'
+    metadata:
+      groupName: Transactions
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+      custom: []
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_KEY}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        name: id
+        description: 'The ID of the transaction.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id: 1
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
-    responses:
-      -
-        status: 401
-        content: '{"message":"Unauthenticated."}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-        custom: []
+    responses: []
     responseFields: []
     auth:
       - headers

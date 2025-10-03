@@ -141,7 +141,7 @@ endpoints:
         name: role
         description: ''
         required: false
-        example: admin
+        example: user
         type: string
         enumValues:
           - user
@@ -180,7 +180,7 @@ endpoints:
         nullable: true
         custom: []
     cleanBodyParameters:
-      role: admin
+      role: user
       name: b
       restore: true
     fileParameters: []

@@ -28,6 +28,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('divisions', DivisionController::class, ['only' => ['store', 'update', 'destroy']]);
         Route::apiResource('positions', PositionController::class, ['only' => ['store', 'update', 'destroy']]);
         Route::apiResource('user-profiles', UserProfileController::class, ['only' => ['index']]);
+        Route::apiResource('transactions', TransactionController::class);
     });
 
     Route::get('/hotels/by-city', [HotelController::class, 'getHotelsByCity']);
@@ -36,7 +37,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/hotels/hotel-offers/{offerId}', [HotelController::class, 'getOfferPricing']);
 
     Route::apiResource('reservations', ReservationController::class);
-    Route::apiResource('transactions', TransactionController::class);
+    Route::apiResource('transactions', TransactionController::class, ['only' => ['show']]);
+
+
 
     Route::post('/meeting-room/reserve', [MeetingRoomReservationController::class, 'store']);
     Route::get('/meeting-room/reservations', [MeetingRoomReservationController::class, 'index']);

@@ -1,16 +1,16 @@
-name: Transactions
+name: Reservations
 description: ''
 endpoints:
   -
     httpMethods:
       - GET
-    uri: api/transactions
+    uri: api/reservations
     metadata:
-      groupName: Transactions
+      groupName: Reservations
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Get all transactions'
+      title: ''
       description: ''
       authenticated: true
       deprecated: false
@@ -21,19 +21,8 @@ endpoints:
       Accept: application/json
     urlParameters: []
     cleanUrlParameters: []
-    queryParameters:
-      type:
-        name: type
-        description: 'Optional. Filter transactions by type. Available: hotel, flight, ppob.'
-        required: false
-        example: hotel
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        custom: []
-    cleanQueryParameters:
-      type: hotel
+    queryParameters: []
+    cleanQueryParameters: []
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
@@ -59,9 +48,9 @@ endpoints:
   -
     httpMethods:
       - POST
-    uri: api/transactions
+    uri: api/reservations
     metadata:
-      groupName: Transactions
+      groupName: Reservations
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
@@ -79,19 +68,9 @@ endpoints:
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      transactionable_id:
-        name: transactionable_id
-        description: ''
-        required: true
-        example: 16
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        custom: []
-      transactionable_type:
-        name: transactionable_type
-        description: ''
+      user_id:
+        name: user_id
+        description: 'The <code>id</code> of an existing record in the users table.'
         required: true
         example: architecto
         type: string
@@ -99,67 +78,88 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         custom: []
-      amount:
-        name: amount
-        description: ''
+      hotel_name:
+        name: hotel_name
+        description: 'Must not be greater than 255 characters.'
         required: true
-        example: 4326.41688
+        example: 'n'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      hotel_id:
+        name: hotel_id
+        description: 'Must not be greater than 255 characters.'
+        required: true
+        example: g
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      check_in_date:
+        name: check_in_date
+        description: 'Must be a valid date.'
+        required: true
+        example: '2025-10-03T07:27:50'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      check_out_date:
+        name: check_out_date
+        description: 'Must be a valid date. Must be a date after or equal to <code>check_in_date</code>.'
+        required: true
+        example: '2051-10-27'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      adults:
+        name: adults
+        description: 'Must be at least 1.'
+        required: true
+        example: 22
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      total_price:
+        name: total_price
+        description: 'Must be at least 0.'
+        required: true
+        example: 84
         type: number
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
-      currency:
-        name: currency
-        description: 'Must not be greater than 5 characters.'
-        required: true
-        example: m
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        custom: []
-      payment_method:
-        name: payment_method
-        description: 'Must not be greater than 50 characters.'
-        required: false
-        example: i
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        custom: []
-      payment_status:
-        name: payment_status
+      status:
+        name: status
         description: ''
         required: false
-        example: expired
+        example: pending
         type: string
         enumValues:
-          - paid
-          - failed
-          - expired
+          - pending
+          - confirmed
+          - cancelled
         exampleWasSpecified: false
         nullable: false
         custom: []
-      paid_at:
-        name: paid_at
-        description: 'Must be a valid date.'
-        required: false
-        example: '2025-10-03T07:21:09'
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        custom: []
     cleanBodyParameters:
-      transactionable_id: 16
-      transactionable_type: architecto
-      amount: 4326.41688
-      currency: m
-      payment_method: i
-      payment_status: expired
-      paid_at: '2025-10-03T07:21:09'
+      user_id: architecto
+      hotel_name: 'n'
+      hotel_id: g
+      check_in_date: '2025-10-03T07:27:50'
+      check_out_date: '2051-10-27'
+      adults: 22
+      total_price: 84
+      status: pending
     fileParameters: []
     responses: []
     responseFields: []
@@ -174,13 +174,13 @@ endpoints:
   -
     httpMethods:
       - GET
-    uri: 'api/transactions/{id}'
+    uri: 'api/reservations/{id}'
     metadata:
-      groupName: Transactions
+      groupName: Reservations
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Get /api/transactions/{id}'
+      title: ''
       description: ''
       authenticated: true
       deprecated: false
@@ -192,16 +192,16 @@ endpoints:
     urlParameters:
       id:
         name: id
-        description: 'ID, external ID, booking code, or invoice number of the transaction.'
-        required: false
-        example: '1'
+        description: 'The ID of the reservation.'
+        required: true
+        example: architecto
         type: string
         enumValues: []
-        exampleWasSpecified: true
+        exampleWasSpecified: false
         nullable: false
         custom: []
     cleanUrlParameters:
-      id: '1'
+      id: architecto
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -230,9 +230,9 @@ endpoints:
     httpMethods:
       - PUT
       - PATCH
-    uri: 'api/transactions/{id}'
+    uri: 'api/reservations/{id}'
     metadata:
-      groupName: Transactions
+      groupName: Reservations
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
@@ -248,78 +248,100 @@ endpoints:
     urlParameters:
       id:
         name: id
-        description: 'The ID of the transaction.'
+        description: 'The ID of the reservation.'
         required: true
-        example: 1
-        type: integer
+        example: architecto
+        type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanUrlParameters:
-      id: 1
+      id: architecto
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      amount:
-        name: amount
-        description: ''
+      hotel_name:
+        name: hotel_name
+        description: 'Must not be greater than 255 characters.'
         required: false
-        example: 4326.41688
+        example: b
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      hotel_id:
+        name: hotel_id
+        description: 'Must not be greater than 255 characters.'
+        required: false
+        example: 'n'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      check_in_date:
+        name: check_in_date
+        description: 'Must be a valid date.'
+        required: false
+        example: '2025-10-03T07:27:50'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      check_out_date:
+        name: check_out_date
+        description: 'Must be a valid date. Must be a date after or equal to <code>check_in_date</code>.'
+        required: false
+        example: '2051-10-27'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      adults:
+        name: adults
+        description: 'Must be at least 1.'
+        required: false
+        example: 22
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      total_price:
+        name: total_price
+        description: 'Must be at least 0.'
+        required: false
+        example: 84
         type: number
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
-      currency:
-        name: currency
-        description: 'Must not be greater than 5 characters.'
-        required: false
-        example: m
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        custom: []
-      payment_method:
-        name: payment_method
-        description: 'Must not be greater than 50 characters.'
-        required: false
-        example: i
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        custom: []
-      payment_status:
-        name: payment_status
+      status:
+        name: status
         description: ''
         required: false
-        example: paid
+        example: cancelled
         type: string
         enumValues:
-          - paid
-          - failed
-          - expired
+          - pending
+          - confirmed
+          - cancelled
         exampleWasSpecified: false
         nullable: false
         custom: []
-      paid_at:
-        name: paid_at
-        description: 'Must be a valid date.'
-        required: false
-        example: '2025-10-03T07:21:09'
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        custom: []
     cleanBodyParameters:
-      amount: 4326.41688
-      currency: m
-      payment_method: i
-      payment_status: paid
-      paid_at: '2025-10-03T07:21:09'
+      hotel_name: b
+      hotel_id: 'n'
+      check_in_date: '2025-10-03T07:27:50'
+      check_out_date: '2051-10-27'
+      adults: 22
+      total_price: 84
+      status: cancelled
     fileParameters: []
     responses: []
     responseFields: []
@@ -334,9 +356,9 @@ endpoints:
   -
     httpMethods:
       - DELETE
-    uri: 'api/transactions/{id}'
+    uri: 'api/reservations/{id}'
     metadata:
-      groupName: Transactions
+      groupName: Reservations
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
@@ -352,16 +374,16 @@ endpoints:
     urlParameters:
       id:
         name: id
-        description: 'The ID of the transaction.'
+        description: 'The ID of the reservation.'
         required: true
-        example: 1
-        type: integer
+        example: architecto
+        type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
     cleanUrlParameters:
-      id: 1
+      id: architecto
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
