@@ -26,7 +26,7 @@ class HotelReservationFactory extends Factory
             ],
             'total_price' => fake()->randomFloat(2, 500000, 10000000),
             'currency' => 'IDR',
-            'status' => fake()->randomElement(['pending', 'confirmed', 'cancelled']),
+            'status' => fake()->randomElement(['pending', 'completed', 'failed', 'expired']),
         ];
     }
 }

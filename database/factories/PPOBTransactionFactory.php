@@ -47,7 +47,7 @@ class PPOBTransactionFactory extends Factory
             'item_name' => $item_name,
             'total_price' => fake()->randomElement([50000, 100000, 200000, 500000]),
             'currency' => 'IDR',
-            'status' => fake()->randomElement(['pending', 'success', 'failed']),
+            'status' => fake()->randomElement(['pending', 'completed', 'failed', 'expired']),
         ];
     }
 }

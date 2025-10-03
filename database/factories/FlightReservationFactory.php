@@ -28,7 +28,7 @@ class FlightReservationFactory extends Factory
             ],
             'total_price' => fake()->randomFloat(2, 1000000, 15000000),
             'currency' => 'IDR',
-            'status' => fake()->randomElement(['pending', 'ticketed', 'cancelled']),
+            'status' => fake()->randomElement(['pending', 'completed', 'failed', 'expired']),
         ];
     }
 }

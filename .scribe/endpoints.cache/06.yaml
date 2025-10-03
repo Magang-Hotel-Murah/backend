@@ -149,7 +149,7 @@ endpoints:
         name: checkInDate
         description: 'Must be a valid date.'
         required: false
-        example: '2025-10-02T06:59:59'
+        example: '2025-10-03T06:30:52'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -159,7 +159,7 @@ endpoints:
         name: checkOutDate
         description: 'Must be a valid date. Must be a date after or equal to <code>checkInDate</code>.'
         required: false
-        example: '2051-10-26'
+        example: '2051-10-27'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -209,7 +209,7 @@ endpoints:
         name: paymentPolicy
         description: ''
         required: false
-        example: ' NONE'
+        example: GUARANTEE
         type: string
         enumValues:
           - GUARANTEE
@@ -237,7 +237,7 @@ endpoints:
         name: bestRateOnly
         description: ''
         required: false
-        example: true
+        example: false
         type: boolean
         enumValues: []
         exampleWasSpecified: false
@@ -246,15 +246,15 @@ endpoints:
     cleanBodyParameters:
       hotelIds: architecto
       adults: 22
-      checkInDate: '2025-10-02T06:59:59'
-      checkOutDate: '2051-10-26'
+      checkInDate: '2025-10-03T06:30:52'
+      checkOutDate: '2051-10-27'
       countryOfResidence: ng
       roomQuantity: 66
       priceRange: architecto
       currency: 'n'
-      paymentPolicy: ' NONE'
+      paymentPolicy: GUARANTEE
       boardType: ' ALL_INCLUSIVE'
-      bestRateOnly: true
+      bestRateOnly: false
     fileParameters: []
     responses:
       -

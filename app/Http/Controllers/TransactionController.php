@@ -96,7 +96,7 @@ class TransactionController extends Controller
             'currency' => 'sometimes|string|max:5',
             'payment_method' => 'nullable|string|max:50',
             'payment_status' => 'sometimes|in:unpaid,paid,failed',
-            'transaction_date' => 'nullable|date',
+            'paid_at' => 'nullable|date',
         ]);
 
         $transaction->update($validated);

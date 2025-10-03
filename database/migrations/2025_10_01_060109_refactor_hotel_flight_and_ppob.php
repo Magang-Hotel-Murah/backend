@@ -36,7 +36,7 @@ return new class extends Migration
             $table->json('guest_details')->nullable()->comment('Detail tamu, jumlah dewasa & anak');
             $table->decimal('total_price', 15, 2);
             $table->string('currency', 5)->default('IDR');
-            $table->enum('status', ['pending', 'confirmed', 'cancelled'])->default('pending');
+            $table->enum('status', ['pending', 'completed', 'failed', 'expired'])->default('pending');
             $table->timestamps();
         });
 
@@ -54,7 +54,7 @@ return new class extends Migration
             $table->json('passenger_details')->nullable()->comment('Detail semua penumpang');
             $table->decimal('total_price', 15, 2);
             $table->string('currency', 5)->default('IDR');
-            $table->enum('status', ['pending', 'ticketed', 'cancelled'])->default('pending');
+            $table->enum('status', ['pending', 'completed', 'failed', 'expired'])->default('pending');
             $table->timestamps();
         });
 
@@ -68,14 +68,14 @@ return new class extends Migration
             $table->string('item_name')->nullable()->comment('Nama item, misal untuk voucher game');
             $table->decimal('total_price', 15, 2);
             $table->string('currency', 5)->default('IDR');
-            $table->enum('status', ['pending', 'success', 'failed'])->default('pending');
+            $table->enum('status', ['pending', 'completed', 'failed', 'expired'])->default('pending');
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('ppob_bills');
+        Schema::dropIfExists('ppob_transactions');
         Schema::dropIfExists('flight_reservations');
         Schema::dropIfExists('hotel_reservations');
         Schema::dropIfExists('transactions');

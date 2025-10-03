@@ -4,27 +4,59 @@ namespace App\Observers;
 
 use App\Models\Transaction;
 use App\Models\HotelReservation;
+use App\Models\FlightReservation;
+use App\Models\PPOBTransaction;
 
 class TransactionObserver
 {
+    /**
+     * Mapping status per tipe transaksi.
+     */
+    protected array $statusMap = [
+        'hotel' => [
+            'paid'   => 'completed',
+            'failed' => 'failed',
+            'expired' => 'expired',
+            'default' => 'pending',
+        ],
+        'flight' => [
+            'paid'   => 'completed',
+            'failed' => 'failed',
+            'expired' => 'expired',
+            'default' => 'pending',
+        ],
+        'ppob' => [
+            'paid'   => 'completed',
+            'failed' => 'failed',
+            'expired' => 'expired',
+            'default' => 'pending',
+        ],
+    ];
+
+    /**
+     * Sinkronisasi status.
+     */
+    protected function syncStatus(Transaction $transaction): void
+    {
+        $type = $transaction->transactionable_type;
+        $related = $transaction->transactionable; // morphTo langsung resolve model
+
+        if (!$related || !isset($this->statusMap[$type])) {
+            return;
+        }
+
+        $status = $this->statusMap[$type][$transaction->payment_status]
+            ?? $this->statusMap[$type]['default'];
+
+        $related->update(['status' => $status]);
+    }
+
     /**
      * Handle the Transaction "created" event.
      */
     public function created(Transaction $transaction): void
     {
-        if ($transaction->transactionable_type === 'hotel') {
-            $reservation = HotelReservation::find($transaction->transactionable_id);
-
-            if ($reservation) {
-                $status = match ($transaction->payment_status) {
-                    'paid' => 'confirmed',
-                    'failed' => 'cancelled',
-                    default => 'pending',
-                };
-
-                $reservation->update(['status' => $status]);
-            }
-        }
+        $this->syncStatus($transaction);
     }
 
     /**
@@ -32,20 +64,6 @@ class TransactionObserver
      */
     public function updated(Transaction $transaction): void
     {
-        if ($transaction->transactionable_type === 'hotel') {
-            $reservation = HotelReservation::find($transaction->transactionable_id);
-
-            if ($reservation) {
-                $status = match ($transaction->payment_status) {
-                    'paid' => 'confirmed',
-                    'failed' => 'cancelled',
-                    default => 'pending',
-                };
-
-                if ($reservation->status !== $status) {
-                    $reservation->update(['status' => $status]);
-                }
-            }
-        }
+        $this->syncStatus($transaction);
     }
 }
