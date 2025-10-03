@@ -73,7 +73,7 @@ class UserProfileController extends Controller
 
 
     /**
-     * Update the specified user profile.
+     * PUT api/user-profiles/{userId}
      *
      * This endpoint allows you to update user profile information such as
      * division, position, address, phone, and optionally profile photo.

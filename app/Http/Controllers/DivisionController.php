@@ -17,7 +17,13 @@ class DivisionController extends Controller
 
     public function show($id)
     {
-        return response()->json(Division::findOrFail($id));
+        $division = Division::findOrFail($id);
+
+        if (!$division) {
+            return response()->json(['message' => 'Division not found'], 404);
+        }
+
+        return response()->json($division);
     }
 
     public function store(Request $request)

@@ -191,7 +191,7 @@ endpoints:
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Update the specified user profile.'
+      title: 'PUT api/user-profiles/{userId}'
       description: |-
         This endpoint allows you to update user profile information such as
         division, position, address, phone, and optionally profile photo.
