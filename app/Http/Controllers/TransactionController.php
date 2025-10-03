@@ -76,8 +76,8 @@ class TransactionController extends Controller
             'amount' => 'required|numeric',
             'currency' => 'required|string|max:5',
             'payment_method' => 'nullable|string|max:50',
-            'payment_status' => 'in:unpaid,paid,failed',
-            'transaction_date' => 'nullable|date',
+            'payment_status' => 'sometimes|in:paid,failed,expired',
+            'paid_at' => 'nullable|date',
         ]);
 
         $transaction = Transaction::create($validated);
@@ -95,7 +95,7 @@ class TransactionController extends Controller
             'amount' => 'sometimes|numeric',
             'currency' => 'sometimes|string|max:5',
             'payment_method' => 'nullable|string|max:50',
-            'payment_status' => 'sometimes|in:unpaid,paid,failed',
+            'payment_status' => 'sometimes|in:paid,failed,expired',
             'paid_at' => 'nullable|date',
         ]);
 

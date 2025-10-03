@@ -171,7 +171,7 @@ endpoints:
         name: restore
         description: ''
         required: false
-        example: false
+        example: true
         type: boolean
         enumValues: []
         exampleWasSpecified: false
@@ -180,7 +180,7 @@ endpoints:
     cleanBodyParameters:
       role: admin
       name: b
-      restore: false
+      restore: true
     fileParameters: []
     responses: []
     responseFields: []

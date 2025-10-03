@@ -104,7 +104,7 @@ endpoints:
         name: check_in_date
         description: 'Must be a valid date.'
         required: true
-        example: '2025-10-03T06:30:52'
+        example: '2025-10-03T07:21:09'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -157,7 +157,7 @@ endpoints:
       user_id: architecto
       hotel_name: 'n'
       hotel_id: g
-      check_in_date: '2025-10-03T06:30:52'
+      check_in_date: '2025-10-03T07:21:09'
       check_out_date: '2051-10-27'
       adults: 22
       total_price: 84
@@ -287,7 +287,7 @@ endpoints:
         name: check_in_date
         description: 'Must be a valid date.'
         required: false
-        example: '2025-10-03T06:30:53'
+        example: '2025-10-03T07:21:09'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -339,7 +339,7 @@ endpoints:
     cleanBodyParameters:
       hotel_name: b
       hotel_id: 'n'
-      check_in_date: '2025-10-03T06:30:53'
+      check_in_date: '2025-10-03T07:21:09'
       check_out_date: '2051-10-27'
       adults: 22
       total_price: 84
