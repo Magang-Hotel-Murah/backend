@@ -17,7 +17,7 @@ class MeetingRoomReservationFactory extends Factory
         $end = (clone $start)->modify('+1 hour');
 
         return [
-            'user_id' => User::factory(),
+            'user_id' => null,
             'meeting_room_id' => MeetingRoom::factory(),
             'title' => $this->faker->sentence(3),
             'description' => $this->faker->optional()->paragraph(),

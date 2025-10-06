@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Auth\Events\Verified;
-
+use Illuminate\Support\Str;
+use App\Models\Company;
 use Carbon\Carbon;
 
 class AuthController extends Controller
@@ -93,6 +94,108 @@ class AuthController extends Controller
             'success' => true,
             'message' => 'User registered successfully, please verify your email',
             'user' => $user,
+        ], 201);
+    }
+
+    public function registerAdmin(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:6|confirmed',
+            'company_name' => 'required|string|max:255',
+        ]);
+
+        // Buat company baru
+        $company = Company::create([
+            'name' => $validated['company_name'],
+            'code' => strtoupper(Str::random(6)), // kode unik perusahaan
+            'invite_url' => null, // nanti bisa generate link invite
+        ]);
+
+        // Buat admin perusahaan
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'role' => 'admin',
+            'company_id' => $company->id,
+        ]);
+
+        // buat profile kosong
+        $user->profile()->create([
+            'division_id' => null,
+            'position_id' => null,
+            'address' => null,
+            'phone' => null,
+            'photo' => null,
+        ]);
+
+        // generate email verification link
+        $verifyUrl = URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addMinutes(60),
+            ['id' => $user->id, 'hash' => sha1($user->email)]
+        );
+
+        event(new Registered($user));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Admin perusahaan berhasil didaftarkan. Silakan verifikasi email.',
+            'user' => $user,
+            'company' => $company,
+            // 'verify_url' => $verifyUrl,
+        ], 201);
+    }
+
+    public function registerUser(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:6|confirmed',
+            'company_code' => 'required|string', // kode perusahaan dari invite
+        ]);
+
+        $company = Company::where('code', $validated['company_code'])->first();
+        if (!$company) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kode perusahaan tidak valid.'
+            ], 422);
+        }
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'role' => 'user',
+            'company_id' => $company->id,
+        ]);
+
+        $user->profile()->create([
+            'division_id' => null,
+            'position_id' => null,
+            'address' => null,
+            'phone' => null,
+            'photo' => null,
+        ]);
+
+        $verifyUrl = URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addMinutes(60),
+            ['id' => $user->id, 'hash' => sha1($user->email)]
+        );
+
+        event(new Registered($user));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'User berhasil didaftarkan. Silakan verifikasi email.',
+            'user' => $user,
+            'company' => $company,
+            // 'verify_url' => $verifyUrl,
         ], 201);
     }
 

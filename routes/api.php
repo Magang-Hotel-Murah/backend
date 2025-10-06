@@ -6,18 +6,19 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\HotelController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\ReservationController;
-use Illuminate\Container\Attributes\Auth;
 use App\Http\Controllers\MeetingRoomReservationController;
 use App\Http\Controllers\MeetingRoomController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\PositionController;
 
-Route::post('/register', [AuthController::class, 'register']);
+Route::post('/register/admin', [AuthController::class, 'registerAdmin']);
+Route::post('/register/user', [AuthController::class, 'registerUser']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
-Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])->middleware(['signed'])->name('verification.verify');
+Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
+    ->middleware(['signed'])->name('verification.verify');
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
