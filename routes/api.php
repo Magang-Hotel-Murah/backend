@@ -44,6 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/meeting-room/reserve', [MeetingRoomReservationController::class, 'store']);
     Route::get('/meeting-room/reservations', [MeetingRoomReservationController::class, 'index']);
     Route::get('/meeting-room/{id}/reservations', [MeetingRoomReservationController::class, 'show']);
+    Route::get('/meeting-room/reservations/{id}', [MeetingRoomReservationController::class, 'detail']);
 
     Route::apiResource('meeting-room', MeetingRoomController::class);
     Route::get('/user-profile/{id?}', [UserProfileController::class, 'show']);

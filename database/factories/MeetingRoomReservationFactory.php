@@ -2,23 +2,29 @@
 
 namespace Database\Factories;
 
-use App\Models\MeetingRoom;
 use App\Models\User;
+use App\Models\MeetingRoom;
+use App\Models\MeetingRoomReservation;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class MeetingRoomReservationFactory extends Factory
 {
+    protected $model = MeetingRoomReservation::class;
+
     public function definition(): array
     {
-        $start = $this->faker->dateTimeBetween('+0 days', '+7 days');
-        $end = (clone $start)->modify('+2 hours');
+        $start = $this->faker->dateTimeBetween('+0 days', '+5 days');
+        $end = (clone $start)->modify('+1 hour');
 
         return [
-            'meeting_room_id' => MeetingRoom::inRandomOrder()->first()->id ?? MeetingRoom::factory(),
-            'user_id' => User::inRandomOrder()->first()->id ?? User::factory(),
+            'user_id' => User::factory(),
+            'meeting_room_id' => MeetingRoom::factory(),
+            'title' => $this->faker->sentence(3),
+            'description' => $this->faker->optional()->paragraph(),
             'start_time' => $start,
             'end_time' => $end,
-            'status' => $this->faker->randomElement(['pending', 'approved', 'rejected']),
+            'participants' => $this->faker->numberBetween(2, 20),
+            'status' => $this->faker->randomElement(['pending', 'approved', 'rejected', 'cancelled']),
         ];
     }
 }

@@ -11,11 +11,19 @@ class MeetingRoomReservation extends Model
     use HasFactory;
 
     protected $fillable = [
-        'meeting_room_id',
         'user_id',
+        'meeting_room_id',
+        'title',
+        'description',
         'start_time',
         'end_time',
+        'participants',
         'status',
+    ];
+
+    protected $casts = [
+        'start_time' => 'datetime',
+        'end_time' => 'datetime',
     ];
 
     public function room()
@@ -28,15 +36,40 @@ class MeetingRoomReservation extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function scopeConflict($query, $start, $end)
+    public function request()
     {
-        return $query->where(function ($q) use ($start, $end) {
-            $q->whereBetween('start_time', [$start, $end])
-                ->orWhereBetween('end_time', [$start, $end])
-                ->orWhere(function ($q) use ($start, $end) {
-                    $q->where('start_time', '<=', $start)
-                        ->where('end_time', '>=', $end);
-                });
-        });
+        return $this->hasOne(MeetingRequest::class, 'reservation_id');
+    }
+
+    public function participants()
+    {
+        return $this->hasMany(MeetingParticipant::class, 'reservation_id');
+    }
+
+    public function scopeConflict($query, $roomId, $start, $end, $excludeId = null)
+    {
+        $room = MeetingRoom::find($roomId);
+
+        if (!$room) return $query;
+
+        $relatedRoomIds = collect([$roomId]);
+
+        if ($room->parent_id) {
+            $relatedRoomIds->push($room->parent_id);
+        } else {
+            $relatedRoomIds = $relatedRoomIds->merge($room->children()->pluck('id'));
+        }
+
+        return $query
+            ->whereIn('meeting_room_id', $relatedRoomIds)
+            ->when($excludeId, fn($q) => $q->where('id', '!=', $excludeId))
+            ->where(function ($q) use ($start, $end) {
+                $q->whereBetween('start_time', [$start, $end])
+                    ->orWhereBetween('end_time', [$start, $end])
+                    ->orWhere(function ($q2) use ($start, $end) {
+                        $q2->where('start_time', '<=', $start)
+                            ->where('end_time', '>=', $end);
+                    });
+            });
     }
 }

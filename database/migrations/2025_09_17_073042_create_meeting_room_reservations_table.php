@@ -13,11 +13,16 @@ return new class extends Migration
     {
         Schema::create('meeting_room_reservations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('meeting_room_id')->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // siapa yg booking
-            $table->dateTime('start_time');            // Waktu mulai
-            $table->dateTime('end_time');              // Waktu selesai
-            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('meeting_room_id')->constrained()->cascadeOnDelete();
+            $table->string('title');
+            $table->text('description')->nullable();
+            $table->dateTime('start_time');
+            $table->dateTime('end_time');
+            $table->integer('participants')->default(0);
+            $table->enum('status', ['pending', 'approved', 'rejected', 'cancelled'])->default('pending');
+            $table->text('rejection_reason')->nullable();
+            $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

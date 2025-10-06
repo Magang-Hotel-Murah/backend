@@ -13,8 +13,13 @@ return new class extends Migration
     {
         Schema::create('meeting_rooms', function (Blueprint $table) {
             $table->id();
-            $table->string('name'); // Nama ruangan (contoh: Room A, Room B, Room C)
-            $table->text('description')->nullable(); // opsional
+            $table->foreignId('parent_id')->nullable()->constrained('meeting_rooms')->nullOnDelete();
+            $table->string('name');
+            $table->integer('capacity');
+            $table->json('facilities')->nullable();
+            $table->enum('status', ['available', 'maintenance'])->default('available');
+            $table->enum('type', ['main', 'sub'])->default('main');
+
             $table->timestamps();
         });
     }

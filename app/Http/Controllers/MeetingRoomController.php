@@ -14,7 +14,7 @@ class MeetingRoomController extends Controller
 {
     public function index()
     {
-        $rooms = MeetingRoom::select('id', 'name', 'description')->get();
+        $rooms = MeetingRoom::all();
         return response()->json($rooms);
     }
 
