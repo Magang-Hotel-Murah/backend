@@ -4,7 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-
+use App\Models\Scopes\CompanyScope;
+use Illuminate\Support\Facades\Auth;
 
 class MeetingRoomReservation extends Model
 {
@@ -21,12 +22,30 @@ class MeetingRoomReservation extends Model
         'rejection_reason',
         'approved_by',
         'status',
+        'company_id',
     ];
 
     protected $casts = [
         'start_time' => 'datetime',
         'end_time' => 'datetime',
     ];
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new CompanyScope);
+
+        static::creating(function ($model) {
+            $user = Auth::user();
+            if ($user && $user->role !== 'super_admin') {
+                $model->company_id = $user->company_id;
+            }
+        });
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
 
     public function room()
     {

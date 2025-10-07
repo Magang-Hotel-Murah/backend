@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Scopes\CompanyScope;
+use Illuminate\Support\Facades\Auth;
 
 class MeetingRequest extends Model
 {
@@ -15,6 +17,7 @@ class MeetingRequest extends Model
         'funds_reason',
         'snacks',
         'equipment',
+        'company_id',
     ];
 
     protected $casts = [
@@ -22,6 +25,23 @@ class MeetingRequest extends Model
         'equipment' => 'array',
         'funds_amount' => 'decimal:2',
     ];
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new CompanyScope);
+
+        static::creating(function ($model) {
+            $user = Auth::user();
+            if ($user && $user->role !== 'super_admin') {
+                $model->company_id = $user->company_id;
+            }
+        });
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
 
     public function reservation()
     {

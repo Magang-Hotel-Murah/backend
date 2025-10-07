@@ -21,6 +21,19 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        function createUserWithProfile(array $userData, array $divisionIds, array $positionIds)
+        {
+            $user = User::factory()->create($userData);
+
+            UserProfile::factory()->create([
+                'user_id'     => $user->id,
+                'division_id' => $divisionIds[array_rand($divisionIds)],
+                'position_id' => $positionIds[array_rand($positionIds)],
+            ]);
+
+            return $user;
+        }
+
         // 1. Seed divisions & positions
         $divisions = Division::factory(6)->create();
         $positions = Position::factory(5)->create();
@@ -31,28 +44,28 @@ class DatabaseSeeder extends Seeder
         // 2. Buat company
         $company = Company::factory()->create();
 
-        // 3. Super Admin
-        $superAdmin = User::factory()->create([
-            'name' => 'Super Admin',
-            'email' => 'superadmin@example.com',
-            'role' => 'super_admin',
+        // Super admin
+        $superAdmin = createUserWithProfile([
+            'name'       => 'Super Admin',
+            'email'      => 'superadmin@example.com',
+            'role'       => 'super_admin',
             'company_id' => null,
-        ]);
-        dump('Super Admin created, total users: ' . User::count());
+        ], $divisionIds, $positionIds);
 
-        // 4. Admin Perusahaan
-        $admin = User::factory()->admin()->create([
-            'name' => 'Admin Perusahaan',
-            'email' => 'admin@test.com',
+        // Admin Perusahaan
+        $admin = createUserWithProfile([
+            'name'       => 'Admin Perusahaan',
+            'email'      => 'admin@example.com',
+            'role'       => 'admin',
             'company_id' => $company->id,
-        ]);
-        dump('Admin Perusahaan created, total users: ' . User::count());
+        ], $divisionIds, $positionIds);
 
-        UserProfile::factory()->create([
-            'user_id' => $admin->id,
-            'division_id' => $divisionIds[array_rand($divisionIds)],
-            'position_id' => $positionIds[array_rand($positionIds)],
-        ]);
+        // User Biasa
+        $user = createUserWithProfile([
+            'name'       => 'User Test',
+            'email'      => 'user@example.com',
+            'company_id' => $company->id,
+        ], $divisionIds, $positionIds);
 
         // 5. 20 User biasa
         $users = User::factory(20)->forCompany($company)->create()->each(function ($user) use ($divisionIds, $positionIds) {
@@ -62,7 +75,6 @@ class DatabaseSeeder extends Seeder
                 'position_id' => $positionIds[array_rand($positionIds)],
             ]);
         });
-        dump('20 Users biasa created, total users: ' . User::count());
 
         $allUsers = User::where('company_id', $company->id)->get();
 
@@ -91,15 +103,16 @@ class DatabaseSeeder extends Seeder
             ->create();
 
         // 9. Meeting rooms
-        $rooms = MeetingRoom::factory(5)->create();
-        dump('Meeting rooms created, total users: ' . User::count());
+        $rooms = MeetingRoom::factory(5)->create([
+            'company_id' => $company->id,
+        ]);
 
         // 10. Meeting reservations + participants + requests
-        MeetingRoomReservation::factory(20)->make()->each(function ($reservation) use ($allUsers, $rooms, $divisionIds, $positionIds) {
+        MeetingRoomReservation::factory(20)->make()->each(function ($reservation) use ($allUsers, $rooms, $divisionIds, $positionIds, $company) {
             $reservation->user_id = $allUsers->random()->id;
             $reservation->meeting_room_id = $rooms->random()->id;
+            $reservation->company_id = $company->id;
             $reservation->save();
-            dump("Reservation {$reservation->id} saved, total users: " . User::count());
 
             // Internal participants (user terdaftar)
             $internalParticipants = $allUsers
@@ -111,6 +124,7 @@ class DatabaseSeeder extends Seeder
                 MeetingParticipant::create([
                     'reservation_id' => $reservation->id,
                     'user_id' => $participant->id,
+                    'company_id' => $reservation->company_id,
                 ]);
             }
 
@@ -122,12 +136,14 @@ class DatabaseSeeder extends Seeder
                     'name' => fake()->name(),
                     'email' => fake()->safeEmail(),
                     'whatsapp_number' => fake()->numerify('+628##########'),
+                    'company_id' => $reservation->company_id,
                 ]);
             }
 
             // Meeting request
             MeetingRequest::create([
                 'reservation_id' => $reservation->id,
+                'company_id' => $reservation->company_id,
             ]);
         });
     }

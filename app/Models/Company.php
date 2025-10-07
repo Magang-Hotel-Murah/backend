@@ -16,12 +16,28 @@ class Company extends Model
         'invite_url',
     ];
 
-    /**
-     * Relasi ke user
-     * Satu perusahaan bisa memiliki banyak user
-     */
     public function users()
     {
         return $this->hasMany(User::class);
+    }
+
+    public function meetingRooms()
+    {
+        return $this->hasMany(MeetingRoom::class);
+    }
+
+    public function meetingRoomReservations()
+    {
+        return $this->hasMany(MeetingRoomReservation::class);
+    }
+
+    public function meetingRequests()
+    {
+        return $this->hasMany(MeetingRequest::class);
+    }
+
+    public function meetingParticipants()
+    {
+        return $this->hasMany(MeetingParticipant::class);
     }
 }

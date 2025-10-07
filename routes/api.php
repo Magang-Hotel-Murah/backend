@@ -23,7 +23,7 @@ Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    Route::middleware('role:admin')->group(function () {
+    Route::middleware('role:admin,super_admin')->group(function () {
         Route::apiResource('users', UserController::class);
         Route::put('/meeting-room/{id}/status', [MeetingRoomReservationController::class, 'updateStatus']);
         Route::apiResource('divisions', DivisionController::class, ['only' => ['store', 'update', 'destroy']]);

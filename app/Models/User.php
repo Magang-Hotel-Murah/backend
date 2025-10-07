@@ -8,6 +8,8 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Scopes\CompanyScope;
+use Illuminate\Support\Facades\Auth;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -30,6 +32,18 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new CompanyScope);
+
+        static::creating(function ($model) {
+            $user = Auth::user();
+            if ($user && $user->role !== 'super_admin') {
+                $model->company_id = $user->company_id;
+            }
+        });
+    }
 
     public function company()
     {
