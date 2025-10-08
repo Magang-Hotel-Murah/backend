@@ -1,16 +1,16 @@
-name: Transactions
+name: 'User Profiles'
 description: ''
 endpoints:
   -
     httpMethods:
       - GET
-    uri: api/transactions
+    uri: api/user-profiles
     metadata:
-      groupName: Transactions
+      groupName: 'User Profiles'
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Get all transactions'
+      title: ''
       description: ''
       authenticated: true
       deprecated: false
@@ -21,19 +21,63 @@ endpoints:
       Accept: application/json
     urlParameters: []
     cleanUrlParameters: []
-    queryParameters:
-      type:
-        name: type
-        description: 'Optional. Filter transactions by type. Available: hotel, flight, ppob.'
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+        custom: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|abcdeEXAMPLETOKEN12345'
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: 'api/user-profile/{id?}'
+    metadata:
+      groupName: 'User Profiles'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+      custom: []
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_KEY}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        name: id
+        description: 'The ID of the .'
         required: false
-        example: hotel
+        example: architecto
         type: string
         enumValues: []
-        exampleWasSpecified: true
+        exampleWasSpecified: false
         nullable: false
         custom: []
-    cleanQueryParameters:
-      type: hotel
+    cleanUrlParameters:
+      id: architecto
+    queryParameters: []
+    cleanQueryParameters: []
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
@@ -59,9 +103,9 @@ endpoints:
   -
     httpMethods:
       - POST
-    uri: api/transactions
+    uri: api/user-profiles
     metadata:
-      groupName: Transactions
+      groupName: 'User Profiles'
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
@@ -79,19 +123,9 @@ endpoints:
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      transactionable_id:
-        name: transactionable_id
-        description: ''
-        required: true
-        example: 16
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        custom: []
-      transactionable_type:
-        name: transactionable_type
-        description: ''
+      division_id:
+        name: division_id
+        description: 'The <code>id</code> of an existing record in the divisions table.'
         required: true
         example: architecto
         type: string
@@ -99,124 +133,43 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         custom: []
-      amount:
-        name: amount
-        description: ''
+      position_id:
+        name: position_id
+        description: 'The <code>id</code> of an existing record in the positions table.'
         required: true
-        example: 4326.41688
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        custom: []
-      currency:
-        name: currency
-        description: 'Must not be greater than 5 characters.'
-        required: true
-        example: m
+        example: architecto
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         custom: []
-      payment_method:
-        name: payment_method
-        description: 'Must not be greater than 50 characters.'
+      address:
+        name: address
+        description: ''
         required: false
-        example: i
+        example: architecto
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: true
         custom: []
-      payment_status:
-        name: payment_status
+      phone:
+        name: phone
         description: ''
         required: false
-        example: failed
-        type: string
-        enumValues:
-          - paid
-          - failed
-          - expired
-        exampleWasSpecified: false
-        nullable: false
-        custom: []
-      paid_at:
-        name: paid_at
-        description: 'Must be a valid date.'
-        required: false
-        example: '2025-10-03T08:34:18'
+        example: architecto
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: true
         custom: []
     cleanBodyParameters:
-      transactionable_id: 16
-      transactionable_type: architecto
-      amount: 4326.41688
-      currency: m
-      payment_method: i
-      payment_status: failed
-      paid_at: '2025-10-03T08:34:18'
+      division_id: architecto
+      position_id: architecto
+      address: architecto
+      phone: architecto
     fileParameters: []
     responses: []
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer 1|abcdeEXAMPLETOKEN12345'
-    controller: null
-    method: null
-    route: null
-    custom: []
-  -
-    httpMethods:
-      - GET
-    uri: 'api/transactions/{id}'
-    metadata:
-      groupName: Transactions
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Get /api/transactions/{id}'
-      description: ''
-      authenticated: true
-      deprecated: false
-      custom: []
-    headers:
-      Authorization: 'Bearer {YOUR_AUTH_KEY}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters:
-      id:
-        name: id
-        description: 'ID, external ID, booking code, or invoice number of the transaction.'
-        required: false
-        example: '1'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        custom: []
-    cleanUrlParameters:
-      id: '1'
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses:
-      -
-        status: 401
-        content: '{"message":"Unauthenticated."}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
-        custom: []
     responseFields: []
     auth:
       - headers
@@ -230,30 +183,32 @@ endpoints:
     httpMethods:
       - PUT
       - PATCH
-    uri: 'api/transactions/{id}'
+    uri: 'api/user-profiles/{id}'
     metadata:
-      groupName: Transactions
+      groupName: 'User Profiles'
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: ''
-      description: ''
+      title: 'PUT api/user-profiles/{userId}'
+      description: |-
+        This endpoint allows you to update user profile information such as
+        division, position, address, phone, and optionally profile photo.
       authenticated: true
       deprecated: false
       custom: []
     headers:
       Authorization: 'Bearer {YOUR_AUTH_KEY}'
-      Content-Type: application/json
+      Content-Type: multipart/form-data
       Accept: application/json
     urlParameters:
       id:
         name: id
-        description: 'The ID of the transaction.'
+        description: 'The ID of the user whose profile will be updated.'
         required: true
         example: 1
         type: integer
         enumValues: []
-        exampleWasSpecified: false
+        exampleWasSpecified: true
         nullable: false
         custom: []
     cleanUrlParameters:
@@ -261,112 +216,63 @@ endpoints:
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      amount:
-        name: amount
-        description: ''
+      photo:
+        name: photo
+        description: 'The profile photo (image file: jpg, jpeg, png, max 2MB).'
         required: false
-        example: 4326.41688
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        custom: []
-      currency:
-        name: currency
-        description: 'Must not be greater than 5 characters.'
-        required: false
-        example: m
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        custom: []
-      payment_method:
-        name: payment_method
-        description: 'Must not be greater than 50 characters.'
-        required: false
-        example: i
-        type: string
+        example: null
+        type: file
         enumValues: []
         exampleWasSpecified: false
         nullable: true
         custom: []
-      payment_status:
-        name: payment_status
-        description: ''
+      division_id:
+        name: division_id
+        description: 'The ID of the division.'
         required: false
-        example: expired
-        type: string
-        enumValues:
-          - paid
-          - failed
-          - expired
-        exampleWasSpecified: false
-        nullable: false
-        custom: []
-      paid_at:
-        name: paid_at
-        description: 'Must be a valid date.'
-        required: false
-        example: '2025-10-03T08:34:18'
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        custom: []
-    cleanBodyParameters:
-      amount: 4326.41688
-      currency: m
-      payment_method: i
-      payment_status: expired
-      paid_at: '2025-10-03T08:34:18'
-    fileParameters: []
-    responses: []
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer 1|abcdeEXAMPLETOKEN12345'
-    controller: null
-    method: null
-    route: null
-    custom: []
-  -
-    httpMethods:
-      - DELETE
-    uri: 'api/transactions/{id}'
-    metadata:
-      groupName: Transactions
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: ''
-      description: ''
-      authenticated: true
-      deprecated: false
-      custom: []
-    headers:
-      Authorization: 'Bearer {YOUR_AUTH_KEY}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters:
-      id:
-        name: id
-        description: 'The ID of the transaction.'
-        required: true
-        example: 1
+        example: 2
         type: integer
         enumValues: []
-        exampleWasSpecified: false
+        exampleWasSpecified: true
         nullable: false
         custom: []
-    cleanUrlParameters:
-      id: 1
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
+      position_id:
+        name: position_id
+        description: 'The ID of the position.'
+        required: false
+        example: 5
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      address:
+        name: address
+        description: 'The address of the user.'
+        required: false
+        example: '"Jl. Merdeka No. 123"'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      phone:
+        name: phone
+        description: 'The phone number of the user.'
+        required: false
+        example: '"08123456789"'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      division_id: 2
+      position_id: 5
+      address: '"Jl. Merdeka No. 123"'
+      phone: '"08123456789"'
+    fileParameters:
+      photo: null
     responses: []
     responseFields: []
     auth:

@@ -14,6 +14,15 @@ return new class extends Migration {
             $table->text('funds_reason')->nullable();
             $table->json('snacks')->nullable();
             $table->json('equipment')->nullable();
+            $table->enum('status', [
+                'pending',          // default setelah dibuat
+                'waiting_finance',  // menunggu approval finance (jika ada cost)
+                'approved',         // sudah disetujui (admin/finance)
+                'rejected',
+                'cancelled'
+            ])->default('pending');
+            $table->text('rejection_reason')->nullable();
+            $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

@@ -31,6 +31,10 @@ class MeetingRequestFactory extends Factory
                 'Speaker',
                 'Laptop'
             ], $this->faker->numberBetween(1, 2)),
+            'status'         => 'pending',
+            'rejection_reason' => null,
+            'approved_by'    => null,
+
         ];
     }
 

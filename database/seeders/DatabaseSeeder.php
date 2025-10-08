@@ -55,15 +55,32 @@ class DatabaseSeeder extends Seeder
         // Admin Perusahaan
         $admin = createUserWithProfile([
             'name'       => 'Admin Perusahaan',
-            'email'      => 'admin@example.com',
-            'role'       => 'admin',
+            'email'      => 'companyadmin@example.com',
+            'role'       => 'company_admin',
             'company_id' => $company->id,
         ], $divisionIds, $positionIds);
 
-        // User Biasa
-        $user = createUserWithProfile([
-            'name'       => 'User Test',
-            'email'      => 'user@example.com',
+        // Finance Officer
+        $financeOfficer = createUserWithProfile([
+            'name'       => 'Finance Officer',
+            'email'      => 'financeofficer@example.com',
+            'role'       => 'finance_officer',
+            'company_id' => $company->id,
+        ], $divisionIds, $positionIds);
+
+        // Employee
+        $employee = createUserWithProfile([
+            'name'       => 'Employee Test',
+            'email'      => 'employee@example.com',
+            'role'       => 'employee',
+            'company_id' => $company->id,
+        ], $divisionIds, $positionIds);
+
+        // Support Staff
+        $supportStaff = createUserWithProfile([
+            'name'       => 'Support Staff',
+            'email'      => 'supportstaff@example.com',
+            'role'       => 'support_staff',
             'company_id' => $company->id,
         ], $divisionIds, $positionIds);
 

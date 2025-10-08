@@ -20,7 +20,7 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
-            'role' => 'user',
+            'role' => 'employee',
             'company_id' => null, // default
         ];
     }
@@ -31,7 +31,7 @@ class UserFactory extends Factory
             $company = Company::factory()->create();
 
             return [
-                'role' => 'admin',
+                'role' => 'company_admin',
                 'company_id' => $company->id,
             ];
         });
@@ -40,7 +40,7 @@ class UserFactory extends Factory
     public function forCompany(Company $company): static
     {
         return $this->state([
-            'role' => 'user',
+            'role' => 'employee',
             'company_id' => $company->id,
         ]);
     }

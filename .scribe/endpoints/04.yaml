@@ -1,12 +1,12 @@
-name: Positions
+name: Divisions
 description: ''
 endpoints:
   -
     httpMethods:
       - POST
-    uri: api/positions
+    uri: api/divisions
     metadata:
-      groupName: Positions
+      groupName: Divisions
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
@@ -51,9 +51,9 @@ endpoints:
     httpMethods:
       - PUT
       - PATCH
-    uri: 'api/positions/{id}'
+    uri: 'api/divisions/{id}'
     metadata:
-      groupName: Positions
+      groupName: Divisions
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
@@ -69,7 +69,7 @@ endpoints:
     urlParameters:
       id:
         name: id
-        description: 'The ID of the position.'
+        description: 'The ID of the division.'
         required: true
         example: architecto
         type: string
@@ -108,9 +108,9 @@ endpoints:
   -
     httpMethods:
       - DELETE
-    uri: 'api/positions/{id}'
+    uri: 'api/divisions/{id}'
     metadata:
-      groupName: Positions
+      groupName: Divisions
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
@@ -126,7 +126,7 @@ endpoints:
     urlParameters:
       id:
         name: id
-        description: 'The ID of the position.'
+        description: 'The ID of the division.'
         required: true
         example: architecto
         type: string
@@ -154,9 +154,9 @@ endpoints:
   -
     httpMethods:
       - GET
-    uri: api/positions
+    uri: api/divisions
     metadata:
-      groupName: Positions
+      groupName: Divisions
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
@@ -198,9 +198,9 @@ endpoints:
   -
     httpMethods:
       - GET
-    uri: 'api/positions/{id}'
+    uri: 'api/divisions/{id}'
     metadata:
-      groupName: Positions
+      groupName: Divisions
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
@@ -216,7 +216,7 @@ endpoints:
     urlParameters:
       id:
         name: id
-        description: 'The ID of the position.'
+        description: 'The ID of the division.'
         required: true
         example: architecto
         type: string

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->integer('capacity');
             $table->json('facilities')->nullable();
-            $table->enum('status', ['available', 'maintenance'])->default('available');
+            $table->string('location')->nullable();
             $table->enum('type', ['main', 'sub'])->default('main');
 
             $table->timestamps();

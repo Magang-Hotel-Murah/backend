@@ -1,21 +1,22 @@
-name: Authentication
+name: Endpoints
 description: ''
 endpoints:
   -
     httpMethods:
       - POST
-    uri: api/register
+    uri: api/register/admin
     metadata:
-      groupName: Authentication
+      groupName: Endpoints
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'POST api/register'
-      description: 'This endpoint does not require authentication.'
-      authenticated: false
+      title: ''
+      description: ''
+      authenticated: true
       deprecated: false
       custom: []
     headers:
+      Authorization: 'Bearer {YOUR_AUTH_KEY}'
       Content-Type: application/json
       Accept: application/json
     urlParameters: []
@@ -25,102 +26,56 @@ endpoints:
     bodyParameters:
       name:
         name: name
-        description: "User's name."
+        description: 'Must not be greater than 255 characters.'
         required: true
-        example: 'John Doe'
+        example: b
         type: string
         enumValues: []
-        exampleWasSpecified: true
+        exampleWasSpecified: false
         nullable: false
         custom: []
       email:
         name: email
-        description: "User's email."
+        description: 'Must be a valid email address.'
         required: true
-        example: 4kV3b@example.com
+        example: zbailey@example.net
         type: string
         enumValues: []
-        exampleWasSpecified: true
+        exampleWasSpecified: false
         nullable: false
         custom: []
       password:
         name: password
-        description: "User's password."
+        description: 'Must be at least 6 characters.'
         required: true
-        example: secret123
+        example: '-0pBNvYgxw'
         type: string
         enumValues: []
-        exampleWasSpecified: true
+        exampleWasSpecified: false
         nullable: false
         custom: []
-      password_confirmation:
-        name: password_confirmation
-        description: "Confirm user's password."
+      company_name:
+        name: company_name
+        description: 'Must not be greater than 255 characters.'
         required: true
-        example: secret123
+        example: a
         type: string
         enumValues: []
-        exampleWasSpecified: true
+        exampleWasSpecified: false
         nullable: false
         custom: []
     cleanBodyParameters:
-      name: 'John Doe'
-      email: 4kV3b@example.com
-      password: secret123
-      password_confirmation: secret123
+      name: b
+      email: zbailey@example.net
+      password: '-0pBNvYgxw'
+      company_name: a
     fileParameters: []
-    responses:
-      -
-        status: 201
-        content: |-
-          {
-            "success": true,
-            "message": "User registered successfully, please verify your email",
-            "user": {
-                "id": 1,
-                "name": "John Doe",
-                "email": "4kV3b@example.com",
-                "role": "user",
-                "email_verified_at": null,
-                "created_at": "2021-01-01T00:00:00.000000Z",
-                "updated_at": "2021-01-01T00:00:00.000000Z"
-            }
-          }
-        headers: []
-        description: ''
-        custom: []
-      -
-        status: 400
-        content: |-
-          {
-            "success": false,
-            "message": "The given data was invalid.",
-            "errors": {
-                "name": ["The name field is required."],
-                "email": ["The email field is required."],
-                "password": ["The password field is required."],
-                "password_confirmation": ["The password confirmation field is required."]
-            }
-          }
-        headers: []
-        description: ''
-        custom: []
-      -
-        status: 400
-        content: |-
-          {
-            "success": false,
-            "message": "The given data was invalid.",
-            "errors": {
-                "email": ["The email has already been taken."],
-                "password": ["The password confirmation does not match."]
-            }
-          }
-        headers: []
-        description: ''
-        custom: []
+    responses: []
     responseFields: []
-    auth: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|abcdeEXAMPLETOKEN12345'
     controller: null
     method: null
     route: null
@@ -128,18 +83,19 @@ endpoints:
   -
     httpMethods:
       - POST
-    uri: api/login
+    uri: api/register/user
     metadata:
-      groupName: Authentication
+      groupName: Endpoints
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'POST api/login'
-      description: 'This endpoint does not require authentication.'
-      authenticated: false
+      title: ''
+      description: ''
+      authenticated: true
       deprecated: false
       custom: []
     headers:
+      Authorization: 'Bearer {YOUR_AUTH_KEY}'
       Content-Type: application/json
       Accept: application/json
     urlParameters: []
@@ -147,301 +103,58 @@ endpoints:
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      email:
-        name: email
-        description: "User's email."
+      name:
+        name: name
+        description: 'Must not be greater than 255 characters.'
         required: true
-        example: john@example.com
+        example: b
         type: string
         enumValues: []
-        exampleWasSpecified: true
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      email:
+        name: email
+        description: 'Must be a valid email address.'
+        required: true
+        example: zbailey@example.net
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
         nullable: false
         custom: []
       password:
         name: password
-        description: "User's password."
+        description: 'Must be at least 6 characters.'
         required: true
-        example: secret123
+        example: '-0pBNvYgxw'
         type: string
         enumValues: []
-        exampleWasSpecified: true
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      company_code:
+        name: company_code
+        description: ''
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
         nullable: false
         custom: []
     cleanBodyParameters:
-      email: john@example.com
-      password: secret123
+      name: b
+      email: zbailey@example.net
+      password: '-0pBNvYgxw'
+      company_code: architecto
     fileParameters: []
-    responses:
-      -
-        status: 200
-        content: |-
-          {
-            "success": true,
-            "user": {
-                "id": 1,
-                "name": "John Doe",
-                "email": "    john@example.com",
-                "profile": {
-                    "id": 1,
-                    "user_id": 1,
-                    "division_id": 2,
-                    "position_id": 3,
-                    "address": "123 Main St",
-                    "phone": "555-1234",
-                    "photo": null,
-                    "created_at": "2024-09-18T07:07:57.000000Z",
-                    "updated_at": "2024-09-18T07:07:57.000000Z",
-                    "division": {
-                        "id": 2,
-                        "name": "Marketing"
-                    },
-                    "position": {
-                        "id": 3,
-                        "name": "Manager"
-                    }
-                }
-            },
-            "token": "1|qwertyuiopasdfghjklzxcvbnm1234567890"
-          }
-        headers: []
-        description: ''
-        custom: []
-      -
-        status: 401
-        content: |-
-          {
-            "success": false,
-            "message": "Incorrect email or password"
-          }
-        headers: []
-        description: ''
-        custom: []
-      -
-        status: 403
-        content: |-
-          {
-            "success": false,
-            "message": "Please verify your email address",
-            "token": "1|qwertyuiopasdfghjklzxcvbnm1234567890"
-          }
-        headers: []
-        description: ''
-        custom: []
-      -
-        status: 500
-        content: |-
-          {
-            "success": false,
-            "message": "An error occurred while processing your request."
-          }
-        headers: []
-        description: ''
-        custom: []
+    responses: []
     responseFields: []
-    auth: []
-    controller: null
-    method: null
-    route: null
-    custom: []
-  -
-    httpMethods:
-      - POST
-    uri: api/forgot-password
-    metadata:
-      groupName: Authentication
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'POST api/forgot-password'
-      description: 'This endpoint does not require authentication.'
-      authenticated: false
-      deprecated: false
-      custom: []
-    headers:
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      email:
-        name: email
-        description: "User's email."
-        required: true
-        example: john@example.com
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        custom: []
-    cleanBodyParameters:
-      email: john@example.com
-    fileParameters: []
-    responses:
-      -
-        status: 200
-        content: |-
-          {
-            "success": true,
-            "message": "Kode OTP reset password sudah dikirim ke email."
-          }
-        headers: []
-        description: ''
-        custom: []
-      -
-        status: 400
-        content: |-
-          {
-            "success": false,
-            "message": "OTP tidak valid"
-          }
-        headers: []
-        description: ''
-        custom: []
-      -
-        status: 400
-        content: |-
-          {
-            "success": false,
-            "message": "OTP sudah kadaluarsa, silakan minta ulang."
-          }
-        headers: []
-        description: ''
-        custom: []
-    responseFields: []
-    auth: []
-    controller: null
-    method: null
-    route: null
-    custom: []
-  -
-    httpMethods:
-      - POST
-    uri: api/reset-password
-    metadata:
-      groupName: Authentication
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'POST api/reset-password'
-      description: 'This endpoint does not require authentication.'
-      authenticated: false
-      deprecated: false
-      custom: []
-    headers:
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      email:
-        name: email
-        description: "User's email."
-        required: true
-        example: john@example.com
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        custom: []
-      otp:
-        name: otp
-        description: 'OTP code.'
-        required: true
-        example: '123456'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        custom: []
-      password:
-        name: password
-        description: 'New password.'
-        required: true
-        example: secret123
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        custom: []
-      password_confirmation:
-        name: password_confirmation
-        description: 'Confirm new password.'
-        required: true
-        example: secret123
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        custom: []
-    cleanBodyParameters:
-      email: john@example.com
-      otp: '123456'
-      password: secret123
-      password_confirmation: secret123
-    fileParameters: []
-    responses:
-      -
-        status: 200
-        content: |-
-          {
-            "success": true,
-            "message": "Password berhasil direset."
-          }
-        headers: []
-        description: ''
-        custom: []
-      -
-        status: 400
-        content: |-
-          {
-            "success": false,
-            "message": "OTP tidak valid"
-          }
-        headers: []
-        description: ''
-        custom: []
-      -
-        status: 400
-        content: |-
-          {
-            "success": false,
-            "message": "OTP sudah kadaluarsa, silakan minta ulang."
-          }
-        headers: []
-        description: ''
-        custom: []
-      -
-        status: 400
-        content: |-
-          {
-            "success": false,
-            "message": "An error occurred while processing your request."
-          }
-        headers: []
-        description: ''
-        custom: []
-      -
-        status: 400
-        content: |-
-          {
-            "success": false,
-            "message": "The given data was invalid.",
-            "errors": {
-                "email": ["The email field is required."],
-                "otp": ["The otp field is required."],
-                "password": ["The password field is required."],
-                "password_confirmation": ["The password confirmation field is required."]
-            }
-          }
-        headers: []
-        description: ''
-        custom: []
-    responseFields: []
-    auth: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|abcdeEXAMPLETOKEN12345'
     controller: null
     method: null
     route: null
@@ -449,77 +162,14 @@ endpoints:
   -
     httpMethods:
       - GET
-    uri: 'api/email/verify/{id}/{hash}'
+    uri: api/meeting-requests
     metadata:
-      groupName: Authentication
+      groupName: Endpoints
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'GET api/email/verify/{id}/{hash}'
-      description: 'This endpoint does not require authentication.'
-      authenticated: false
-      deprecated: false
-      custom: []
-    headers:
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters:
-      id:
-        name: id
-        description: 'The ID of the verify.'
-        required: true
-        example: architecto
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        custom: []
-      hash:
-        name: hash
-        description: ''
-        required: true
-        example: architecto
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        custom: []
-    cleanUrlParameters:
-      id: architecto
-      hash: architecto
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses:
-      -
-        status: 200
-        content: |-
-          {
-           "success": true,
-           "message": "Email verified successfully."
-          }
-        headers: []
-        description: ''
-        custom: []
-    responseFields: []
-    auth: []
-    controller: null
-    method: null
-    route: null
-    custom: []
-  -
-    httpMethods:
-      - POST
-    uri: api/logout
-    metadata:
-      groupName: Authentication
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'POST api/logout'
-      description: 'This endpoint requires authentication.'
+      title: ''
+      description: ''
       authenticated: true
       deprecated: false
       custom: []
@@ -536,15 +186,232 @@ endpoints:
     fileParameters: []
     responses:
       -
-        status: 200
-        content: |-
-          {
-            "success": true,
-            "message": "Logged out successfully"
-          }
-        headers: []
-        description: ''
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
         custom: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|abcdeEXAMPLETOKEN12345'
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: 'api/meeting-requests/{id}'
+    metadata:
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+      custom: []
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_KEY}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        name: id
+        description: 'The ID of the meeting request.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+        custom: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|abcdeEXAMPLETOKEN12345'
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - PUT
+      - PATCH
+    uri: 'api/meeting-requests/{id}'
+    metadata:
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+      custom: []
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_KEY}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        name: id
+        description: 'The ID of the meeting request.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|abcdeEXAMPLETOKEN12345'
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - DELETE
+    uri: 'api/meeting-requests/{id}'
+    metadata:
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+      custom: []
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_KEY}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        name: id
+        description: 'The ID of the meeting request.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 1|abcdeEXAMPLETOKEN12345'
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - PUT
+    uri: 'api/meeting-requests/{id}/status'
+    metadata:
+      groupName: Endpoints
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      deprecated: false
+      custom: []
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_KEY}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        name: id
+        description: 'The ID of the meeting request.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      status:
+        name: status
+        description: ''
+        required: true
+        example: rejected
+        type: string
+        enumValues:
+          - approved
+          - rejected
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      rejection_reason:
+        name: rejection_reason
+        description: ''
+        required: false
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        custom: []
+    cleanBodyParameters:
+      status: rejected
+      rejection_reason: architecto
+    fileParameters: []
+    responses: []
     responseFields: []
     auth:
       - headers

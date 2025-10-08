@@ -18,6 +18,29 @@ class MeetingRoomReservationController extends Controller
 {
     public function index()
     {
+        $user = Auth::user();
+
+        switch ($user->role) {
+            case 'super_admin':
+            case 'company_admin':
+                $rule = [];
+                break;
+
+            case 'employee':
+                $rule = ['user_id' => $user->id];
+                break;
+
+            case 'support_staff':
+                $rule = ['status' => 'approved'];
+                break;
+
+            case 'finance_officer':
+                $rule = [];
+                break;
+
+            default:
+                return response()->json(['message' => 'Unauthorized'], 403);
+        }
         $reservations = MeetingRoomReservation::with(
             'user:id,name',
             'user.profile:id,user_id,division_id,position_id',
@@ -26,6 +49,7 @@ class MeetingRoomReservationController extends Controller
             'room:id,name'
         )
             ->orderBy('start_time', 'asc')
+            ->where($rule)
             ->get();
 
         return response()->json($reservations);
@@ -110,8 +134,7 @@ class MeetingRoomReservationController extends Controller
         ]);
 
         return DB::transaction(function () use ($request, $id) {
-            $reservation = MeetingRoomReservation::with('room')->findOrFail($id);
-            $room = $reservation->room;
+            $reservation = MeetingRoomReservation::with(['room', 'request'])->findOrFail($id);
 
             if ($request->status === 'approved') {
                 if ($conflictMessage = $this->checkConflict(
@@ -129,6 +152,18 @@ class MeetingRoomReservationController extends Controller
                     'rejection_reason' => null,
                 ]);
 
+                if ($reservation->request) {
+                    if ($reservation->request->funds_amount > 0) {
+                        $reservation->request->update([
+                            'status' => 'waiting_finance',
+                        ]);
+                    } else {
+                        $reservation->request->update([
+                            'status' => 'approved',
+                        ]);
+                    }
+                }
+
                 $rejectionReason = $request->rejection_reason
                     ?: 'Bentrok dengan jadwal yang telah disetujui otomatis oleh sistem.';
 
@@ -142,9 +177,16 @@ class MeetingRoomReservationController extends Controller
             } elseif ($request->status === 'rejected') {
                 $reservation->update([
                     'status' => 'rejected',
-                    'rejection_reason' => $request->rejection_reason ?? 'Ditolak oleh HR.',
+                    'rejection_reason' => $request->rejection_reason ?? 'Ditolak oleh admin perusahaan.',
                     'approved_by' => Auth::id(),
                 ]);
+
+                if ($reservation->request) {
+                    $reservation->request->update([
+                        'status' => 'rejected',
+                        'rejection_reason' => $request->rejection_reason ?? 'Ditolak karena booking tidak disetujui.',
+                    ]);
+                }
             } else {
                 $reservation->update([
                     'status' => 'pending',
@@ -161,6 +203,7 @@ class MeetingRoomReservationController extends Controller
             ]);
         });
     }
+
 
     private function rules(): array
     {

@@ -20,7 +20,12 @@ return new class extends Migration
             $table->dateTime('start_time');
             $table->dateTime('end_time');
             $table->integer('participants')->default(0);
-            $table->enum('status', ['pending', 'approved', 'rejected', 'cancelled'])->default('pending');
+            $table->enum('status', [
+                'pending',         // default setelah dibuat
+                'approved',       // sudah disetujui (admin)
+                'rejected',
+                'cancelled'
+            ])->default('pending');
             $table->text('rejection_reason')->nullable();
             $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();

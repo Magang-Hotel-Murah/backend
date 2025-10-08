@@ -8,6 +8,7 @@ use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\MeetingRoomReservationController;
 use App\Http\Controllers\MeetingRoomController;
+use App\Http\Controllers\MeetingRequestController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\PositionController;
@@ -23,9 +24,9 @@ Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    Route::middleware('role:admin,super_admin')->group(function () {
+    Route::middleware('role:company_admin,super_admin')->group(function () {
         Route::apiResource('users', UserController::class);
-        Route::put('/meeting-room/{id}/status', [MeetingRoomReservationController::class, 'updateStatus']);
+        Route::put('/meeting-reservations/{id}/status', [MeetingRoomReservationController::class, 'updateStatus']);
         Route::apiResource('divisions', DivisionController::class, ['only' => ['store', 'update', 'destroy']]);
         Route::apiResource('positions', PositionController::class, ['only' => ['store', 'update', 'destroy']]);
         Route::apiResource('user-profiles', UserProfileController::class, ['only' => ['index']]);
@@ -40,8 +41,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('reservations', ReservationController::class);
     Route::apiResource('transactions', TransactionController::class, ['only' => ['show']]);
 
-
-
     Route::post('/meeting-room/reserve', [MeetingRoomReservationController::class, 'store']);
     Route::get('/meeting-room/reservations', [MeetingRoomReservationController::class, 'index']);
     Route::get('/meeting-room/{id}/reservations', [MeetingRoomReservationController::class, 'show']);
@@ -52,4 +51,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('user-profiles', UserProfileController::class, ['only' => ['store', 'update']]);
     Route::apiResource('divisions', DivisionController::class, ['only' => ['index', 'show']]);
     Route::apiResource('positions', PositionController::class, ['only' => ['index', 'show']]);
+
+    Route::apiResource('/meeting-requests', MeetingRequestController::class);
+    Route::middleware('role:finance_officer')->put('/meeting-requests/{id}/status', [MeetingRequestController::class, 'updateStatus']);
 });

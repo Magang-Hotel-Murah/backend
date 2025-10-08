@@ -25,7 +25,7 @@ class MeetingRoomFactory extends Factory
                 'AC',
                 'HDMI Cable'
             ], $this->faker->numberBetween(2, 4)),
-            'status'     => $this->faker->randomElement(['available', 'maintenance']),
+            'location'   => $this->faker->optional()->address(),
             'type'       => $this->faker->randomElement(['main', 'sub']),
         ];
     }

@@ -18,6 +18,9 @@ class MeetingRequest extends Model
         'snacks',
         'equipment',
         'company_id',
+        'status',
+        'rejection_reason',
+        'approved_by',
     ];
 
     protected $casts = [
@@ -46,5 +49,10 @@ class MeetingRequest extends Model
     public function reservation()
     {
         return $this->belongsTo(MeetingRoomReservation::class, 'reservation_id');
+    }
+
+    public function approvedBy()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
     }
 }
