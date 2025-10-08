@@ -10,6 +10,8 @@ use App\Models\User;
 use App\Models\MeetingParticipant;
 use App\Models\MeetingRequest;
 use App\Models\MeetingRoom;
+use Illuminate\Support\Facades\Log;
+use App\Models\Scopes\CompanyScope;
 
 /**
  * @group Meeting Room Reservations
@@ -18,29 +20,6 @@ class MeetingRoomReservationController extends Controller
 {
     public function index()
     {
-        $user = Auth::user();
-
-        switch ($user->role) {
-            case 'super_admin':
-            case 'company_admin':
-                $rule = [];
-                break;
-
-            case 'employee':
-                $rule = ['user_id' => $user->id];
-                break;
-
-            case 'support_staff':
-                $rule = ['status' => 'approved'];
-                break;
-
-            case 'finance_officer':
-                $rule = [];
-                break;
-
-            default:
-                return response()->json(['message' => 'Unauthorized'], 403);
-        }
         $reservations = MeetingRoomReservation::with(
             'user:id,name',
             'user.profile:id,user_id,division_id,position_id',
@@ -49,13 +28,12 @@ class MeetingRoomReservationController extends Controller
             'room:id,name'
         )
             ->orderBy('start_time', 'asc')
-            ->where($rule)
             ->get();
 
         return response()->json($reservations);
     }
 
-    public function show($room_id)
+    public function indexByRoom($room_id)
     {
         $reservation = MeetingRoomReservation::with(
             'user:id,name',
@@ -71,10 +49,10 @@ class MeetingRoomReservationController extends Controller
         return response()->json($reservation);
     }
 
-    public function detail($reservation_id)
+    public function show($reservation_id)
     {
-        $reservation = MeetingRoomReservation::select('id', 'user_id', 'meeting_room_id', 'title', 'description', 'start_time', 'end_time', 'status', 'participants')
-            ->with([
+        try {
+            $reservation = MeetingRoomReservation::with([
                 'user:id,name',
                 'user.profile:id,user_id,division_id,position_id',
                 'user.profile.division:id,name',
@@ -84,11 +62,16 @@ class MeetingRoomReservationController extends Controller
                 'participants.user:id,name,email',
                 'participants.user.profile:user_id,phone',
                 'request:reservation_id,funds_amount,funds_reason,snacks,equipment',
-            ])
-            ->findOrFail($reservation_id);
+            ])->findOrFail($reservation_id);
 
-        return response()->json($reservation);
+            return response()->json($reservation);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'Reservasi tidak ditemukan atau Anda tidak memiliki akses ke data ini.'
+            ], 404);
+        }
     }
+
 
     public function store(Request $request)
     {

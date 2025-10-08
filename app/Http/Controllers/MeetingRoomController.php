@@ -36,7 +36,6 @@ class MeetingRoomController extends Controller
                 'integer',
                 Rule::exists('meeting_rooms', 'id'),
                 function ($attribute, $value, $fail) use ($request, $room) {
-                    // ambil type dari request kalau dikirim, kalau tidak ambil dari DB
                     $type = $request->input('type', $room->type);
 
                     if ($type === 'main' && $value !== null) {
