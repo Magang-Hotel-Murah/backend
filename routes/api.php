@@ -12,7 +12,7 @@ use App\Http\Controllers\MeetingRequestController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\PositionController;
-
+use App\Http\Controllers\InviteController;
 
 Route::post('/register/admin', [AuthController::class, 'registerAdmin']);
 Route::post('/register/user', [AuthController::class, 'registerUser']);
@@ -21,6 +21,8 @@ Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
     ->middleware(['signed'])->name('verification.verify');
+
+Route::post('/activate-account', [InviteController::class, 'activate']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -33,6 +35,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('user-profiles', UserProfileController::class, ['only' => ['index']]);
         Route::apiResource('transactions', TransactionController::class);
         Route::apiResource('meeting-room', MeetingRoomController::class);
+        Route::post('/invite-users', [InviteController::class, 'inviteUsers']);
     });
 
     Route::get('/hotels/by-city', [HotelController::class, 'getHotelsByCity']);
