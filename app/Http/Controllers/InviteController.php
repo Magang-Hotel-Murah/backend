@@ -19,7 +19,7 @@ class InviteController extends Controller
     {
         $request->validate([
             'employees' => 'required|array|min:1',
-            'employees.*.role' => 'required|in:employee,finance,staff,service',
+            'employees.*.role' => 'required|in:employee,finance_officer,support_staff',
             'employees.*.emails' => 'required|array|min:1',
             'employees.*.emails.*' => 'required|email|distinct',
         ]);
