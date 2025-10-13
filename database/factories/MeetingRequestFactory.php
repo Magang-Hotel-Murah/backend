@@ -13,11 +13,14 @@ class MeetingRequestFactory extends Factory
 
     public function definition(): array
     {
+        // Kadang ada dana, kadang tidak
+        $fundsAmount = $this->faker->optional()->randomFloat(2, 100000, 5000000);
+
         return [
             'company_id'     => Company::factory(),
             'reservation_id' => MeetingRoomReservation::factory(),
-            'funds_amount'   => $this->faker->optional()->randomFloat(2, 100000, 5000000),
-            'funds_reason'   => $this->faker->optional()->sentence(),
+            'funds_amount'   => $fundsAmount,
+            'funds_reason'   => $fundsAmount ? $this->faker->sentence() : null, // hanya isi kalau ada dana
             'snacks'         => $this->faker->optional()->randomElements([
                 'Snack Box',
                 'Kopi',
@@ -34,7 +37,6 @@ class MeetingRequestFactory extends Factory
             'status'         => 'pending',
             'rejection_reason' => null,
             'approved_by'    => null,
-
         ];
     }
 

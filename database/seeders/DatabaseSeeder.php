@@ -158,10 +158,10 @@ class DatabaseSeeder extends Seeder
             }
 
             // Meeting request
-            MeetingRequest::create([
-                'reservation_id' => $reservation->id,
-                'company_id' => $reservation->company_id,
-            ]);
+            MeetingRequest::factory()
+                ->for($reservation, 'reservation')
+                ->forCompany($reservation->company)
+                ->create();
         });
     }
 }
