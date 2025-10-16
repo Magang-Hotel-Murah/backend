@@ -20,13 +20,10 @@ class MeetingRoomReservationController extends Controller
         $perPage = $request->get('per_page', 10);
         $reservations = MeetingRoomReservation::with([
             'user:id,name',
-            'user.profile:id,user_id,division_id,position_id',
-            'user.profile.division:id,name',
-            'user.profile.position:id,name',
             'room:id,name',
         ])
-            ->when($request->has('user_id'), function ($query) use ($request) {
-                $query->where('user_id', $request->user_id);
+            ->when($request->has('user'), function ($query) use ($request) {
+                $query->where('user_id', Auth::id());
             })
             ->when($request->has('status'), function ($query) use ($request) {
                 $query->where('status', $request->status);
@@ -41,9 +38,6 @@ class MeetingRoomReservationController extends Controller
     {
         $reservation = MeetingRoomReservation::with(
             'user:id,name',
-            'user.profile:id,user_id,division_id,position_id',
-            'user.profile.division:id,name',
-            'user.profile.position:id,name',
             'room:id,name'
         )
             ->where('meeting_room_id', $room_id)
