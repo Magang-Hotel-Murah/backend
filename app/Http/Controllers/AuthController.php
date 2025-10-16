@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Auth\Events\Verified;
+use App\Mail\VerifyUserMail;
 use Illuminate\Support\Str;
 use App\Models\Company;
 use Carbon\Carbon;
@@ -50,7 +51,7 @@ class AuthController extends Controller
                 'photo' => null,
             ]);
 
-            event(new Registered($user));
+            Mail::to($user->email)->send(new VerifyUserMail($user));
 
             DB::commit();
 

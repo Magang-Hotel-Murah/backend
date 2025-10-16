@@ -19,7 +19,7 @@ Route::post('/register/user', [AuthController::class, 'registerUser']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
-Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
+Route::get('/verify-email/{id}/{hash}', [AuthController::class, 'verifyEmail'])
     ->middleware(['signed'])->name('verification.verify');
 
 Route::post('/activate-account', [InviteController::class, 'activate']);
