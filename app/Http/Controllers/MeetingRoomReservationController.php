@@ -109,6 +109,74 @@ class MeetingRoomReservationController extends Controller
         ], 201);
     }
 
+    public function update(Request $request, $id)
+    {
+        $validated = $request->validate(array_merge($this->rules(), [
+            'status' => 'sometimes|in:cancelled',
+        ]));
+
+        if ($conflictMessage = $this->checkConflict(
+            $validated['meeting_room_id'],
+            $validated['start_time'],
+            $validated['end_time'],
+            $id
+        )) {
+            return response()->json(['message' => "Tidak dapat membuat reservasi. {$conflictMessage}"], 422);
+        }
+
+        $reservation = DB::transaction(function () use ($validated, $id) {
+            $reservation = MeetingRoomReservation::with(['request'])->findOrFail($id);
+
+            if ($reservation->status === 'approved' && isset($validated['status']) && $validated['status'] !== $reservation->status) {
+                throw new \Exception('Status tidak dapat diubah karena reservasi sudah disetujui.');
+            }
+
+            if (isset($validated['status']) && $validated['status'] === 'cancelled') {
+                $reservation->request()->update(['status' => 'cancelled']);
+            }
+
+            // sebelum transaksi
+            $hasParticipantsKey = array_key_exists('participants', $validated);
+
+            // di dalam transaction, saat update:
+            $updateData = [
+                'meeting_room_id' => $validated['meeting_room_id'],
+                'title'           => $validated['title'],
+                'description'     => $validated['description'] ?? null,
+                'start_time'      => $validated['start_time'],
+                'end_time'        => $validated['end_time'],
+            ];
+
+            // hanya set participants count kalau key dikirim
+            if ($hasParticipantsKey) {
+                $updateData['participants'] = count($validated['participants'] ?? []);
+            }
+
+            // status logic (tetap seperti semula, tapi gunakan $updateData)
+            $updateData['status'] = $reservation->status === 'approved'
+                ? $reservation->status
+                : ($validated['status'] ?? $reservation->status);
+
+            $reservation->update($updateData);
+
+            // setelah update, panggil saveParticipants hanya kalau key dikirim
+            if ($hasParticipantsKey) {
+                $this->saveParticipants($reservation, $validated['participants'] ?? []);
+            }
+
+            // panggil saveRequest hanya kalau key request ada
+            if (array_key_exists('request', $validated)) {
+                $this->saveRequest($reservation, $validated['request'] ?? []);
+            }
+            return $reservation->load(['participants', 'request', 'room']);
+        });
+
+        return response()->json([
+            'message' => 'Reservasi ruangan berhasil diperbarui.',
+            'data' => $reservation,
+        ], 200);
+    }
+
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
@@ -237,14 +305,20 @@ class MeetingRoomReservationController extends Controller
 
     private function saveParticipants(MeetingRoomReservation $reservation, array $participants): void
     {
+        if (empty($participants)) {
+            return;
+        }
+
+        $reservation->participants()->delete();
+
         foreach ($participants as $p) {
             $data = ['reservation_id' => $reservation->id];
             if (isset($p['user_id'])) {
                 $data['user_id'] = $p['user_id'];
             } else {
                 $data = array_merge($data, [
-                    'name' => $p['name'] ?? null,
-                    'email' => $p['email'] ?? null,
+                    'name'            => $p['name'] ?? null,
+                    'email'           => $p['email'] ?? null,
                     'whatsapp_number' => $p['whatsapp_number'] ?? null,
                 ]);
             }
@@ -256,12 +330,24 @@ class MeetingRoomReservationController extends Controller
     {
         if (empty($requestData)) return;
 
-        MeetingRequest::create([
-            'reservation_id' => $reservation->id,
-            'funds_amount'   => $requestData['funds_amount'] ?? null,
-            'funds_reason'   => $requestData['funds_reason'] ?? null,
-            'snacks'         => $requestData['snacks'] ?? [],
-            'equipment'      => $requestData['equipment'] ?? [],
-        ]);
+        $existingRequest = $reservation->request;
+
+        if ($existingRequest) {
+            $existingRequest->update([
+                'funds_amount'   => $requestData['funds_amount'] ?? null,
+                'funds_reason'   => $requestData['funds_reason'] ?? null,
+                'snacks'         => $requestData['snacks'] ?? [],
+                'equipment'      => $requestData['equipment'] ?? [],
+            ]);
+        } else {
+            MeetingRequest::create([
+                'reservation_id' => $reservation->id,
+                'company_id'     => $reservation->company_id,
+                'funds_amount'   => $requestData['funds_amount'] ?? null,
+                'funds_reason'   => $requestData['funds_reason'] ?? null,
+                'snacks'         => $requestData['snacks'] ?? [],
+                'equipment'      => $requestData['equipment'] ?? [],
+            ]);
+        }
     }
 }
