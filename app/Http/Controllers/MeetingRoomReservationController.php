@@ -6,29 +6,33 @@ use Illuminate\Http\Request;
 use App\Models\MeetingRoomReservation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Models\User;
 use App\Models\MeetingParticipant;
 use App\Models\MeetingRequest;
 use App\Models\MeetingRoom;
-use Illuminate\Support\Facades\Log;
-use App\Models\Scopes\CompanyScope;
 
 /**
  * @group Meeting Room Reservations
  */
 class MeetingRoomReservationController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $reservations = MeetingRoomReservation::with(
+        $perPage = $request->get('per_page', 10);
+        $reservations = MeetingRoomReservation::with([
             'user:id,name',
             'user.profile:id,user_id,division_id,position_id',
             'user.profile.division:id,name',
             'user.profile.position:id,name',
-            'room:id,name'
-        )
+            'room:id,name',
+        ])
+            ->when($request->has('user_id'), function ($query) use ($request) {
+                $query->where('user_id', $request->user_id);
+            })
+            ->when($request->has('status'), function ($query) use ($request) {
+                $query->where('status', $request->status);
+            })
             ->orderBy('start_time', 'asc')
-            ->get();
+            ->paginate($perPage);
 
         return response()->json($reservations);
     }
@@ -135,10 +139,8 @@ class MeetingRoomReservationController extends Controller
                 $reservation->request()->update(['status' => 'cancelled']);
             }
 
-            // sebelum transaksi
             $hasParticipantsKey = array_key_exists('participants', $validated);
 
-            // di dalam transaction, saat update:
             $updateData = [
                 'meeting_room_id' => $validated['meeting_room_id'],
                 'title'           => $validated['title'],
@@ -147,24 +149,20 @@ class MeetingRoomReservationController extends Controller
                 'end_time'        => $validated['end_time'],
             ];
 
-            // hanya set participants count kalau key dikirim
             if ($hasParticipantsKey) {
                 $updateData['participants'] = count($validated['participants'] ?? []);
             }
 
-            // status logic (tetap seperti semula, tapi gunakan $updateData)
             $updateData['status'] = $reservation->status === 'approved'
                 ? $reservation->status
                 : ($validated['status'] ?? $reservation->status);
 
             $reservation->update($updateData);
 
-            // setelah update, panggil saveParticipants hanya kalau key dikirim
             if ($hasParticipantsKey) {
                 $this->saveParticipants($reservation, $validated['participants'] ?? []);
             }
 
-            // panggil saveRequest hanya kalau key request ada
             if (array_key_exists('request', $validated)) {
                 $this->saveRequest($reservation, $validated['request'] ?? []);
             }
