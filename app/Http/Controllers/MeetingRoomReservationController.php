@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\DB;
 use App\Models\MeetingParticipant;
 use App\Models\MeetingRequest;
 use App\Models\MeetingRoom;
+use App\Models\Scopes\CompanyScope;
+use App\Models\Company;
+use Carbon\Carbon;
 
 /**
  * @group Meeting Room Reservations
@@ -33,6 +36,99 @@ class MeetingRoomReservationController extends Controller
 
         return response()->json($reservations);
     }
+
+    public function meetingDisplay(Request $request)
+    {
+        $company = Company::where('code', $request->company_code)->firstOrFail();
+        $companyId = $company->id;
+        $now = Carbon::now();
+
+        // Ambil nilai filter dari request: day | week | month | year (default: day)
+        $filter = $request->get('filter', 'day');
+
+        // Tentukan rentang waktu berdasarkan filter
+        switch ($filter) {
+            case 'week':
+                $startDate = $now->copy()->startOfWeek();
+                $endDate   = $now->copy()->endOfWeek();
+                break;
+            case 'month':
+                $startDate = $now->copy()->startOfMonth();
+                $endDate   = $now->copy()->endOfMonth();
+                break;
+            case 'year':
+                $startDate = $now->copy()->startOfYear();
+                $endDate   = $now->copy()->endOfYear();
+                break;
+            default:
+                $startDate = $now->copy()->startOfDay();
+                $endDate   = $now->copy()->endOfDay();
+                break;
+        }
+
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $startDate = Carbon::parse($request->start_date)->startOfDay();
+            $endDate   = Carbon::parse($request->end_date)->endOfDay();
+        }
+
+        $query = MeetingRoomReservation::withoutGlobalScope(CompanyScope::class)
+            ->select('id', 'user_id', 'company_id', 'title', 'meeting_room_id', 'start_time', 'end_time', 'participants', 'status')
+            ->with([
+                'user:id,name',
+                'user.profile:id,user_id,division_id,position_id',
+                'user.profile.division:id,name',
+                'user.profile.position:id,name',
+                'room:id,name',
+                'company:id,code,name',
+            ])
+            ->where('company_id', $companyId)
+            ->where('status', 'approved')
+            ->whereBetween('start_time', [$startDate, $endDate]);
+
+        if ($request->filled('room_id')) {
+            $query->where('meeting_room_id', $request->room_id);
+        }
+
+        if ($request->filled('division_id')) {
+            $query->whereHas('user.profile', function ($q) use ($request) {
+                $q->where('division_id', $request->division_id);
+            });
+        }
+
+        if ($request->filled('status')) {
+            $status = $request->status;
+
+            $query->when($status === 'ongoing', function ($q) use ($now) {
+                $q->where('start_time', '<=', $now)
+                    ->where('end_time', '>=', $now);
+            });
+
+            $query->when($status === 'upcoming', function ($q) use ($now) {
+                $q->where('start_time', '>', $now);
+            });
+
+            $query->when($status === 'finished', function ($q) use ($now) {
+                $q->where('end_time', '<', $now);
+            });
+
+            $query->when($status === 'cancelled', function ($q) {
+                $q->where('status', 'cancelled');
+            });
+        }
+
+        $reservations = $query->orderBy('start_time', 'asc')->get();
+
+        return response()->json([
+            'filter' => $filter,
+            'date_range' => [
+                'start' => $startDate->toDateTimeString(),
+                'end'   => $endDate->toDateTimeString(),
+            ],
+            'total' => $reservations->count(),
+            'reservations' => $reservations
+        ]);
+    }
+
 
     public function indexByRoom($room_id)
     {

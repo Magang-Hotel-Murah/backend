@@ -14,6 +14,7 @@ use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\InviteController;
 
+Route::get('/meeting-display/{company_code}', [MeetingRoomReservationController::class, 'meetingDisplay']);
 Route::post('/register/admin', [AuthController::class, 'registerAdmin']);
 Route::post('/register/user', [AuthController::class, 'registerUser']);
 Route::post('/login', [AuthController::class, 'login']);
