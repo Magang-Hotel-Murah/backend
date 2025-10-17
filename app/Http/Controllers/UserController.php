@@ -39,7 +39,7 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'role' => 'nullable|in:user,admin',
+            'role' => 'nullable|in:employee,finance_officer,support_staff,company_admin,super_admin',
             'name' => 'nullable|string|max:255',
             'email' => 'nullable|email|unique:users,email,' . $id,
             'restore' => 'nullable|boolean',
