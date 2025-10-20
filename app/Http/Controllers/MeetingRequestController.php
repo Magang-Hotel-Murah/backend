@@ -66,10 +66,18 @@ class MeetingRequestController extends Controller
     {
         $request->validate([
             'status' => 'required|in:approved,rejected',
-            'rejection_reason' => 'nullable|string'
+            'rejection_reason' => 'required_if:status,rejected|string|nullable',
+        ], [
+            'rejection_reason.required_if' => 'Alasan penolakan wajib diisi jika status ditolak.',
         ]);
 
-        $requestData = MeetingRequest::with('reservation')->where('status', 'waiting_finance')->findOrFail($id);
+        $meetingRequest = MeetingRequest::with('reservation')->findOrFail($id);
+
+        if ($meetingRequest->status !== 'waiting_finance') {
+            return response()->json([
+                'message' => 'Status tidak dapat diubah karena status saat tidak menunggu persetujuan finance.',
+            ], 403);
+        }
 
         $updateData = [
             'status' => $request->status,
@@ -80,13 +88,14 @@ class MeetingRequestController extends Controller
             $updateData['rejection_reason'] = $request->rejection_reason ?? 'Ditolak oleh finance.';
         }
 
-        $requestData->update($updateData);
+        $meetingRequest->update($updateData);
 
         return response()->json([
             'message' => 'Status request berhasil diperbarui.',
-            'data' => $requestData->fresh(['reservation']),
+            'data' => $meetingRequest->fresh(['reservation']),
         ]);
     }
+
 
     public function destroy(MeetingRequest $meetingRequest)
     {

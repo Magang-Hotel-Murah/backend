@@ -96,7 +96,7 @@ class DatabaseSeeder extends Seeder
         $allUsers = User::where('company_id', $company->id)->get();
 
         // 6. Hotel reservations
-        HotelReservation::factory(100)
+        HotelReservation::factory(5)
             ->recycle($allUsers)
             ->has(Transaction::factory()->state(fn(array $attrs, HotelReservation $reservation) => [
                 'amount' => $reservation->total_price
@@ -104,7 +104,7 @@ class DatabaseSeeder extends Seeder
             ->create();
 
         // 7. Flight reservations
-        FlightReservation::factory(100)
+        FlightReservation::factory(5)
             ->recycle($allUsers)
             ->has(Transaction::factory()->state(fn(array $attrs, FlightReservation $reservation) => [
                 'amount' => $reservation->total_price
@@ -112,7 +112,7 @@ class DatabaseSeeder extends Seeder
             ->create();
 
         // 8. PPOB transactions
-        PPOBTransaction::factory(100)
+        PPOBTransaction::factory(5)
             ->recycle($allUsers)
             ->has(Transaction::factory()->state(fn(array $attrs, PPOBTransaction $bill) => [
                 'amount' => $bill->total_price

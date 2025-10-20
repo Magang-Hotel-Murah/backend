@@ -201,7 +201,6 @@ class MeetingRoomReservationService
 
             switch ($data['status']) {
                 case 'approved':
-                    // ✅ Cek bentrok jadwal
                     if ($conflictMessage = $this->checkConflict(
                         $reservation->meeting_room_id,
                         $reservation->start_time,
@@ -211,14 +210,12 @@ class MeetingRoomReservationService
                         throw new \Exception("Tidak dapat menyetujui reservasi. {$conflictMessage}");
                     }
 
-                    // ✅ Update status utama
                     $reservation->update([
                         'status' => 'approved',
                         'approved_by' => Auth::id(),
                         'rejection_reason' => null,
                     ]);
 
-                    // ✅ Update request terkait
                     if ($reservation->request) {
                         $reservation->request->update([
                             'status' => $reservation->request->funds_amount > 0
@@ -227,7 +224,6 @@ class MeetingRoomReservationService
                         ]);
                     }
 
-                    // ✅ Tolak otomatis reservasi lain yang bentrok
                     $rejectionReason = $data['rejection_reason']
                         ?? 'Bentrok dengan jadwal yang telah disetujui otomatis oleh sistem.';
 
@@ -247,7 +243,6 @@ class MeetingRoomReservationService
                     break;
 
                 case 'rejected':
-                    // ❌ Ditolak oleh admin
                     $reservation->update([
                         'status' => 'rejected',
                         'rejection_reason' => $data['rejection_reason'] ?? 'Ditolak oleh admin perusahaan.',
@@ -262,8 +257,7 @@ class MeetingRoomReservationService
                     }
                     break;
 
-                default: // pending
-                    // ⏳ Kembalikan ke status pending
+                default:
                     $reservation->update([
                         'status' => 'pending',
                         'approved_by' => null,
