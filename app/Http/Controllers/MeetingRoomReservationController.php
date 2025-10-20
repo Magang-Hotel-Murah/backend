@@ -28,320 +28,124 @@ class MeetingRoomReservationController extends Controller
 
     public function index(Request $request)
     {
-        $reservations = $this->reservationService->getReservations($request);
-        return response()->json($reservations);
+        try {
+            $reservations = $this->reservationService->getReservations($request);
+
+            return response()->json([
+                'message' => 'Daftar reservasi berhasil diambil.',
+                'data' => $reservations,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
     }
 
     public function meetingDisplay(Request $request)
     {
-        $data = $this->reservationService->getMeetingDisplay($request);
-        return response()->json($data);
+        try {
+            $data = $this->reservationService->getMeetingDisplay($request);
+            return response()->json([
+                'message' => 'Data rapat berhasil diambil.',
+                'data' => $data,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
     }
 
     public function indexByRoom($room_id)
     {
-        $reservation = MeetingRoomReservation::with(
-            'user:id,name',
-            'room:id,name'
-        )
-            ->where('meeting_room_id', $room_id)
-            ->orderBy('start_time', 'asc')
-            ->get();
+        try {
+            $reservations = $this->reservationService->getReservationsByRoom($room_id);
 
-        return response()->json($reservation);
+            return response()->json([
+                'message' => 'Daftar reservasi berhasil diambil.',
+                'data' => $reservations,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
+        }
     }
 
     public function show($reservation_id)
     {
         try {
-            $reservation = MeetingRoomReservation::with([
-                'user:id,name',
-                'user.profile:id,user_id,division_id,position_id',
-                'user.profile.division:id,name',
-                'user.profile.position:id,name',
-                'room:id,name',
-                'participants:id,reservation_id,user_id,name,email,whatsapp_number',
-                'participants.user:id,name,email',
-                'participants.user.profile:user_id,phone',
-                'request:reservation_id,funds_amount,funds_reason,snacks,equipment',
-            ])->findOrFail($reservation_id);
+            $reservation = $this->reservationService->getReservationDetails($reservation_id);
 
-            return response()->json($reservation);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
-                'message' => 'Reservasi tidak ditemukan atau Anda tidak memiliki akses ke data ini.'
-            ], 404);
+                'message' => 'Detail reservasi berhasil diambil.',
+                'data' => $reservation,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
         }
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate($this->rules());
+        $validated = $request->validate($this->reservationService->rules());
 
-        if ($conflictMessage = $this->checkConflict(
-            $validated['meeting_room_id'],
-            $validated['start_time'],
-            $validated['end_time']
-        )) {
-            return response()->json(['message' => "Tidak dapat membuat reservasi. {$conflictMessage}"], 422);
-        }
-
-        $reservation = DB::transaction(function () use ($validated) {
-            $reservation = MeetingRoomReservation::create([
-                'meeting_room_id' => $validated['meeting_room_id'],
-                'user_id'         => Auth::id(),
-                'title'           => $validated['title'],
-                'description'     => $validated['description'] ?? null,
-                'start_time'      => $validated['start_time'],
-                'end_time'        => $validated['end_time'],
-                'participants'    => count($validated['participants'] ?? []),
-                'status'          => 'pending',
+        try {
+            $result = $this->reservationService->createReservation($validated);
+            return response()->json([
+                'message' => 'Reservasi berhasil dibuat.',
+                'data' => $result,
             ]);
-
-            $this->saveParticipants($reservation, $validated['participants'] ?? []);
-            $this->saveRequest($reservation, $validated['request'] ?? []);
-
-            return $reservation->load(['participants', 'request', 'room']);
-        });
-
-        return response()->json([
-            'message' => 'Reservasi ruangan berhasil dibuat.',
-            'data' => $reservation,
-        ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 422);
+        }
     }
 
     public function update(Request $request, $id)
     {
-        $validated = $request->validate(array_merge($this->rules(), [
-            'status' => 'sometimes|in:cancelled',
-        ]));
+        $validated = $request->validate(array_merge(
+            $this->reservationService->rules(),
+            ['status' => 'sometimes|in:cancelled']
+        ));
 
-        if ($conflictMessage = $this->checkConflict(
+        $conflictMessage = $this->reservationService->checkConflict(
             $validated['meeting_room_id'],
             $validated['start_time'],
             $validated['end_time'],
             $id
-        )) {
-            return response()->json(['message' => "Tidak dapat membuat reservasi. {$conflictMessage}"], 422);
+        );
+
+        if ($conflictMessage) {
+            return response()->json([
+                'message' => "Tidak dapat membuat reservasi. {$conflictMessage}"
+            ], 422);
         }
 
-        $reservation = DB::transaction(function () use ($validated, $id) {
-            $reservation = MeetingRoomReservation::with(['request'])->findOrFail($id);
-
-            if ($reservation->status === 'approved' && isset($validated['status']) && $validated['status'] !== $reservation->status) {
-                throw new \Exception('Status tidak dapat diubah karena reservasi sudah disetujui.');
-            }
-
-            if (isset($validated['status']) && $validated['status'] === 'cancelled') {
-                $reservation->request()->update(['status' => 'cancelled']);
-            }
-
-            $hasParticipantsKey = array_key_exists('participants', $validated);
-
-            $updateData = [
-                'meeting_room_id' => $validated['meeting_room_id'],
-                'title'           => $validated['title'],
-                'description'     => $validated['description'] ?? null,
-                'start_time'      => $validated['start_time'],
-                'end_time'        => $validated['end_time'],
-            ];
-
-            if ($hasParticipantsKey) {
-                $updateData['participants'] = count($validated['participants'] ?? []);
-            }
-
-            $updateData['status'] = $reservation->status === 'approved'
-                ? $reservation->status
-                : ($validated['status'] ?? $reservation->status);
-
-            $reservation->update($updateData);
-
-            if ($hasParticipantsKey) {
-                $this->saveParticipants($reservation, $validated['participants'] ?? []);
-            }
-
-            if (array_key_exists('request', $validated)) {
-                $this->saveRequest($reservation, $validated['request'] ?? []);
-            }
-            return $reservation->load(['participants', 'request', 'room']);
-        });
-
-        return response()->json([
-            'message' => 'Reservasi ruangan berhasil diperbarui.',
-            'data' => $reservation,
-        ], 200);
+        try {
+            $reservation = $this->reservationService->updateReservation($validated, $id);
+            return response()->json([
+                'message' => 'Reservasi diperbarui.',
+                'data' => $reservation,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 422);
+        }
     }
 
     public function updateStatus(Request $request, $id)
     {
-        $request->validate([
+        $validated = $request->validate([
             'status' => 'required|in:pending,approved,rejected',
-            'rejection_reason' => 'nullable|string'
+            'rejection_reason' => 'nullable|string',
         ]);
 
-        return DB::transaction(function () use ($request, $id) {
-            $reservation = MeetingRoomReservation::with(['room', 'request'])->findOrFail($id);
-
-            if ($request->status === 'approved') {
-                if ($conflictMessage = $this->checkConflict(
-                    $reservation->meeting_room_id,
-                    $reservation->start_time,
-                    $reservation->end_time,
-                    $reservation->id
-                )) {
-                    return response()->json(['message' => "Tidak dapat menyetujui reservasi. {$conflictMessage}"], 422);
-                }
-
-                $reservation->update([
-                    'status' => 'approved',
-                    'approved_by' => Auth::id(),
-                    'rejection_reason' => null,
-                ]);
-
-                if ($reservation->request) {
-                    if ($reservation->request->funds_amount > 0) {
-                        $reservation->request->update([
-                            'status' => 'waiting_finance',
-                        ]);
-                    } else {
-                        $reservation->request->update([
-                            'status' => 'approved',
-                        ]);
-                    }
-                }
-
-                $rejectionReason = $request->rejection_reason
-                    ?: 'Bentrok dengan jadwal yang telah disetujui otomatis oleh sistem.';
-
-                MeetingRoomReservation::where('status', 'pending')
-                    ->conflict($reservation->meeting_room_id, $reservation->start_time, $reservation->end_time, $reservation->id)
-                    ->update([
-                        'status' => 'rejected',
-                        'rejection_reason' => $rejectionReason,
-                        'approved_by' => Auth::id(),
-                    ]);
-            } elseif ($request->status === 'rejected') {
-                $reservation->update([
-                    'status' => 'rejected',
-                    'rejection_reason' => $request->rejection_reason ?? 'Ditolak oleh admin perusahaan.',
-                    'approved_by' => Auth::id(),
-                ]);
-
-                if ($reservation->request) {
-                    $reservation->request->update([
-                        'status' => 'rejected',
-                        'rejection_reason' => $request->rejection_reason ?? 'Ditolak karena booking tidak disetujui.',
-                    ]);
-                }
-            } else {
-                $reservation->update([
-                    'status' => 'pending',
-                    'approved_by' => null,
-                    'rejection_reason' => null,
-                ]);
-            }
-
-            $reservation->refresh()->load(['participants', 'request', 'room']);
-
+        try {
+            $result = $this->reservationService->updateStatus($validated, $id);
             return response()->json([
                 'message' => 'Status reservasi diperbarui.',
-                'data' => $reservation,
+                'data' => $result,
             ]);
-        });
-    }
-
-    private function rules(): array
-    {
-        return [
-            'meeting_room_id'       => 'required|exists:meeting_rooms,id',
-            'title'                 => 'required|string',
-            'description'           => 'nullable|string',
-            'start_time'            => 'required|date|after:now',
-            'end_time'              => 'required|date|after:start_time',
-
-            'participants'                => 'nullable|array',
-            'participants.*.user_id'      => 'nullable|exists:users,id',
-            'participants.*.name'         => 'nullable|string',
-            'participants.*.email'        => 'nullable|email',
-            'participants.*.whatsapp_number' => 'nullable|string',
-
-            'request'                     => 'nullable|array',
-            'request.funds_amount'        => 'nullable|numeric|min:0',
-            'request.funds_reason'        => 'nullable|string|required_with:request.funds_amount',
-            'request.snacks'              => 'nullable|array',
-            'request.equipment'           => 'nullable|array',
-        ];
-    }
-
-    private function checkConflict(int $roomId, string $start, string $end, int $excludeId = null): ?string
-    {
-        $conflictQuery = MeetingRoomReservation::where('status', 'approved')
-            ->conflict($roomId, $start, $end, $excludeId);
-
-        if (!$conflictQuery->exists()) {
-            return null;
-        }
-
-        $conflicting = $conflictQuery->first();
-        $room = MeetingRoom::with('parent', 'children')->find($roomId);
-        $conflictRoom = $conflicting->room;
-
-        if ($room->parent_id && $room->parent_id === $conflictRoom->id) {
-            return "Ruangan ini adalah bagian dari ruangan $conflictRoom->name yang sudah terpakai.";
-        } elseif ($room->id === $conflictRoom->parent_id) {
-            return "Salah satu subruangan dari $room->name sudah memiliki jadwal di waktu yang sama.";
-        } elseif ($room->id === $conflictRoom->id) {
-            return "Ruangan $room->name sudah memiliki reservasi yang disetujui pada waktu tersebut.";
-        }
-
-        return "Ruangan ini sudah memiliki reservasi yang bentrok.";
-    }
-
-    private function saveParticipants(MeetingRoomReservation $reservation, array $participants): void
-    {
-        if (empty($participants)) {
-            return;
-        }
-
-        $reservation->participants()->delete();
-
-        foreach ($participants as $p) {
-            $data = ['reservation_id' => $reservation->id];
-            if (isset($p['user_id'])) {
-                $data['user_id'] = $p['user_id'];
-            } else {
-                $data = array_merge($data, [
-                    'name'            => $p['name'] ?? null,
-                    'email'           => $p['email'] ?? null,
-                    'whatsapp_number' => $p['whatsapp_number'] ?? null,
-                ]);
-            }
-            MeetingParticipant::create($data);
-        }
-    }
-
-    private function saveRequest(MeetingRoomReservation $reservation, array $requestData): void
-    {
-        if (empty($requestData)) return;
-
-        $existingRequest = $reservation->request;
-
-        if ($existingRequest) {
-            $existingRequest->update([
-                'funds_amount'   => $requestData['funds_amount'] ?? null,
-                'funds_reason'   => $requestData['funds_reason'] ?? null,
-                'snacks'         => $requestData['snacks'] ?? [],
-                'equipment'      => $requestData['equipment'] ?? [],
-            ]);
-        } else {
-            MeetingRequest::create([
-                'reservation_id' => $reservation->id,
-                'company_id'     => $reservation->company_id,
-                'funds_amount'   => $requestData['funds_amount'] ?? null,
-                'funds_reason'   => $requestData['funds_reason'] ?? null,
-                'snacks'         => $requestData['snacks'] ?? [],
-                'equipment'      => $requestData['equipment'] ?? [],
-            ]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 }
