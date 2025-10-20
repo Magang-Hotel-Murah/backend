@@ -26,8 +26,8 @@ class MeetingRoomReservation extends Model
     ];
 
     protected $casts = [
-        'start_time' => 'datetime',
-        'end_time' => 'datetime',
+        'start_time' => 'datetime:Y-m-d H:i:s',
+        'end_time' => 'datetime:Y-m-d H:i:s',
     ];
 
     protected static function booted()
