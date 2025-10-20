@@ -73,83 +73,6 @@ class MeetingRoomReservationService
         ];
     }
 
-    protected function getDateRange($request)
-    {
-        $now = Carbon::now();
-        $filter = $request->get('filter', 'day');
-
-        switch ($filter) {
-            case 'week':
-                $startDate = $now->copy()->startOfWeek();
-                $endDate   = $now->copy()->endOfWeek();
-                break;
-            case 'month':
-                $startDate = $now->copy()->startOfMonth();
-                $endDate   = $now->copy()->endOfMonth();
-                break;
-            case 'year':
-                $startDate = $now->copy()->startOfYear();
-                $endDate   = $now->copy()->endOfYear();
-                break;
-            default:
-                $startDate = $now->copy()->startOfDay();
-                $endDate   = $now->copy()->endOfDay();
-                break;
-        }
-
-        if ($request->filled('start_date') && $request->filled('end_date')) {
-            $startDate = Carbon::parse($request->start_date)->startOfDay();
-            $endDate   = Carbon::parse($request->end_date)->endOfDay();
-        }
-
-        return [$startDate, $endDate, $filter];
-    }
-
-    protected function applyFilters($query, $request, $now)
-    {
-        $request->validate([
-            'status' => 'nullable|in:ongoing,upcoming,finished'
-        ]);
-
-        if (blank($request->status)) {
-            $query->where('status', 'approved');
-        }
-
-        if ($request->filled('room_id')) {
-            $query->where('meeting_room_id', $request->room_id);
-        }
-
-        if ($request->filled('division_id')) {
-            $query->whereHas('user.profile', function ($q) use ($request) {
-                $q->where('division_id', $request->division_id);
-            });
-        }
-
-        if ($request->filled('status')) {
-            $status = $request->status;
-
-            $query->when($status === 'ongoing', function ($q) use ($now) {
-                $q->where('start_time', '<=', $now)
-                    ->where('end_time', '>=', $now)
-                    ->where('status', 'approved');
-            });
-
-            $query->when($status === 'upcoming', function ($q) use ($now) {
-                $q->where('start_time', '>', $now)
-                    ->where('status', 'approved');
-            });
-
-            $query->when($status === 'finished', function ($q) use ($now) {
-                $q->where('end_time', '<', $now)
-                    ->where('status', 'approved');
-            });
-
-            $query->when($status === 'cancelled', function ($q) {
-                $q->where('status', 'cancelled');
-            });
-        }
-    }
-
     public function getReservationsByRoom($room_id)
     {
         $reservation = MeetingRoomReservation::with(
@@ -170,6 +93,7 @@ class MeetingRoomReservationService
             'user.profile:id,user_id,division_id,position_id',
             'user.profile.division:id,name',
             'user.profile.position:id,name',
+            'approver:id,name',
             'room:id,name',
             'participants:id,reservation_id,user_id,name,email,whatsapp_number',
             'participants.user:id,name,email',
@@ -350,6 +274,83 @@ class MeetingRoomReservationService
 
             return $reservation->refresh()->load(['participants', 'request', 'room']);
         });
+    }
+
+    protected function getDateRange($request)
+    {
+        $now = Carbon::now();
+        $filter = $request->get('filter', 'day');
+
+        switch ($filter) {
+            case 'week':
+                $startDate = $now->copy()->startOfWeek();
+                $endDate   = $now->copy()->endOfWeek();
+                break;
+            case 'month':
+                $startDate = $now->copy()->startOfMonth();
+                $endDate   = $now->copy()->endOfMonth();
+                break;
+            case 'year':
+                $startDate = $now->copy()->startOfYear();
+                $endDate   = $now->copy()->endOfYear();
+                break;
+            default:
+                $startDate = $now->copy()->startOfDay();
+                $endDate   = $now->copy()->endOfDay();
+                break;
+        }
+
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $startDate = Carbon::parse($request->start_date)->startOfDay();
+            $endDate   = Carbon::parse($request->end_date)->endOfDay();
+        }
+
+        return [$startDate, $endDate, $filter];
+    }
+
+    protected function applyFilters($query, $request, $now)
+    {
+        $request->validate([
+            'status' => 'nullable|in:ongoing,upcoming,finished'
+        ]);
+
+        if (blank($request->status)) {
+            $query->where('status', 'approved');
+        }
+
+        if ($request->filled('room_id')) {
+            $query->where('meeting_room_id', $request->room_id);
+        }
+
+        if ($request->filled('division_id')) {
+            $query->whereHas('user.profile', function ($q) use ($request) {
+                $q->where('division_id', $request->division_id);
+            });
+        }
+
+        if ($request->filled('status')) {
+            $status = $request->status;
+
+            $query->when($status === 'ongoing', function ($q) use ($now) {
+                $q->where('start_time', '<=', $now)
+                    ->where('end_time', '>=', $now)
+                    ->where('status', 'approved');
+            });
+
+            $query->when($status === 'upcoming', function ($q) use ($now) {
+                $q->where('start_time', '>', $now)
+                    ->where('status', 'approved');
+            });
+
+            $query->when($status === 'finished', function ($q) use ($now) {
+                $q->where('end_time', '<', $now)
+                    ->where('status', 'approved');
+            });
+
+            $query->when($status === 'cancelled', function ($q) {
+                $q->where('status', 'cancelled');
+            });
+        }
     }
 
     public function rules(): array

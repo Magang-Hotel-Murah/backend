@@ -42,6 +42,11 @@ class MeetingRoomReservation extends Model
         });
     }
 
+    public function approver()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
+
     public function company()
     {
         return $this->belongsTo(Company::class);
