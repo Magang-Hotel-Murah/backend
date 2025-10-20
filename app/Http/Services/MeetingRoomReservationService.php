@@ -308,9 +308,13 @@ class MeetingRoomReservationService
             'status' => 'nullable|in:ongoing,upcoming,finished'
         ]);
 
-        if (blank($request->status)) {
-            $query->where('status', 'approved');
-        }
+        $query->where('status', 'approved')
+            ->where(function ($q) {
+                $q->whereDoesntHave('request')
+                    ->orWhereHas('request', function ($r) {
+                        $r->where('status', 'approved');
+                    });
+            });
 
         if ($request->filled('room_id')) {
             $query->where('meeting_room_id', $request->room_id);
@@ -327,18 +331,15 @@ class MeetingRoomReservationService
 
             $query->when($status === 'ongoing', function ($q) use ($now) {
                 $q->where('start_time', '<=', $now)
-                    ->where('end_time', '>=', $now)
-                    ->where('status', 'approved');
+                    ->where('end_time', '>=', $now);
             });
 
             $query->when($status === 'upcoming', function ($q) use ($now) {
-                $q->where('start_time', '>', $now)
-                    ->where('status', 'approved');
+                $q->where('start_time', '>', $now);
             });
 
             $query->when($status === 'finished', function ($q) use ($now) {
-                $q->where('end_time', '<', $now)
-                    ->where('status', 'approved');
+                $q->where('end_time', '<', $now);
             });
 
             $query->when($status === 'cancelled', function ($q) {
@@ -346,6 +347,7 @@ class MeetingRoomReservationService
             });
         }
     }
+
 
     public function rules(): array
     {
