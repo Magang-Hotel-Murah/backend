@@ -11,7 +11,10 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\Company;
 use App\Models\Scopes\CompanyScope;
-
+use App\Mail\MeetingNotificationMail;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+use App\Http\Services\WhatsappService;
 
 class MeetingRoomReservationService
 {
@@ -129,9 +132,11 @@ class MeetingRoomReservationService
         }
 
         $reservation = DB::transaction(function () use ($validated) {
+            $user = Auth::user();
+
             $reservation = MeetingRoomReservation::create([
-                'user_id'          => Auth::id(),
-                'company_id'       => Auth::user()->company_id,
+                'user_id'          => $user->id,
+                'company_id'       => $user->company_id,
                 'meeting_room_id'  => $validated['meeting_room_id'],
                 'title'            => $validated['title'],
                 'description'      => $validated['description'] ?? null,
@@ -142,6 +147,23 @@ class MeetingRoomReservationService
 
             $this->saveParticipants($reservation, $validated['participants'] ?? []);
             $this->saveRequest($reservation, $validated['request'] ?? []);
+
+            try {
+                Mail::to($user->email)->send(new MeetingNotificationMail(
+                    'Reservasi Ruang Meeting Diajukan',
+                    "Halo {$user->name}, reservasi ruang meeting Anda dengan judul '{$reservation->title}' telah diajukan dan menunggu persetujuan."
+                ));
+
+                if ($user->profile && $user->profile->phone) {
+                    $wa = new WhatsappService();
+                    $wa->send(
+                        $user->profile->phone ?? null,
+                        "Halo {$user->name}, reservasi ruang meeting Anda dengan judul '{$reservation->title}' telah diajukan dan menunggu persetujuan."
+                    );
+                }
+            } catch (\Exception $e) {
+                Log::error('Gagal mengirim notifikasi: ' . $e->getMessage());
+            }
 
             return $this->getReservationDetails($reservation->id);
         });
