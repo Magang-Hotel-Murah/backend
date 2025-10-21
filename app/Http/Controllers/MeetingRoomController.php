@@ -92,10 +92,6 @@ class MeetingRoomController extends Controller
             'capacity',
         ]);
 
-        if (isset($data['facilities']) && is_array($data['facilities'])) {
-            $data['facilities'] = json_encode($data['facilities']);
-        }
-
         $room->update($data);
 
         return response()->json([
@@ -155,10 +151,6 @@ class MeetingRoomController extends Controller
             'facilities',
             'capacity'
         ]);
-
-        if (isset($data['facilities']) && is_array($data['facilities'])) {
-            $data['facilities'] = json_encode($data['facilities']);
-        }
 
         $room = MeetingRoom::create($data);
 
