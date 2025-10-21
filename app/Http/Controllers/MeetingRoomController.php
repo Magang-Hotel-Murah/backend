@@ -24,9 +24,6 @@ class MeetingRoomController extends Controller
             return response()->json($rooms);
         }
 
-        /*
-
-*/
         $rooms = MeetingRoom::all();
         return response()->json($rooms);
     }
