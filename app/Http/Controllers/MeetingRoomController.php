@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\MeetingRoom;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * @group Meeting Rooms
@@ -37,13 +38,33 @@ class MeetingRoomController extends Controller
                 Rule::exists('meeting_rooms', 'id'),
                 function ($attribute, $value, $fail) use ($request, $room) {
                     $type = $request->input('type', $room->type);
+                    $user = Auth::user();
+                    $companyId = $user->company_id ?? null;
 
                     if ($type === 'main' && $value !== null) {
                         $fail('Ruangan utama tidak boleh memiliki parent_id.');
                     }
 
-                    if ($type === 'sub' && $value === null) {
-                        $fail('Ruangan sub harus memiliki parent_id.');
+                    if ($type === 'sub') {
+                        if ($value === null) {
+                            $fail('Ruangan sub harus memiliki parent_id.');
+                            return;
+                        }
+
+                        $hasMain = MeetingRoom::where('company_id', $companyId)
+                            ->where('type', 'main')
+                            ->where('id', '!=', $room->id)
+                            ->exists();
+
+                        if (!$hasMain && $room->type !== 'main') {
+                            $fail('Tidak bisa membuat ruangan sub sebelum ada ruangan main untuk company ini.');
+                            return;
+                        }
+
+                        $parentRoom = MeetingRoom::find($value);
+                        if ($parentRoom && $parentRoom->type !== 'main') {
+                            $fail('Parent ruangan harus bertipe main.');
+                        }
                     }
                 }
             ],
@@ -84,11 +105,30 @@ class MeetingRoomController extends Controller
                 'integer',
                 Rule::exists('meeting_rooms', 'id'),
                 function ($attribute, $value, $fail) use ($request) {
+                    $user = Auth::user();
+                    $companyId = $user->company_id ?? null;
+
                     if ($request->type === 'main' && $value !== null) {
                         $fail('Ruangan utama tidak boleh memiliki parent_id.');
                     }
-                    if ($request->type === 'sub' && $value === null) {
-                        $fail('Ruangan sub harus memiliki parent_id.');
+
+                    if ($request->type === 'sub') {
+                        if ($value === null) {
+                            $fail('Ruangan sub harus memiliki parent_id.');
+                        } else {
+                            $hasMain = MeetingRoom::where('company_id', $companyId)
+                                ->where('type', 'main')
+                                ->exists();
+
+                            if (!$hasMain) {
+                                $fail('Tidak bisa membuat ruangan sub sebelum ada ruangan main untuk company ini.');
+                            }
+
+                            $parentRoom = MeetingRoom::find($value);
+                            if ($parentRoom && $parentRoom->type !== 'main') {
+                                $fail('Parent ruangan harus bertipe main.');
+                            }
+                        }
                     }
                 }
             ],
