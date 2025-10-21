@@ -16,11 +16,16 @@
         </div>
 
         <div style="padding:30px;">
-            <p style="font-size:16px;color:#333;">Halo,</p>
 
-            <p style="font-size:15px;color:#555;line-height:1.6;">
-                {{ $messageText }}
-            </p>
+            @php
+                $formattedMessage = preg_replace('/\*(.*?)\*/', '<strong>$1</strong>', $messageText);
+                $formattedMessage = nl2br($formattedMessage);
+            @endphp
+
+            <div style="font-size:15px;color:#555;line-height:1.8;">
+                {!! $formattedMessage !!}
+            </div>
+
 
             <p style="font-size:14px;color:#777;margin-top:25px;line-height:1.6;">
                 Mohon periksa jadwal meeting Anda melalui sistem <strong>{{ config('app.name') }}</strong>.

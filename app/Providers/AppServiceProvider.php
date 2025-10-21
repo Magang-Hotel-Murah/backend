@@ -6,7 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use App\Models\Transaction;
 use App\Observers\TransactionObserver;
-
+use Carbon\Carbon;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,5 +24,7 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         Transaction::observe(TransactionObserver::class);
+
+        Carbon::setLocale('id');
     }
 }

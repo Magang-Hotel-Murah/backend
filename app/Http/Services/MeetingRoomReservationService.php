@@ -147,23 +147,11 @@ class MeetingRoomReservationService
 
             $this->saveParticipants($reservation, $validated['participants'] ?? []);
             $this->saveRequest($reservation, $validated['request'] ?? []);
-
-            try {
-                Mail::to($user->email)->send(new MeetingNotificationMail(
-                    'Reservasi Ruang Meeting Diajukan',
-                    "Halo {$user->name}, reservasi ruang meeting Anda dengan judul '{$reservation->title}' telah diajukan dan menunggu persetujuan."
-                ));
-
-                if ($user->profile && $user->profile->phone) {
-                    $wa = new WhatsappService();
-                    $wa->send(
-                        $user->profile->phone ?? null,
-                        "Halo {$user->name}, reservasi ruang meeting Anda dengan judul '{$reservation->title}' telah diajukan dan menunggu persetujuan."
-                    );
-                }
-            } catch (\Exception $e) {
-                Log::error('Gagal mengirim notifikasi: ' . $e->getMessage());
-            }
+            $this->notifyUser(
+                $reservation,
+                'Reservasi Diajukan',
+                "Halo {$user->name},\nReservasi ruang meeting *{$reservation->title}* telah *diajukan* dan menunggu persetujuan."
+            );
 
             return $this->getReservationDetails($reservation->id);
         });
@@ -219,72 +207,19 @@ class MeetingRoomReservationService
     public function updateStatus(array $data, $id)
     {
         return DB::transaction(function () use ($data, $id) {
-            $reservation = MeetingRoomReservation::with(['room', 'request'])->findOrFail($id);
+            $reservation = MeetingRoomReservation::with(['room', 'request', 'user.profile'])->findOrFail($id);
 
             switch ($data['status']) {
                 case 'approved':
-                    if ($conflictMessage = $this->checkConflict(
-                        $reservation->meeting_room_id,
-                        $reservation->start_time,
-                        $reservation->end_time,
-                        $reservation->id
-                    )) {
-                        throw new \Exception("Tidak dapat menyetujui reservasi. {$conflictMessage}");
-                    }
-
-                    $reservation->update([
-                        'status' => 'approved',
-                        'approved_by' => Auth::id(),
-                        'rejection_reason' => null,
-                    ]);
-
-                    if ($reservation->request) {
-                        $reservation->request->update([
-                            'status' => $reservation->request->funds_amount > 0
-                                ? 'waiting_finance'
-                                : 'approved',
-                        ]);
-                    }
-
-                    $rejectionReason = $data['rejection_reason']
-                        ?? 'Bentrok dengan jadwal yang telah disetujui otomatis oleh sistem.';
-
-                    MeetingRoomReservation::where('status', 'pending')
-                        ->conflict(
-                            $reservation->meeting_room_id,
-                            $reservation->start_time,
-                            $reservation->end_time,
-                            $reservation->id
-                        )
-                        ->update([
-                            'status' => 'rejected',
-                            'rejection_reason' => $rejectionReason,
-                            'approved_by' => Auth::id(),
-                        ]);
-
+                    $this->handleApproval($reservation, $data);
                     break;
 
                 case 'rejected':
-                    $reservation->update([
-                        'status' => 'rejected',
-                        'rejection_reason' => $data['rejection_reason'] ?? 'Ditolak oleh admin perusahaan.',
-                        'approved_by' => Auth::id(),
-                    ]);
-
-                    if ($reservation->request) {
-                        $reservation->request->update([
-                            'status' => 'rejected',
-                            'rejection_reason' => $data['rejection_reason'] ?? 'Ditolak karena booking tidak disetujui.',
-                        ]);
-                    }
+                    $this->handleRejection($reservation, $data);
                     break;
 
                 default:
-                    $reservation->update([
-                        'status' => 'pending',
-                        'approved_by' => null,
-                        'rejection_reason' => null,
-                    ]);
+                    $this->resetStatus($reservation);
                     break;
             }
 
@@ -464,5 +399,131 @@ class MeetingRoomReservationService
                 'equipment'      => $requestData['equipment'] ?? [],
             ]);
         }
+    }
+
+    private function handleApproval($reservation, array $data)
+    {
+        if ($conflictMessage = $this->checkConflict(
+            $reservation->meeting_room_id,
+            $reservation->start_time,
+            $reservation->end_time,
+            $reservation->id
+        )) {
+            throw new \Exception("Tidak dapat menyetujui reservasi. {$conflictMessage}");
+        }
+
+        $reservation->update([
+            'status' => 'approved',
+            'approved_by' => Auth::id(),
+            'rejection_reason' => null,
+        ]);
+
+        $this->updateRequestStatus($reservation);
+        $this->sendApprovalNotification($reservation);
+        $this->rejectConflictingReservations($reservation, $data);
+    }
+
+    private function handleRejection($reservation, array $data)
+    {
+        $reason = $data['rejection_reason'] ?? 'Ditolak oleh admin perusahaan.';
+
+        $reservation->update([
+            'status' => 'rejected',
+            'rejection_reason' => $reason,
+            'approved_by' => Auth::id(),
+        ]);
+
+        if ($reservation->request) {
+            $reservation->request->update([
+                'status' => 'rejected',
+                'rejection_reason' => $reason,
+            ]);
+        }
+
+        $this->notifyUser(
+            $reservation,
+            'Reservasi Ditolak',
+            "Halo {$reservation->user->name},\nReservasi ruang meeting *{$reservation->title}* telah *ditolak*.\n\n❌ *Alasan:* {$reason}"
+        );
+    }
+
+    private function resetStatus($reservation)
+    {
+        $reservation->update([
+            'status' => 'pending',
+            'approved_by' => null,
+            'rejection_reason' => null,
+        ]);
+    }
+
+    private function updateRequestStatus($reservation)
+    {
+        if (!$reservation->request) {
+            return;
+        }
+
+        $newStatus = $reservation->request->funds_amount > 0
+            ? 'waiting_finance'
+            : 'approved';
+
+        $reservation->request->update(['status' => $newStatus]);
+    }
+
+    private function rejectConflictingReservations($reservation, array $data)
+    {
+        $rejectionReason = $data['rejection_reason']
+            ?? 'Bentrok dengan jadwal yang telah disetujui otomatis oleh sistem.';
+
+        $conflictingReservations = MeetingRoomReservation::where('status', 'pending')
+            ->conflict(
+                $reservation->meeting_room_id,
+                $reservation->start_time,
+                $reservation->end_time,
+                $reservation->id
+            );
+
+        foreach ($conflictingReservations->get() as $conflict) {
+            $conflict->update([
+                'status' => 'rejected',
+                'rejection_reason' => $rejectionReason,
+                'approved_by' => Auth::id(),
+            ]);
+
+            $this->notifyUser(
+                $conflict,
+                'Reservasi Ditolak',
+                "Halo {$conflict->user->name}, reservasi ruang meeting *{$conflict->title}* telah *ditolak* karena bentrok dengan jadwal yang telah disetujui otomatis oleh sistem."
+            );
+        }
+    }
+
+    private function sendApprovalNotification($reservation)
+    {
+        $user = $reservation->user;
+        $room = $reservation->room;
+        $title = $reservation->title;
+
+        Carbon::setLocale('id');
+
+        $start = Carbon::parse($reservation->start_time)->timezone('Asia/Jakarta');
+        $end = Carbon::parse($reservation->end_time)->timezone('Asia/Jakarta');
+
+        $tanggal = $start->translatedFormat('l, d F Y');
+        $waktu = "{$start->format('H:i')} - {$end->format('H:i')} WIB";
+
+        $isFinance = $reservation->request && $reservation->request->funds_amount > 0;
+
+        $message = $isFinance
+            ? "Halo {$user->name},\nReservasi ruang meeting *{$title}* di *{$room->name}* telah *disetujui oleh admin* dan *menunggu persetujuan keuangan*."
+            : "Halo {$user->name},\nReservasi ruang meeting *{$title}* telah *disetujui*.\n\n📍 *Lokasi:* {$room->name}, {$room->location}\n📅 *Tanggal:* {$tanggal}\n🕒 *Waktu:* {$waktu}";
+
+        $this->notifyUser($reservation, 'Status Reservasi Diperbarui', $message);
+    }
+
+    private function notifyUser($reservation, string $subject, string $message)
+    {
+        $user = $reservation->user;
+        Mail::to($user->email)->send(new MeetingNotificationMail($subject, $message));
+        app(WhatsappService::class)->send($user->profile->phone, $message);
     }
 }
