@@ -12,8 +12,21 @@ use Illuminate\Support\Facades\Auth;
  */
 class MeetingRoomController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $validated = $request->validate([
+            'type' => 'sometimes|in:main,sub',
+        ]);
+
+        if ($request->has('type')) {
+            $type = $validated['type'];
+            $rooms = MeetingRoom::where('type', $type)->get();
+            return response()->json($rooms);
+        }
+
+        /*
+
+*/
         $rooms = MeetingRoom::all();
         return response()->json($rooms);
     }
