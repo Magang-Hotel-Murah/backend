@@ -62,7 +62,7 @@ class InviteController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan saat mengirim undangan. Silakan coba lagi.',
+                'message' => 'Terjadi kesalahan saat mengirim undangan. Silakan coba lagi. ' . $e->getMessage(),
             ], 500);
         }
     }

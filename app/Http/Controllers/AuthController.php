@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -13,6 +12,7 @@ use App\Mail\VerifyUserMail;
 use Illuminate\Support\Str;
 use App\Models\Company;
 use Carbon\Carbon;
+use App\Mail\ForgotPasswordMail;
 
 class AuthController extends Controller
 {
@@ -163,10 +163,7 @@ class AuthController extends Controller
             ]
         );
 
-        Mail::raw("Gunakan kode OTP ini untuk reset password: $otp (berlaku 5 menit)", function ($message) use ($request) {
-            $message->to($request->email)
-                ->subject('Reset Password - Kode OTP');
-        });
+        Mail::to($request->email)->send(new ForgotPasswordMail($otp));
 
         return response()->json([
             'success' => true,
