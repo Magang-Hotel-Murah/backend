@@ -5,48 +5,100 @@ namespace App\Http\Controllers;
 use App\Models\MeetingRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class MeetingRequestController extends Controller
 {
     public function index(Request $request)
     {
+        $request->validate([
+            'start_date' => 'nullable|date',
+            'end_date'   => 'nullable|date|after_or_equal:start_date',
+            'period'     => 'nullable|string|in:all,week,month,year',
+            'status'     => 'nullable|string|in:approved,waiting_finance',
+        ]);
+
         $user = Auth::user();
+        $period = $request->get('period', 'all');
+        $status = $request->get('status');
+        $isSummary = $request->get('summary', false) ? true : false;
 
-        $query = MeetingRequest::query();
 
-        switch ($user->role) {
-            case 'super_admin':
-                break;
+        $baseQuery = MeetingRequest::query()
+            ->where('funds_amount', '>', 0)
+            ->whereIn('status', ['approved', 'waiting_finance']);
 
-            case 'employee':
-            case 'company_admin':
-                $query->whereHas(
-                    'reservation',
-                    fn($q) =>
-                    $q->where('user_id', $user->id)
-                );
-                break;
-
-            case 'finance_officer':
-                $query->where('status', 'waiting_finance');
-                break;
-
-            case 'support_staff':
-                $query->where('status', 'approved')
-                    ->whereHas(
-                        'reservation',
-                        fn($q) =>
-                        $q->where('status', 'approved')
-                    );
-                break;
-
-            default:
-                return response()->json(['message' => 'Unauthorized'], 403);
+        if ($status) {
+            $baseQuery->where('status', $status);
         }
 
-        $meetings = $query->with(['reservation', 'approvedBy'])->get();
+        if ($request->filled(['start_date', 'end_date'])) {
+            $startDate = Carbon::parse($request->start_date)->startOfDay();
+            $endDate   = Carbon::parse($request->end_date)->endOfDay();
+        } elseif ($period !== 'all') {
+            [$startDate, $endDate] = $this->getDateRange($period);
+        } else {
+            $startDate = null;
+            $endDate = null;
+        }
 
-        return response()->json($meetings);
+        if ($startDate && $endDate) {
+            $baseQuery->whereBetween('created_at', [$startDate, $endDate]);
+        }
+
+        if ($isSummary) {
+            $funds = (clone $baseQuery)
+                ->selectRaw('status, SUM(funds_amount) as total')
+                ->groupBy('status')
+                ->pluck('total', 'status');
+
+            $approvedFunds = $funds['approved'] ?? 0;
+            $pendingFunds  = $funds['waiting_finance'] ?? 0;
+            $totalFunds    = $approvedFunds + $pendingFunds;
+
+            if (!$startDate || !$endDate) {
+                $startDate = (clone $baseQuery)->min('created_at');
+                $endDate   = (clone $baseQuery)->max('created_at');
+            }
+
+            return response()->json([
+                'message'         => 'Rekap dana meeting berhasil diambil.',
+                'period'          => $period,
+                'start_date'      => $startDate ? Carbon::parse($startDate)->toDateString() : null,
+                'end_date'        => $endDate ? Carbon::parse($endDate)->toDateString() : null,
+                'total_funds'     => $totalFunds,
+                'approved_funds'  => $approvedFunds,
+                'pending_funds'   => $pendingFunds,
+            ]);
+        }
+
+        $meetings = $baseQuery->with(['reservation', 'approvedBy'])->get();
+
+        if (!$startDate || !$endDate) {
+            $startDate = $meetings->min('created_at');
+            $endDate   = $meetings->max('created_at');
+        }
+
+        return response()->json([
+            'message'     => 'Data meeting request berhasil diambil.',
+            'period'      => $period,
+            'start_date'  => $startDate ? Carbon::parse($startDate)->toDateString() : null,
+            'end_date'    => $endDate ? Carbon::parse($endDate)->toDateString() : null,
+            'count'       => $meetings->count(),
+            'data'        => $meetings,
+        ]);
+    }
+
+    protected function getDateRange(string $period): array
+    {
+        $now = Carbon::now();
+
+        return match ($period) {
+            'week'  => [$now->copy()->startOfWeek(), $now->copy()->endOfWeek()],
+            'month' => [$now->copy()->startOfMonth(), $now->copy()->endOfMonth()],
+            'year'  => [$now->copy()->startOfYear(), $now->copy()->endOfYear()],
+            default => [$now->copy()->startOfDay(), $now->copy()->endOfDay()],
+        };
     }
 
     public function show($id)
