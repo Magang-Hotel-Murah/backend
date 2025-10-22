@@ -20,6 +20,8 @@ class MeetingRoomReservationService
 {
     public function getReservations($request)
     {
+        $user = Auth::user();
+        $role = $user->role;
         $perPage = $request->get('per_page', 10);
 
         $query = MeetingRoomReservation::with([
@@ -27,8 +29,15 @@ class MeetingRoomReservationService
             'room:id,name',
         ]);
 
+        if ($role === 'support_staff') {
+            $query->where('status', 'approved')
+                ->whereHas('request', function ($q) {
+                    $q->where('status', 'approved');
+                });
+        }
+
         if ($request->has('user')) {
-            $query->where('user_id', Auth::user()->id);
+            $query->where('user_id', $user->id);
         }
 
         if ($request->has('status')) {
