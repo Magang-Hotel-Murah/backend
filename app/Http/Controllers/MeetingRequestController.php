@@ -22,6 +22,7 @@ class MeetingRequestController extends Controller
         $period = $request->get('period', 'all');
         $status = $request->get('status');
         $isSummary = $request->get('summary', false) ? true : false;
+        $isTrash = $request->get('trash', false) ? true : false;
 
 
         $baseQuery = MeetingRequest::query()
@@ -70,6 +71,10 @@ class MeetingRequestController extends Controller
                 'approved_funds'  => $approvedFunds,
                 'pending_funds'   => $pendingFunds,
             ]);
+        }
+
+        if ($isTrash) {
+            $baseQuery->onlyTrashed();
         }
 
         $meetings = $baseQuery->with(['reservation', 'approvedBy'])->get();
@@ -161,11 +166,18 @@ class MeetingRequestController extends Controller
         ]);
     }
 
-
-    public function destroy(MeetingRequest $meetingRequest)
+    public function destroy($id)
     {
-        $meetingRequest->delete();
+        $meetingRequest = MeetingRequest::withTrashed()->findOrFail($id);
 
-        return response()->json(['message' => 'Meeting request deleted']);
+        if ($meetingRequest->trashed()) {
+            $meetingRequest->restore();
+            $message = 'Meeting request restored successfully.';
+        } else {
+            $meetingRequest->delete();
+            $message = 'Meeting request deleted successfully.';
+        }
+
+        return response()->json(['message' => $message]);
     }
 }
