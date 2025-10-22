@@ -92,6 +92,7 @@ class MeetingRoomReservationService
     public function getReservationDetails($reservation_id)
     {
         $reservation = MeetingRoomReservation::with([
+            'company:id,code,name',
             'user:id,name',
             'user.profile:id,user_id,division_id,position_id',
             'user.profile.division:id,name',

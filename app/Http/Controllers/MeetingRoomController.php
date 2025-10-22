@@ -30,7 +30,9 @@ class MeetingRoomController extends Controller
 
     public function show($id)
     {
-        $room = MeetingRoom::find($id);
+        $room = MeetingRoom::with(
+            'company:id,code,name',
+        )->find($id);
         return response()->json($room);
     }
 

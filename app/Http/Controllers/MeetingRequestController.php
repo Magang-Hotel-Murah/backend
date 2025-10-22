@@ -4,12 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\MeetingRequest;
 use Illuminate\Support\Facades\Auth;
-
 use Illuminate\Http\Request;
 
 class MeetingRequestController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
 
@@ -50,9 +49,23 @@ class MeetingRequestController extends Controller
         return response()->json($meetings);
     }
 
-    public function show(MeetingRequest $meetingRequest)
+    public function show($id)
     {
-        return response()->json($meetingRequest->load(['reservation', 'approvedBy']));
+        $meetingRequest = MeetingRequest::with([
+            'reservation',
+            'reservation.user:id,name',
+            'reservation.room:id,name,location',
+            'reservation.user.profile:id,user_id,division_id,position_id',
+            'reservation.user.profile.division:id,name',
+            'reservation.user.profile.position:id,name',
+            'approvedBy',
+            'company:id,code,name'
+        ])->find($id);
+
+        if (!$meetingRequest) {
+            return response()->json(['message' => 'Meeting request not found'], 404);
+        }
+        return response()->json($meetingRequest);
     }
 
     public function update(Request $request, MeetingRequest $meetingRequest)
