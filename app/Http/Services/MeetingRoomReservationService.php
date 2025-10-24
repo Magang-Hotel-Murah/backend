@@ -158,17 +158,37 @@ class MeetingRoomReservationService
 
             $participants = $validated['participants'] ?? [];
 
+            if (!empty($validated['all_users'])) {
+                $allUsers = User::pluck('id')
+                    ->map(fn($id) => ['user_id' => $id])
+                    ->toArray();
+
+                $participants = array_merge($participants, $allUsers);
+            }
+
             if (!empty($validated['division_ids'])) {
                 $divisionUsers = User::whereHas('profile', function ($query) use ($validated) {
                     $query->whereIn('division_id', $validated['division_ids']);
-                })->get()->map(function ($user) {
-                    return [
-                        'user_id' => $user->id,
-                    ];
-                })->toArray();;
+                })
+                    ->pluck('id')
+                    ->map(fn($id) => ['user_id' => $id])
+                    ->toArray();
 
                 $participants = array_merge($participants, $divisionUsers);
             }
+
+            if (!empty($validated['position_ids'])) {
+                $positionUsers = User::whereHas('profile', function ($query) use ($validated) {
+                    $query->whereIn('position_id', $validated['position_ids']);
+                })
+                    ->pluck('id') // ambil hanya kolom id
+                    ->map(fn($id) => ['user_id' => $id]) // ubah menjadi array dengan key 'user_id'
+                    ->toArray();
+
+                $participants = array_merge($participants, $positionUsers);
+            }
+
+            $participants = collect($participants)->unique('user_id')->values()->toArray();
 
             $this->saveParticipants($reservation, $participants);
             $this->saveRequest($reservation, $validated['request'] ?? []);
@@ -348,6 +368,11 @@ class MeetingRoomReservationService
 
             'division_ids'                => 'nullable|array',
             'division_ids.*'              => 'exists:user_profiles,division_id',
+
+            'position_ids'                => 'nullable|array',
+            'position_ids.*'              => 'exists:user_profiles,position_id',
+
+            'all_users'                 => 'nullable|boolean',
 
             'request'                     => 'nullable|array',
             'request.funds_amount'        => 'nullable|numeric|min:0',
