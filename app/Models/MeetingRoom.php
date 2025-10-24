@@ -15,6 +15,7 @@ class MeetingRoom extends Model
         'name',
         'capacity',
         'facilities',
+        'location',
         'type',
         'parent_id',
         'company_id',
