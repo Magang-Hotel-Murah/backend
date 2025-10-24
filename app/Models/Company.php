@@ -13,7 +13,7 @@ class Company extends Model
     protected $fillable = [
         'name',
         'code',
-        'invite_url',
+        'display_url',
     ];
 
     public function users()

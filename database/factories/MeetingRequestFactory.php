@@ -45,10 +45,16 @@ class MeetingRequestFactory extends Factory
         return $this->state([
             'company_id' => $company->id,
         ])->afterMaking(function (MeetingRequest $request) use ($company) {
-            // Pastikan reservation-nya punya company_id yang sama
+            // Pastikan reservation sesuai company
             if ($request->reservation && $request->reservation->company_id !== $company->id) {
                 $reservation = MeetingRoomReservation::factory()->forCompany($company)->create();
                 $request->reservation_id = $reservation->id;
+            }
+
+            // ✅ Jika reservation sudah disetujui, maka request juga disetujui
+            if ($request->reservation && $request->reservation->status === 'approved') {
+                $request->status = 'approved';
+                $request->approved_by = $request->reservation->approved_by ?? null;
             }
         });
     }

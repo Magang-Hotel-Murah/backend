@@ -11,8 +11,8 @@ return new class extends Migration
         Schema::create('companies', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
-            $table->string('code')->unique(); // kode unik perusahaan untuk invite
-            $table->string('invite_url')->nullable(); // URL invite untuk user baru
+            $table->string('code')->unique(); // kode unik perusahaan untuk display URL
+            $table->string('display_url')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

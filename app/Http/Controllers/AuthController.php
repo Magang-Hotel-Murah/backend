@@ -29,10 +29,13 @@ class AuthController extends Controller
         DB::beginTransaction();
 
         try {
+            $code = strtoupper(Str::random(6));
+            $host = env('APP_URL');
+
             $company = Company::create([
                 'name' => $validated['company_name'],
-                'code' => strtoupper(Str::random(6)),
-                'invite_url' => null,
+                'code' => $code,
+                'display_url' => $host . '/api/meeting-display/' . $code,
             ]);
 
             $user = User::create([

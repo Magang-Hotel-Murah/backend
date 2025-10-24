@@ -15,10 +15,12 @@ class CompanyFactory extends Factory
 
     public function definition(): array
     {
+        $code = strtoupper(Str::random(6));
+        $host = env('APP_URL');
         return [
             'name' => fake()->company(),
-            'code' => strtoupper(fake()->unique()->lexify('??????')), // kode unik 6 huruf
-            'invite_url' => null,
+            'code' => $code, // kode unik 6 huruf
+            'display_url' => $host . '/api/meeting-display/' . $code,
         ];
     }
 }
