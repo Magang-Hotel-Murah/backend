@@ -15,6 +15,7 @@ use App\Mail\MeetingNotificationMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use App\Http\Services\WhatsappService;
+use App\Models\User;
 
 class MeetingRoomReservationService
 {
@@ -155,7 +156,21 @@ class MeetingRoomReservationService
                 'status'           => 'pending',
             ]);
 
-            $this->saveParticipants($reservation, $validated['participants'] ?? []);
+            $participants = $validated['participants'] ?? [];
+
+            if (!empty($validated['division_ids'])) {
+                $divisionUsers = User::whereHas('profile', function ($query) use ($validated) {
+                    $query->whereIn('division_id', $validated['division_ids']);
+                })->get()->map(function ($user) {
+                    return [
+                        'user_id' => $user->id,
+                    ];
+                })->toArray();;
+
+                $participants = array_merge($participants, $divisionUsers);
+            }
+
+            $this->saveParticipants($reservation, $participants);
             $this->saveRequest($reservation, $validated['request'] ?? []);
             $this->notifyUser(
                 $reservation,
@@ -330,6 +345,9 @@ class MeetingRoomReservationService
             'participants.*.name'         => 'nullable|string',
             'participants.*.email'        => 'nullable|email',
             'participants.*.whatsapp_number' => 'nullable|string',
+
+            'division_ids'                => 'nullable|array',
+            'division_ids.*'              => 'exists:user_profiles,division_id',
 
             'request'                     => 'nullable|array',
             'request.funds_amount'        => 'nullable|numeric|min:0',
