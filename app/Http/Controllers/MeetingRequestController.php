@@ -49,6 +49,7 @@ class MeetingRequestController extends Controller
 
         if ($isSummary) {
             $funds = (clone $baseQuery)
+                ->withTrashed()
                 ->selectRaw('status, SUM(funds_amount) as total')
                 ->groupBy('status')
                 ->pluck('total', 'status');
@@ -74,7 +75,7 @@ class MeetingRequestController extends Controller
         }
 
         if ($isTrash) {
-            $baseQuery->onlyTrashed();
+            $baseQuery->withTrashed();
         }
 
         $meetings = $baseQuery->with(['reservation', 'approvedBy'])->get();
