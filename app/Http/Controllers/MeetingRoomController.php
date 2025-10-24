@@ -164,8 +164,11 @@ class MeetingRoomController extends Controller
 
     public function destroy($id)
     {
-        $room = MeetingRoom::find($id);
+        $room = MeetingRoom::findOrFail($id);
         $room->delete();
-        return response()->json(null, 204);
+
+        return response()->json([
+            'message' => 'Ruangan berhasil dihapus',
+        ]);
     }
 }

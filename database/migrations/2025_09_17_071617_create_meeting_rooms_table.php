@@ -19,7 +19,7 @@ return new class extends Migration
             $table->json('facilities')->nullable();
             $table->string('location')->nullable();
             $table->enum('type', ['main', 'sub'])->default('main');
-
+            $table->softDeletes();
             $table->timestamps();
         });
     }

@@ -54,7 +54,7 @@ class MeetingRoomReservation extends Model
 
     public function room()
     {
-        return $this->belongsTo(MeetingRoom::class, 'meeting_room_id');
+        return $this->belongsTo(MeetingRoom::class, 'meeting_room_id')->withTrashed();
     }
 
     public function user()
