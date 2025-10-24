@@ -53,6 +53,13 @@ class MeetingRoomController extends Controller
                     $user = Auth::user();
                     $companyId = $user->company_id ?? null;
 
+                    if ($room->type === 'main' && $type === 'sub') {
+                        $hasSubRooms = MeetingRoom::where('parent_id', $room->id)->exists();
+                        if ($hasSubRooms) {
+                            $fail('Tidak bisa mengubah ruangan main menjadi sub karena masih memiliki sub-ruangan.');
+                        }
+                    }
+
                     if ($type === 'main' && $value !== null) {
                         $fail('Ruangan utama tidak boleh memiliki parent_id.');
                     }
@@ -164,11 +171,29 @@ class MeetingRoomController extends Controller
 
     public function destroy($id)
     {
-        $room = MeetingRoom::findOrFail($id);
-        $room->delete();
+
+        $room = MeetingRoom::withTrashed()->findOrFail($id);
+
+        if ($room->type === 'main') {
+            $hasSubRooms = MeetingRoom::where('parent_id', $room->id)->exists();
+            if ($hasSubRooms) {
+                return response()->json([
+                    'message' => 'Tidak bisa menghapus ruangan main karena masih memiliki sub-ruangan.'
+                ], 400);
+            }
+        }
+
+        if (!$room->trashed()) {
+            $room->delete();
+            $message = 'Ruangan berhasil dihapus';
+        } else {
+            $room->restore();
+            $message = 'Ruangan berhasil dipulihkan';
+        }
 
         return response()->json([
-            'message' => 'Ruangan berhasil dihapus',
+            'message' => $message,
+            'data' => $room->fresh(),
         ]);
     }
 }
