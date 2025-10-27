@@ -202,18 +202,23 @@ class MeetingRoomController extends Controller
     {
         $validated = $request->validate([
             'date' => 'required|date',
-            'start_time' => 'required|date_format:H:i',
-            'end_time' => 'required|date_format:H:i|after:start_time',
+            'start_time' => 'nullable|date_format:H:i',
+            'end_time' => 'nullable|date_format:H:i|after:start_time',
             'participants_count' => 'required|integer|min:1',
             'facilities' => 'array',
         ]);
 
-        $startDateTime = Carbon::parse($validated['date'] . ' ' . $validated['start_time']);
-        $endDateTime = Carbon::parse($validated['date'] . ' ' . $validated['end_time']);
+        $hasTime = !empty($validated['start_time']) && !empty($validated['end_time']);
+        $startDateTime = $hasTime ? Carbon::parse($validated['date'] . ' ' . $validated['start_time']) : null;
+        $endDateTime = $hasTime ? Carbon::parse($validated['date'] . ' ' . $validated['end_time']) : null;
 
-        $rooms = MeetingRoom::with(['reservations' => function ($q) use ($startDateTime, $endDateTime) {
-            $q->where('status', 'approved')
-                ->where(function ($q2) use ($startDateTime, $endDateTime) {
+        $rooms = MeetingRoom::with(['reservations' => function ($q) use ($validated, $hasTime, $startDateTime, $endDateTime) {
+            $q->select('id', 'meeting_room_id', 'title', 'start_time', 'end_time')
+                ->where('status', 'approved')
+                ->whereDate('start_time', $validated['date']);
+
+            if ($hasTime) {
+                $q->where(function ($q2) use ($startDateTime, $endDateTime) {
                     $q2->whereBetween('start_time', [$startDateTime, $endDateTime])
                         ->orWhereBetween('end_time', [$startDateTime, $endDateTime])
                         ->orWhere(function ($q3) use ($startDateTime, $endDateTime) {
@@ -221,6 +226,7 @@ class MeetingRoomController extends Controller
                                 ->where('end_time', '>=', $endDateTime);
                         });
                 });
+            }
         }])
             ->select('id', 'name', 'capacity', 'facilities', 'location', 'type')
             ->where('capacity', '>=', $validated['participants_count'])
@@ -233,18 +239,49 @@ class MeetingRoomController extends Controller
             })
             ->get();
 
-        $available = $rooms->filter(fn($r) => $r->reservations->isEmpty())->values();
-        $conflicted = $rooms->filter(fn($r) => $r->reservations->isNotEmpty())->values();
+        $generateFreeSlots = function ($reservations, $date, $dayStart = '08:00', $dayEnd = '17:00') {
+            $slots = [];
+            $current = Carbon::parse($date . ' ' . $dayStart);
+            $dayEndTime = Carbon::parse($date . ' ' . $dayEnd);
+
+            $reservations = $reservations->filter(fn($res) => Carbon::parse($res->start_time)->toDateString() === $date)
+                ->sortBy('start_time');
+
+            foreach ($reservations as $res) {
+                $resStart = Carbon::parse($res->start_time);
+                $resEnd = Carbon::parse($res->end_time);
+
+                if ($current < $resStart) {
+                    $slots[] = [
+                        'start_time' => $current->format('H:i'),
+                        'end_time' => $resStart->format('H:i')
+                    ];
+                }
+
+                if ($current < $resEnd) {
+                    $current = $resEnd->copy();
+                }
+            }
+
+            if ($current < $dayEndTime) {
+                $slots[] = [
+                    'start_time' => $current->format('H:i'),
+                    'end_time' => $dayEndTime->format('H:i')
+                ];
+            }
+
+            return $slots;
+        };
+
+        $rooms->each(function ($room) use ($generateFreeSlots, $validated) {
+            $room->free_slots = $generateFreeSlots($room->reservations, $validated['date']);
+        });
 
         return response()->json([
             'message' => 'Ruangan tersedia',
             'data' => [
                 'date' => $validated['date'],
-                'start_time' => $validated['start_time'],
-                'end_time' => $validated['end_time'],
-                'available_room_count' => $available->count(),
-                'available_rooms' => $available,
-                'conflicted_rooms' => $conflicted,
+                'rooms' => $rooms,
             ],
         ]);
     }
