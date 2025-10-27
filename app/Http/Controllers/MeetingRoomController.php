@@ -6,6 +6,7 @@ use App\Models\MeetingRoom;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 /**
  * @group Meeting Rooms
@@ -194,6 +195,55 @@ class MeetingRoomController extends Controller
         return response()->json([
             'message' => $message,
             'data' => $room->fresh(),
+        ]);
+    }
+
+    public function searchAvailableRooms(Request $request)
+    {
+        $validated = $request->validate([
+            'date' => 'required|date',
+            'start_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i|after:start_time',
+            'participants_count' => 'required|integer|min:1',
+            'facilities' => 'array',
+        ]);
+
+        $startDateTime = Carbon::parse($validated['date'] . ' ' . $validated['start_time']);
+        $endDateTime = Carbon::parse($validated['date'] . ' ' . $validated['end_time']);
+
+        $rooms = MeetingRoom::with(['reservations' => function ($q) use ($startDateTime, $endDateTime) {
+            $q->where('status', 'approved')
+                ->where(function ($q2) use ($startDateTime, $endDateTime) {
+                    $q2->whereBetween('start_time', [$startDateTime, $endDateTime])
+                        ->orWhereBetween('end_time', [$startDateTime, $endDateTime])
+                        ->orWhere(function ($q3) use ($startDateTime, $endDateTime) {
+                            $q3->where('start_time', '<=', $startDateTime)
+                                ->where('end_time', '>=', $endDateTime);
+                        });
+                });
+        }])
+            ->select('id', 'name', 'capacity', 'facilities', 'location', 'type')
+            ->where('capacity', '>=', $validated['participants_count'])
+            ->when(!empty($validated['facilities']), function ($query) use ($validated) {
+                $query->where(function ($q) use ($validated) {
+                    foreach ($validated['facilities'] as $facility) {
+                        $q->orWhereJsonContains('facilities', $facility);
+                    }
+                });
+            })
+            ->get();
+
+        $available = $rooms->filter(fn($r) => $r->reservations->isEmpty())->values();
+
+        return response()->json([
+            'message' => 'Ruangan tersedia',
+            'data' => [
+                'date' => $validated['date'],
+                'start_time' => $validated['start_time'],
+                'end_time' => $validated['end_time'],
+                'available_room_count' => $available->count(),
+                'available_rooms' => $available,
+            ],
         ]);
     }
 }

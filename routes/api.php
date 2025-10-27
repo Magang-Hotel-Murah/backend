@@ -35,7 +35,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('positions', PositionController::class, ['only' => ['store', 'update', 'destroy']]);
         Route::apiResource('user-profiles', UserProfileController::class, ['only' => ['index']]);
         Route::apiResource('transactions', TransactionController::class);
-        Route::apiResource('meeting-room', MeetingRoomController::class);
+        Route::apiResource('meeting-room', MeetingRoomController::class, ['only' => ['store', 'update', 'destroy']]);
         Route::post('/invite-users', [InviteController::class, 'inviteUsers']);
     });
 
@@ -50,6 +50,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('/meeting-room-reservations', MeetingRoomReservationController::class);
     Route::get('/meeting-room/{room_id}/reservations', [MeetingRoomReservationController::class, 'indexByRoom']);
 
+    Route::post('/meeting-rooms/search', [MeetingRoomController::class, 'searchAvailableRooms']);
     Route::get('/user-profile/{id?}', [UserProfileController::class, 'show']);
     Route::apiResource('meeting-room', MeetingRoomController::class, ['only' => ['index', 'show']]);
     Route::apiResource('user-profiles', UserProfileController::class, ['only' => ['store', 'update']]);
