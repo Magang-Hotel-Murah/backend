@@ -234,6 +234,7 @@ class MeetingRoomController extends Controller
             ->get();
 
         $available = $rooms->filter(fn($r) => $r->reservations->isEmpty())->values();
+        $conflicted = $rooms->filter(fn($r) => $r->reservations->isNotEmpty())->values();
 
         return response()->json([
             'message' => 'Ruangan tersedia',
@@ -243,6 +244,7 @@ class MeetingRoomController extends Controller
                 'end_time' => $validated['end_time'],
                 'available_room_count' => $available->count(),
                 'available_rooms' => $available,
+                'conflicted_rooms' => $conflicted,
             ],
         ]);
     }
