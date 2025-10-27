@@ -6,6 +6,7 @@ use App\Models\MeetingRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Http\Services\MeetingRoomReservationService;
 
 class MeetingRequestController extends Controller
 {
@@ -157,9 +158,29 @@ class MeetingRequestController extends Controller
 
         if ($request->status === 'rejected') {
             $updateData['rejection_reason'] = $request->rejection_reason ?? 'Ditolak oleh finance.';
+            $reservation = $meetingRequest->reservation()
+                ->with([
+                    'participants.user.profile',
+                    'participants.user',
+                    'room'
+                ])
+                ->first();
+
+            app(\App\Http\Services\NotificationService::class)->sendRejectionNotification($reservation, $request->rejection_reason ?? 'Ditolak oleh finance.');
         }
 
         $meetingRequest->update($updateData);
+
+        if ($request->status === 'approved') {
+            $reservation = $meetingRequest->reservation()
+                ->with([
+                    'participants.user.profile',
+                    'participants.user',
+                    'room'
+                ])->first();
+
+            app(\App\Http\Services\NotificationService::class)->sendApprovalNotification($reservation);
+        }
 
         return response()->json([
             'message' => 'Status request berhasil diperbarui.',

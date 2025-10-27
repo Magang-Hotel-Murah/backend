@@ -18,7 +18,6 @@ class MeetingRoomReservation extends Model
         'description',
         'start_time',
         'end_time',
-        'participants',
         'rejection_reason',
         'approved_by',
         'status',
