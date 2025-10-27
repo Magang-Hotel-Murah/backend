@@ -128,18 +128,55 @@ class MeetingRoomReservationService
 
     public function createReservation(array $validated)
     {
+        $user = Auth::user();
+
+        $participants = $validated['participants'] ?? [];
+
+        if (!empty($validated['all_users'])) {
+            $allUsers = User::pluck('id')
+                ->map(fn($id) => ['user_id' => $id])
+                ->toArray();
+
+            $participants = array_merge($participants, $allUsers);
+        }
+
+        if (!empty($validated['division_ids'])) {
+            $divisionUsers = User::whereHas('profile', function ($query) use ($validated) {
+                $query->whereIn('division_id', $validated['division_ids']);
+            })
+                ->pluck('id')
+                ->map(fn($id) => ['user_id' => $id])
+                ->toArray();
+
+            $participants = array_merge($participants, $divisionUsers);
+        }
+
+        if (!empty($validated['position_ids'])) {
+            $positionUsers = User::whereHas('profile', function ($query) use ($validated) {
+                $query->whereIn('position_id', $validated['position_ids']);
+            })
+                ->pluck('id')
+                ->map(fn($id) => ['user_id' => $id])
+                ->toArray();
+
+            $participants = array_merge($participants, $positionUsers);
+        }
+
+        $participants = collect($participants)->unique('user_id')->values()->toArray();
+
         $conflictMessage = $this->checkConflict(
             $validated['meeting_room_id'],
             $validated['start_time'],
-            $validated['end_time']
+            $validated['end_time'],
+            null,
+            count($participants)
         );
 
         if ($conflictMessage) {
             throw new \Exception($conflictMessage, 409);
         }
 
-        $reservation = DB::transaction(function () use ($validated) {
-            $user = Auth::user();
+        $reservation = DB::transaction(function () use ($validated, $user, $participants) {
 
             $reservation = MeetingRoomReservation::create([
                 'user_id'          => $user->id,
@@ -151,40 +188,6 @@ class MeetingRoomReservationService
                 'end_time'         => $validated['end_time'],
                 'status'           => 'pending',
             ]);
-
-            $participants = $validated['participants'] ?? [];
-
-            if (!empty($validated['all_users'])) {
-                $allUsers = User::pluck('id')
-                    ->map(fn($id) => ['user_id' => $id])
-                    ->toArray();
-
-                $participants = array_merge($participants, $allUsers);
-            }
-
-            if (!empty($validated['division_ids'])) {
-                $divisionUsers = User::whereHas('profile', function ($query) use ($validated) {
-                    $query->whereIn('division_id', $validated['division_ids']);
-                })
-                    ->pluck('id')
-                    ->map(fn($id) => ['user_id' => $id])
-                    ->toArray();
-
-                $participants = array_merge($participants, $divisionUsers);
-            }
-
-            if (!empty($validated['position_ids'])) {
-                $positionUsers = User::whereHas('profile', function ($query) use ($validated) {
-                    $query->whereIn('position_id', $validated['position_ids']);
-                })
-                    ->pluck('id')
-                    ->map(fn($id) => ['user_id' => $id])
-                    ->toArray();
-
-                $participants = array_merge($participants, $positionUsers);
-            }
-
-            $participants = collect($participants)->unique('user_id')->values()->toArray();
 
             $this->saveParticipants($reservation, $participants);
             $this->saveRequest($reservation, $validated['request'] ?? []);
@@ -383,29 +386,54 @@ class MeetingRoomReservationService
         ];
     }
 
-    public function checkConflict(int $roomId, string $start, string $end, int $excludeId = null): ?string
-    {
+    public function checkConflict(
+        int $roomId,
+        string $start,
+        string $end,
+        int $excludeId = null,
+        ?int $participantCount = null
+    ): ?string {
         $conflictQuery = MeetingRoomReservation::where('status', 'approved')
             ->conflict($roomId, $start, $end, $excludeId);
 
-        if (!$conflictQuery->exists()) {
-            return null;
+        if ($conflictQuery->exists()) {
+            $conflicting = $conflictQuery->first();
+            $room = MeetingRoom::with('parent', 'children')->find($roomId);
+            $conflictRoom = $conflicting->room;
+
+            if ($room->parent_id && $room->parent_id === $conflictRoom->id) {
+                return "Ruangan ini adalah bagian dari ruangan {$conflictRoom->name} yang sudah terpakai.";
+            } elseif ($room->id === $conflictRoom->parent_id) {
+                return "Salah satu subruangan dari {$room->name} sudah memiliki jadwal di waktu yang sama.";
+            } elseif ($room->id === $conflictRoom->id) {
+                return "Ruangan {$room->name} sudah memiliki reservasi yang disetujui pada waktu tersebut.";
+            }
+
+            return "Ruangan ini sudah memiliki reservasi yang bentrok.";
         }
 
-        $conflicting = $conflictQuery->first();
-        $room = MeetingRoom::with('parent', 'children')->find($roomId);
-        $conflictRoom = $conflicting->room;
+        if ($participantCount !== null) {
+            $room = MeetingRoom::find($roomId);
+            if (!$room) {
+                return 'Ruangan tidak ditemukan.';
+            }
 
-        if ($room->parent_id && $room->parent_id === $conflictRoom->id) {
-            return "Ruangan ini adalah bagian dari ruangan $conflictRoom->name yang sudah terpakai.";
-        } elseif ($room->id === $conflictRoom->parent_id) {
-            return "Salah satu subruangan dari $room->name sudah memiliki jadwal di waktu yang sama.";
-        } elseif ($room->id === $conflictRoom->id) {
-            return "Ruangan $room->name sudah memiliki reservasi yang disetujui pada waktu tersebut.";
+            $totalExisting = MeetingRoomReservation::where('status', 'approved')
+                ->conflict($roomId, $start, $end, $excludeId)
+                ->withCount('participants')
+                ->get()
+                ->sum('participants_count');
+
+            $totalAfter = $totalExisting + $participantCount;
+
+            if ($totalAfter > $room->capacity) {
+                return "Kapasitas ruangan tidak mencukupi. Kapasitas maksimal {$room->capacity}, total peserta {$totalAfter}.";
+            }
         }
 
-        return "Ruangan ini sudah memiliki reservasi yang bentrok.";
+        return null;
     }
+
 
     public function saveParticipants(MeetingRoomReservation $reservation, array $participants): void
     {
