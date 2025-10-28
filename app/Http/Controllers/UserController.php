@@ -10,6 +10,33 @@ use Illuminate\Http\Request;
  */
 class UserController extends Controller
 {
+    public function listLimited(Request $request)
+    {
+        $query = User::select('id', 'name')
+            ->with([
+                'profile.division:id,name',
+                'profile.position:id,name'
+            ]);
+
+        if ($search = $request->query('q')) {
+            $query->where('name', 'like', "%{$search}%");
+        }
+
+        $users = $query->get();
+
+        $result = $users->map(function ($user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'division' => $user->profile->division->name ?? null,
+                'position' => $user->profile->position->name ?? null,
+            ];
+        });
+
+        return response()->json($result);
+    }
+
+
     public function index(Request $request)
     {
         if ($request->has('with_deleted') && $request->with_deleted) {

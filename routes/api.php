@@ -28,6 +28,8 @@ Route::post('/activate-account', [InviteController::class, 'activate']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
+    Route::get('/users/list', [UserController::class, 'listLimited']);
+
     Route::middleware('role:company_admin,super_admin')->group(function () {
         Route::apiResource('users', UserController::class);
         Route::put('/meeting-room-reservations/{id}/status', [MeetingRoomReservationController::class, 'updateStatus']);
