@@ -54,7 +54,7 @@ class MeetingRoomReservationService
         [$startDate, $endDate, $filter] = $this->getDateRange($request);
 
         $query = MeetingRoomReservation::withoutGlobalScope(CompanyScope::class)
-            ->select('id', 'user_id', 'company_id', 'title', 'meeting_room_id', 'start_time', 'end_time', 'participants', 'status')
+            ->select('id', 'user_id', 'company_id', 'title', 'meeting_room_id', 'start_time', 'end_time', 'status')
             ->with([
                 'user:id,name',
                 'user.profile:id,user_id,division_id,position_id',
