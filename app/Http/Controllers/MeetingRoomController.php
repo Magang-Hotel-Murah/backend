@@ -17,17 +17,30 @@ class MeetingRoomController extends Controller
     {
         $validated = $request->validate([
             'type' => 'sometimes|in:main,sub',
+            'facilities_only' => 'sometimes',
         ]);
 
+        if ($request->boolean('facilities_only')) {
+            $rooms = MeetingRoom::pluck('facilities')->toArray();
+
+            $facilities = collect($rooms)
+                ->flatten()
+                ->unique()
+                ->values()
+                ->all();
+
+            return response()->json(['facilities' => $facilities]);
+        }
+
         if ($request->has('type')) {
-            $type = $validated['type'];
-            $rooms = MeetingRoom::where('type', $type)->get();
+            $rooms = MeetingRoom::where('type', $validated['type'])->get();
             return response()->json($rooms);
         }
 
         $rooms = MeetingRoom::all();
         return response()->json($rooms);
     }
+
 
     public function show($id)
     {
