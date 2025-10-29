@@ -13,7 +13,10 @@ use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\InviteController;
+use App\Http\Controllers\WebHookController;
 
+Route::get('/webhook/whatsapp', [WebHookController::class, 'verify']);
+Route::post('/webhook/whatsapp', [WebHookController::class, 'handle']);
 Route::get('/meeting-display/{company_code}', [MeetingRoomReservationController::class, 'meetingDisplay']);
 Route::post('/register/admin', [AuthController::class, 'registerAdmin']);
 Route::post('/register/user', [AuthController::class, 'registerUser']);
