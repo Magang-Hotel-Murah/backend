@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use App\Models\Company;
 use App\Models\Scopes\CompanyScope;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 class MeetingRoomReservationService
 {
@@ -126,43 +127,27 @@ class MeetingRoomReservationService
         return $reservation;
     }
 
-    public function createReservation(array $validated)
+    private function normalizePhone($number)
     {
-        $user = Auth::user();
+        $number = preg_replace('/[^0-9]/', '', $number);
 
-        $participants = $validated['participants'] ?? [];
-
-        if (!empty($validated['all_users'])) {
-            $allUsers = User::pluck('id')
-                ->map(fn($id) => ['user_id' => $id])
-                ->toArray();
-
-            $participants = array_merge($participants, $allUsers);
+        if (substr($number, 0, 1) === '0') {
+            $number = '62' . substr($number, 1);
+        } elseif (substr($number, 0, 2) === '62') {
+        } elseif (substr($number, 0, 3) === '628') {
         }
+        return $number;
+    }
 
-        if (!empty($validated['division_ids'])) {
-            $divisionUsers = User::whereHas('profile', function ($query) use ($validated) {
-                $query->whereIn('division_id', $validated['division_ids']);
-            })
-                ->pluck('id')
-                ->map(fn($id) => ['user_id' => $id])
-                ->toArray();
+    public function createReservation(array $validated, $waNumber = null)
+    {
+        $waNumberNormalized = $this->normalizePhone($waNumber);
 
-            $participants = array_merge($participants, $divisionUsers);
-        }
+        $user = User::whereHas('profile', function ($q) use ($waNumberNormalized) {
+            $q->whereRaw("REPLACE(REPLACE(REPLACE(phone, '+', ''), '-', ''), ' ', '') = ?", [$waNumberNormalized]);
+        })->first() ?? Auth::user();
 
-        if (!empty($validated['position_ids'])) {
-            $positionUsers = User::whereHas('profile', function ($query) use ($validated) {
-                $query->whereIn('position_id', $validated['position_ids']);
-            })
-                ->pluck('id')
-                ->map(fn($id) => ['user_id' => $id])
-                ->toArray();
-
-            $participants = array_merge($participants, $positionUsers);
-        }
-
-        $participants = collect($participants)->unique('user_id')->values()->toArray();
+        $participants = $this->resolveParticipants($validated);
 
         $conflictMessage = $this->checkConflict(
             $validated['meeting_room_id'],
@@ -176,8 +161,7 @@ class MeetingRoomReservationService
             throw new \Exception($conflictMessage, 409);
         }
 
-        $reservation = DB::transaction(function () use ($validated, $user, $participants) {
-
+        return DB::transaction(function () use ($validated, $user, $participants) {
             $reservation = MeetingRoomReservation::create([
                 'user_id'          => $user->id,
                 'company_id'       => $user->company_id,
@@ -193,11 +177,8 @@ class MeetingRoomReservationService
             $this->saveRequest($reservation, $validated['request'] ?? []);
             app(NotificationService::class)->sendReservationCreated($reservation);
 
-
-            return $this->getReservationDetails($reservation->id);
+            return $reservation;
         });
-
-        return $reservation;
     }
 
     public function updateReservation(array $validated, $id)
@@ -361,7 +342,7 @@ class MeetingRoomReservationService
             'meeting_room_id'       => 'required|exists:meeting_rooms,id',
             'title'                 => 'required|string',
             'description'           => 'nullable|string',
-            'start_time'            => 'required|date|after:now',
+            'start_time'            => 'required|date|after_or_equal:now',
             'end_time'              => 'required|date|after:start_time',
 
             'participants'                => 'nullable|array',
@@ -386,19 +367,84 @@ class MeetingRoomReservationService
         ];
     }
 
+    private function resolveParticipants(array $validated): array
+    {
+        $participants = $validated['participants'] ?? [];
+
+        if (!empty($validated['all_users'])) {
+            $participants = array_merge(
+                $participants,
+                User::pluck('id')->map(fn($id) => ['user_id' => $id])->toArray()
+            );
+        }
+
+        if (!empty($validated['division_ids'])) {
+            $participants = array_merge(
+                $participants,
+                User::whereHas(
+                    'profile',
+                    fn($q) =>
+                    $q->whereIn('division_id', $validated['division_ids'])
+                )->pluck('id')->map(fn($id) => ['user_id' => $id])->toArray()
+            );
+        }
+
+        if (!empty($validated['position_ids'])) {
+            $participants = array_merge(
+                $participants,
+                User::whereHas(
+                    'profile',
+                    fn($q) =>
+                    $q->whereIn('position_id', $validated['position_ids'])
+                )->pluck('id')->map(fn($id) => ['user_id' => $id])->toArray()
+            );
+        }
+
+        return collect($participants)->unique('user_id')->values()->toArray();
+    }
+
     public function checkConflict(
-        int $roomId,
+        MeetingRoom|int $room,
         string $start,
         string $end,
         int $excludeId = null,
         ?int $participantCount = null
     ): ?string {
-        $conflictQuery = MeetingRoomReservation::where('status', 'approved')
-            ->conflict($roomId, $start, $end, $excludeId);
+        $roomId = $room instanceof MeetingRoom ? $room->id : $room;
 
+        $bufferMinutes = 14;
+        $startWithBuffer = Carbon::parse($start)->subMinutes($bufferMinutes)->toDateTimeString();
+        $endWithBuffer = Carbon::parse($end)->addMinutes($bufferMinutes)->toDateTimeString();
+
+        $conflictQuery = MeetingRoomReservation::with('room')
+            ->where(function ($q) {
+                $q->where(function ($sub) {
+                    $sub->where('status', 'approved')
+                        ->whereDoesntHave('request', function ($r) {
+                            $r->where('funds_amount', '>', 0);
+                        });
+                })
+                    ->orWhere(function ($sub) {
+                        $sub->where('status', 'approved')
+                            ->whereHas('request', function ($r) {
+                                $r->where('funds_amount', '>', 0)
+                                    ->where('status', 'approved');
+                            });
+                    });
+            })
+            ->conflict($roomId, $startWithBuffer, $endWithBuffer, $excludeId);
+
+        Log::info('Check conflict params', [
+            'roomId' => $roomId,
+            'start' => $start,
+            'end' => $end,
+            'count' => $conflictQuery->count(),
+            'sql' => $conflictQuery->toSql(),
+            'bindings' => $conflictQuery->getBindings(),
+        ]);
         if ($conflictQuery->exists()) {
             $conflicting = $conflictQuery->first();
-            $room = MeetingRoom::with('parent', 'children')->find($roomId);
+            $room = MeetingRoom::with('parent:id,name', 'children:id,parent_id,name')->find($roomId);
             $conflictRoom = $conflicting->room;
 
             if ($room->parent_id && $room->parent_id === $conflictRoom->id) {
@@ -413,13 +459,11 @@ class MeetingRoomReservationService
         }
 
         if ($participantCount !== null) {
-            $room = MeetingRoom::find($roomId);
-            if (!$room) {
-                return 'Ruangan tidak ditemukan.';
-            }
+            $room = MeetingRoom::select('id', 'capacity')->find($roomId);
+            if (!$room) return 'Ruangan tidak ditemukan.';
 
             $totalExisting = MeetingRoomReservation::where('status', 'approved')
-                ->conflict($roomId, $start, $end, $excludeId)
+                ->conflict($roomId, $startWithBuffer, $endWithBuffer, $excludeId)
                 ->withCount('participants')
                 ->get()
                 ->sum('participants_count');
@@ -434,29 +478,27 @@ class MeetingRoomReservationService
         return null;
     }
 
-
     public function saveParticipants(MeetingRoomReservation $reservation, array $participants): void
     {
-        if (empty($participants)) {
-            return;
-        }
+        if (empty($participants)) return;
 
         $reservation->participants()->delete();
+        $companyId = $reservation->user->company_id;
 
-        foreach ($participants as $p) {
-            $data = ['reservation_id' => $reservation->id];
-            if (isset($p['user_id'])) {
-                $data['user_id'] = $p['user_id'];
-            } else {
-                $data = array_merge($data, [
-                    'name'            => $p['name'] ?? null,
-                    'email'           => $p['email'] ?? null,
-                    'whatsapp_number' => $p['whatsapp_number'] ?? null,
-                ]);
-            }
-            MeetingParticipant::create($data);
-        }
+        $data = collect($participants)->map(function ($p) use ($reservation, $companyId) {
+            return [
+                'reservation_id'   => $reservation->id,
+                'company_id'       => $companyId,
+                'user_id'          => $p['user_id'] ?? null,
+                'name'             => $p['name'] ?? null,
+                'email'            => $p['email'] ?? null,
+                'whatsapp_number'  => $p['whatsapp_number'] ?? null,
+            ];
+        })->toArray();
+
+        MeetingParticipant::insert($data);
     }
+
 
     public function saveRequest(MeetingRoomReservation $reservation, array $requestData): void
     {
