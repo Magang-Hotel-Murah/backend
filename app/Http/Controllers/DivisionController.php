@@ -38,10 +38,10 @@ class DivisionController extends Controller
 
     public function show($id)
     {
-        $division = Division::findOrFail($id);
+        $division = Division::find($id);
 
         if (!$division) {
-            return response()->json(['message' => 'Division not found'], 404);
+            return response()->json(['message' => 'Divisi tidak ditemukan atau tidak milik perusahaan Anda.'], 404);
         }
 
         return response()->json($division->load('positions'));
