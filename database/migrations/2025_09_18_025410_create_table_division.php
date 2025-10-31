@@ -10,7 +10,8 @@ return new class extends Migration
     {
         Schema::create('divisions', function (Blueprint $table) {
             $table->id();
-            $table->string('name'); // contoh: IT, HR, Finance
+            $table->foreignId('company_id')->constrained()->onDelete('cascade');
+            $table->string('name');
             $table->timestamps();
         });
     }
