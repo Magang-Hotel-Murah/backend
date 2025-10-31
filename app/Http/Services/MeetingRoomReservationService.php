@@ -357,6 +357,16 @@ class MeetingRoomReservationService
             'position_ids'                => 'nullable|array',
             'position_ids.*'              => 'exists:user_profiles,position_id',
 
+            'position_combinations' => 'nullable|array',
+            'position_combinations.*.position_id' => 'required|exists:user_profiles,position_id',
+            'position_combinations.*.division_ids' => 'required|array',
+            'position_combinations.*.division_ids.*' => 'exists:user_profiles,division_id',
+
+            'division_combinations' => 'nullable|array',
+            'division_combinations.*.division_id' => 'required|exists:user_profiles,division_id',
+            'division_combinations.*.position_ids' => 'required|array',
+            'division_combinations.*.position_ids.*' => 'exists:user_profiles,position_id',
+
             'all_users'                 => 'nullable|boolean',
 
             'request'                     => 'nullable|array',
@@ -398,6 +408,34 @@ class MeetingRoomReservationService
                     $q->whereIn('position_id', $validated['position_ids'])
                 )->pluck('id')->map(fn($id) => ['user_id' => $id])->toArray()
             );
+        }
+
+        if (!empty($validated['position_combinations'])) {
+            foreach ($validated['position_combinations'] as $combo) {
+                $participants = array_merge(
+                    $participants,
+                    User::whereHas(
+                        'profile',
+                        fn($q) =>
+                        $q->where('position_id', $combo['position_id'])
+                            ->whereIn('division_id', $combo['division_ids'])
+                    )->pluck('id')->map(fn($id) => ['user_id' => $id])->toArray()
+                );
+            }
+        }
+
+        if (!empty($validated['division_combinations'])) {
+            foreach ($validated['division_combinations'] as $combo) {
+                $participants = array_merge(
+                    $participants,
+                    User::whereHas(
+                        'profile',
+                        fn($q) =>
+                        $q->where('division_id', $combo['division_id'])
+                            ->whereIn('position_id', $combo['position_ids'])
+                    )->pluck('id')->map(fn($id) => ['user_id' => $id])->toArray()
+                );
+            }
         }
 
         return collect($participants)->unique('user_id')->values()->toArray();
