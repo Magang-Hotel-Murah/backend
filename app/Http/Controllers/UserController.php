@@ -12,14 +12,34 @@ class UserController extends Controller
 {
     public function listLimited(Request $request)
     {
+        $request->validate([
+            'division_id' => 'nullable|integer|exists:divisions,id',
+            'position_id' => 'nullable|integer|exists:positions,id',
+            'name' => 'nullable|string'
+        ]);
+
         $query = User::select('id', 'name')
             ->with([
                 'profile.division:id,name',
                 'profile.position:id,name'
             ]);
 
-        if ($search = $request->query('q')) {
+        if ($search = $request->query('name')) {
             $query->where('name', 'like', "%{$search}%");
+        }
+
+        $divisionId = $request->query('division_id');
+        $positionId = $request->query('position_id');
+
+        if ($divisionId || $positionId) {
+            $query->whereHas('profile', function ($q) use ($divisionId, $positionId) {
+                if ($divisionId) {
+                    $q->where('division_id', $divisionId);
+                }
+                if ($positionId) {
+                    $q->where('position_id', $positionId);
+                }
+            });
         }
 
         $users = $query->get();
@@ -28,6 +48,8 @@ class UserController extends Controller
             return [
                 'id' => $user->id,
                 'name' => $user->name,
+                'division_id' => $user->profile->division_id ?? null,
+                'position_id' => $user->profile->position_id ?? null,
                 'division' => $user->profile->division->name ?? null,
                 'position' => $user->profile->position->name ?? null,
             ];
@@ -99,7 +121,7 @@ class UserController extends Controller
 
     public function destroy($id)
     {
-        $user = User::withTrashed()->findOrFail($id); // pastikan bisa restore juga
+        $user = User::withTrashed()->findOrFail($id);
         $message = '';
 
         if ($user->trashed()) {
