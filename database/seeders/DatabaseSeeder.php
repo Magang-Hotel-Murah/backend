@@ -16,6 +16,7 @@ use App\Models\Position;
 use App\Models\FlightReservation;
 use App\Models\PPOBTransaction;
 use App\Models\Transaction;
+use App\Models\DivisionPosition;
 
 class DatabaseSeeder extends Seeder
 {
@@ -34,15 +35,31 @@ class DatabaseSeeder extends Seeder
             return $user;
         }
 
-        // 1. Seed divisions & positions
-        $divisions = Division::factory(6)->create();
-        $positions = Position::factory(5)->create();
+        // 1. Buat company
+        $company = Company::factory()->create();
+
+        // 2. Seed divisions & positions
+        $divisions = Division::factory(6)->create([
+            'company_id' => $company->id,
+        ]);
+        $positions = Position::factory(5)->create([
+            'company_id' => $company->id,
+        ]);
 
         $divisionIds = $divisions->pluck('id')->toArray();
         $positionIds = $positions->pluck('id')->toArray();
 
-        // 2. Buat company
-        $company = Company::factory()->create();
+        foreach ($divisions as $division) {
+            // Setiap divisi punya 2–4 posisi acak
+            $assignedPositions = $positions->random(rand(2, min(4, $positions->count())));
+
+            foreach ($assignedPositions as $position) {
+                DivisionPosition::firstOrCreate([
+                    'division_id' => $division->id,
+                    'position_id' => $position->id,
+                ]);
+            }
+        }
 
         // Super admin
         $superAdmin = createUserWithProfile([
