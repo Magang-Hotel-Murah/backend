@@ -22,7 +22,7 @@ class UserProfileController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->role !== 'admin') {
+        if ($user->role !== 'super_admin' && $user->role !== 'company_admin') {
             $id = $user->id;
         } else {
             if (!$id) {
