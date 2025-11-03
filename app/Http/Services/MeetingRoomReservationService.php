@@ -186,6 +186,15 @@ class MeetingRoomReservationService
         return DB::transaction(function () use ($validated, $id) {
             $reservation = MeetingRoomReservation::with(['request'])->findOrFail($id);
 
+            if ($reservation->status === 'approved') {
+                if (
+                    (isset($validated['meeting_room_id']) && $validated['meeting_room_id'] != $reservation->meeting_room_id) ||
+                    (isset($validated['start_time']) && $validated['start_time'] != $reservation->start_time) ||
+                    (isset($validated['end_time']) && $validated['end_time'] != $reservation->end_time)
+                ) {
+                    throw new \Exception('Reservasi sudah disetujui. Jadwal dan ruangan tidak dapat diubah.');
+                }
+            }
             if ($reservation->status === 'approved' && isset($validated['status']) && $validated['status'] !== $reservation->status) {
                 throw new \Exception('Status tidak dapat diubah karena reservasi sudah disetujui.');
             }
