@@ -5,13 +5,21 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Http\Services\WhatsappService;
+
 
 class WebHookController extends Controller
 {
-    // Verifikasi dari Meta
+    protected $whatsappService;
+
+    public function __construct(WhatsappService $whatsappService)
+    {
+        $this->whatsappService = $whatsappService;
+    }
+
     public function verify(Request $request)
     {
-        $verifyToken = env('WHATSAPP_VERIFY_TOKEN'); // harus sama kayak yang kamu set di Meta Webhook config
+        $verifyToken = env('WHATSAPP_VERIFY_TOKEN');
 
         $mode = $request->get('hub_mode');
         $token = $request->get('hub_verify_token');
@@ -28,7 +36,6 @@ class WebHookController extends Controller
     {
         $data = $request->all();
 
-        // Log cuma body pesan biar gak kepotong
         $message = $data['entry'][0]['changes'][0]['value']['messages'][0] ?? null;
         if ($message) {
             $from = $message['from'];
@@ -45,20 +52,11 @@ class WebHookController extends Controller
 
     private function sendMessage($to, $text)
     {
-        $url = "https://graph.facebook.com/v22.0/" . env('WA_PHONE_ID') . "/messages";
-        // Log::info("Sending message to $to: $text");
+        $response = $this->whatsappService->send($to, $text);
 
-        $response = Http::withToken(env('WHATSAPP_TOKEN'))
-            ->post($url, [
-                "messaging_product" => "whatsapp",
-                "to" => $to,
-                "type" => "text",
-                "text" => ["body" => $text],
-            ]);
-
-        // Log::info('WhatsApp API response: ' . $response->body());
-
-        return $response->json();
+        if (!$response) {
+            Log::error("Failed to send message to $to: $text");
+        }
     }
 
     private function normalizePhone($number)
@@ -75,16 +73,21 @@ class WebHookController extends Controller
 
     private function handleMessage($from, $text)
     {
+        $waNumberNormalized = $this->normalizePhone($from);
+        $user = \App\Models\User::whereHas('profile', function ($q) use ($waNumberNormalized) {
+            $q->whereRaw("REPLACE(REPLACE(REPLACE(phone, '+', ''), '-', ''), ' ', '') = ?", [$waNumberNormalized]);
+        })->first() ?? null;
+
+        if (!$user) {
+            return "Anda belum terdaftar di sistem. Hubungi admin.";
+        }
+
         if (strtolower($text) === 'reset') {
             cache()->forget("wa_user_$from");
             return "Chat sudah direset. Ketik '1' untuk mulai reservasi ulang.";
         }
         $state = cache("wa_user_$from") ?? ['step' => 'menu'];
 
-        $waNumberNormalized = $this->normalizePhone($from);
-        $user = \App\Models\User::whereHas('profile', function ($q) use ($waNumberNormalized) {
-            $q->whereRaw("REPLACE(REPLACE(REPLACE(phone, '+', ''), '-', ''), ' ', '') = ?", [$waNumberNormalized]);
-        })->first() ?? null;
 
         $companyId = $user ? $user->company_id : null;
 
@@ -92,10 +95,10 @@ class WebHookController extends Controller
             case 'menu':
                 if (strtolower($text) === '1' || strtolower($text) === 'reservasi') {
                     $state['step'] = 'awaiting_date';
-                    cache(["wa_user_$from" => $state], now()->addMinutes(30));
+                    cache()->put("wa_user_$from", $state, now()->addMinutes(30));
                     return "Silakan masukkan tanggal meeting (YYYY-MM-DD):";
                 }
-                return "Menu:\n1. Reservasi\nKetik '1' untuk mulai reservasi.";
+                return "Halo {$user->name}! 👋,\nSelamat datang di Sistem Reservasi Meeting Room. \nKetik '1' untuk mulai reservasi.";
 
             case 'awaiting_date':
                 if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $text)) {
@@ -111,7 +114,7 @@ class WebHookController extends Controller
 
                 $state['date'] = $text;
                 $state['step'] = 'awaiting_participants';
-                cache(["wa_user_$from" => $state], now()->addMinutes(30));
+                cache()->put("wa_user_$from", $state, now()->addMinutes(30));
 
                 return "Berapa jumlah peserta meeting?";
 
@@ -122,7 +125,7 @@ class WebHookController extends Controller
                 }
                 $state['participants_count'] = intval($text);
                 $state['step'] = 'show_rooms';
-                cache(["wa_user_$from" => $state], now()->addMinutes(30));
+                cache()->put("wa_user_$from", $state, now()->addMinutes(30));
 
                 $request = new \Illuminate\Http\Request([
                     'date' => $state['date'],
@@ -149,7 +152,7 @@ class WebHookController extends Controller
 
                 $rooms = array_filter($rooms, fn($room) => ($room->company_id ?? null) == $companyId);
 
-                cache(["wa_user_{$from}_available_rooms" => $rooms], now()->addMinutes(30));
+                cache()->put("wa_user_{$from}_available_rooms", $rooms, now()->addMinutes(30));
 
                 $message = "{$messageText}\n\n";
                 if (empty($rooms)) {
@@ -188,13 +191,13 @@ class WebHookController extends Controller
 
                 $state['meeting_room_id'] = $selectedRoom->id;
                 $state['step'] = 'awaiting_title';
-                cache(["wa_user_$from" => $state], now()->addMinutes(30));
+                cache()->put("wa_user_$from", $state, now()->addMinutes(30));
                 return "Masukkan judul meeting:";
 
             case 'awaiting_title':
                 $state['title'] = $text;
                 $state['step'] = 'awaiting_start_end';
-                cache(["wa_user_$from" => $state], now()->addMinutes(30));
+                cache()->put("wa_user_$from", $state, now()->addMinutes(30));
                 return "Masukkan jam mulai dan selesai (HH:MM-HH:MM), misal: 09:00-10:00";
 
             case 'awaiting_start_end':
@@ -210,7 +213,7 @@ class WebHookController extends Controller
                 $selectedRoom = null;
 
                 foreach ($availableRooms as $room) {
-                    if ($room->id == $selectedRoomId) { // pakai -> bukan ['']
+                    if ($room->id == $selectedRoomId) {
                         $selectedRoom = $room;
                         break;
                     }
@@ -220,9 +223,8 @@ class WebHookController extends Controller
                     return "Terjadi kesalahan, ruangan tidak ditemukan di cache.";
                 }
 
-                // Cek apakah waktu input sesuai dengan free_slots
                 $validSlot = false;
-                foreach ($selectedRoom->free_slots ?? [] as $slot) { // pakai ->
+                foreach ($selectedRoom->free_slots ?? [] as $slot) {
                     if ($startTime >= $slot->start_time && $endTime <= $slot->end_time) {
                         $validSlot = true;
                         break;
@@ -234,18 +236,17 @@ class WebHookController extends Controller
                     return "Waktu tidak sesuai slot yang tersedia. Slot yang tersedia: {$slotsText}";
                 }
 
-                // Simpan ke state
                 $state['start_time'] = $startTime;
                 $state['end_time'] = $endTime;
                 $state['step'] = 'awaiting_description';
-                cache(["wa_user_$from" => $state], now()->addMinutes(30));
+                cache()->put("wa_user_$from", $state, now()->addMinutes(30));
 
                 return "Masukkan deskripsi meeting (opsional), ketik '-' jika kosong:";
 
             case 'awaiting_description':
                 $state['description'] = $text === '-' ? null : $text;
                 $state['step'] = 'awaiting_participants_detail';
-                cache(["wa_user_$from" => $state], now()->addMinutes(30));
+                cache()->put("wa_user_$from", $state, now()->addMinutes(30));
 
                 return "Masukkan peserta tambahan (opsional), format: nama,email,whatsapp; pisahkan pakai titik koma, ketik '-' jika tidak ada:";
 
@@ -267,18 +268,35 @@ class WebHookController extends Controller
                                 'whatsapp_number' => $user?->profile?->phone ?? null,
                             ];
                         } else {
-                            return [
+                            $participant = [
                                 'user_id' => null,
                                 'name' => $fields[0] ?? null,
-                                'email' => $fields[1] ?? null,
-                                'whatsapp_number' => $fields[2] ?? null,
+                                'email' => null,
+                                'whatsapp_number' => null,
                             ];
+
+                            if (isset($fields[1])) {
+                                // Kalau field kedua email → simpan ke email
+                                // kalau bukan → anggap itu nomor WhatsApp
+                                if (filter_var($fields[1], FILTER_VALIDATE_EMAIL)) {
+                                    $participant['email'] = $fields[1];
+                                } else {
+                                    $participant['whatsapp_number'] = preg_replace('/\D/', '', $fields[1]);
+                                }
+                            }
+
+                            if (isset($fields[2])) {
+                                // Kalau ada field ketiga, anggap phone
+                                $participant['whatsapp_number'] = preg_replace('/\D/', '', $fields[2]);
+                            }
+
+                            return $participant;
                         }
                     }, explode(';', $text));
                     $state['participants'] = $participants;
                 }
                 $state['step'] = 'awaiting_request';
-                cache(["wa_user_$from" => $state], now()->addMinutes(30));
+                cache()->put("wa_user_$from", $state, now()->addMinutes(30));
                 return "Masukkan request opsional (funds_amount,funds_reason;snacks;equipment), format contoh: 50000,Snack untuk meeting;Kopi,Teh;Projector,Mic; ketik '-' jika tidak ada:";
 
             case 'awaiting_request':
@@ -315,7 +333,7 @@ class WebHookController extends Controller
                         return "Gagal membuat reservasi.";
                     }
                     cache()->forget("wa_user_$from");
-                    return "Reservasi berhasil dibuat!\nID: {$reservation->id}\nRoom: {$state['meeting_room_id']}\nTanggal: {$state['date']}\nWaktu: {$state['start_time']}-{$state['end_time']}";
+                    return "Detail reservasi!\nID: {$reservation->id}\nRoom: {$state['meeting_room_id']}\nTanggal: {$state['date']}\nWaktu: {$state['start_time']}-{$state['end_time']}";
                 } catch (\Exception $e) {
                     return "Gagal membuat reservasi: " . $e->getMessage();
                 }

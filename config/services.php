@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'whatsapp' => [
+        'phone_number_id' => env('WA_PHONE_ID'),
+        'access_token'    => env('WHATSAPP_TOKEN'),
+    ],
+
+
 ];
