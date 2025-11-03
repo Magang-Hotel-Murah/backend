@@ -11,7 +11,13 @@ class Position extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['company_id', 'name'];
+    protected $fillable = [
+        'company_id',
+        'name'
+    ];
+
+    protected $hidden = ['pivot'];
+
 
     public function company()
     {

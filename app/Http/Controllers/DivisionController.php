@@ -44,7 +44,7 @@ class DivisionController extends Controller
             return response()->json(['message' => 'Divisi tidak ditemukan atau tidak milik perusahaan Anda.'], 404);
         }
 
-        return response()->json($division->load('positions'));
+        return response()->json($division->load('positions:id,name'));
     }
 
     public function store(Request $request)
@@ -118,7 +118,7 @@ class DivisionController extends Controller
 
         return response()->json([
             'message' => 'Divisi berhasil dibuat.',
-            'data' => $division->load('positions'),
+            'data' => $division->load('positions:id,name'),
         ]);
     }
 
@@ -206,7 +206,7 @@ class DivisionController extends Controller
 
         return response()->json([
             'message' => 'Divisi berhasil diperbarui.',
-            'data' => $division->load('positions'),
+            'data' => $division->load('positions:id,name')->toArray(),
         ]);
     }
 
