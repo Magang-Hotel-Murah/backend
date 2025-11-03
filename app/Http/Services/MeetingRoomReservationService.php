@@ -183,18 +183,41 @@ class MeetingRoomReservationService
 
     public function updateReservation(array $validated, $id)
     {
+
         return DB::transaction(function () use ($validated, $id) {
             $reservation = MeetingRoomReservation::with(['request'])->findOrFail($id);
 
+            Log::info('UpdateReservation values', [
+                'validated' => [
+                    'room' => $validated['meeting_room_id'] ?? null,
+                    'start' => $validated['start_time'] ?? null,
+                    'end' => $validated['end_time'] ?? null,
+                ],
+                'current' => [
+                    'status' => $reservation->status,
+                    'room' => $reservation->meeting_room_id,
+                    'start' => $reservation->start_time,
+                    'end' => $reservation->end_time,
+                ]
+            ]);
+
             if ($reservation->status === 'approved') {
+                $validatedStart = isset($validated['start_time'])
+                    ? date('Y-m-d H:i:s', strtotime($validated['start_time']))
+                    : null;
+                $validatedEnd = isset($validated['end_time'])
+                    ? date('Y-m-d H:i:s', strtotime($validated['end_time']))
+                    : null;
+
                 if (
                     (isset($validated['meeting_room_id']) && $validated['meeting_room_id'] != $reservation->meeting_room_id) ||
-                    (isset($validated['start_time']) && $validated['start_time'] != $reservation->start_time) ||
-                    (isset($validated['end_time']) && $validated['end_time'] != $reservation->end_time)
+                    ($validatedStart && $validatedStart != $reservation->start_time) ||
+                    ($validatedEnd && $validatedEnd != $reservation->end_time)
                 ) {
                     throw new \Exception('Reservasi sudah disetujui. Jadwal dan ruangan tidak dapat diubah.');
                 }
             }
+
             if ($reservation->status === 'approved' && isset($validated['status']) && $validated['status'] !== $reservation->status) {
                 throw new \Exception('Status tidak dapat diubah karena reservasi sudah disetujui.');
             }
@@ -203,7 +226,7 @@ class MeetingRoomReservationService
                 $reservation->request()->update(['status' => 'cancelled']);
             }
 
-            $hasParticipantsKey = array_key_exists('participants', $validated);
+            $participants = $this->resolveParticipants($validated);
 
             $updateData = [
                 'meeting_room_id' => $validated['meeting_room_id'],
@@ -211,27 +234,50 @@ class MeetingRoomReservationService
                 'description'     => $validated['description'] ?? null,
                 'start_time'      => $validated['start_time'],
                 'end_time'        => $validated['end_time'],
+                'status'          => $reservation->status === 'approved'
+                    ? $reservation->status
+                    : ($validated['status'] ?? $reservation->status),
             ];
-
-            if ($hasParticipantsKey) {
-                $updateData['participants'] = count($validated['participants'] ?? []);
-            }
-
-            $updateData['status'] = $reservation->status === 'approved'
-                ? $reservation->status
-                : ($validated['status'] ?? $reservation->status);
 
             $reservation->update($updateData);
 
-            if ($hasParticipantsKey) {
-                $this->saveParticipants($reservation, $validated['participants'] ?? []);
-            }
-
+            // 🔹 Simpan ulang peserta dan request
+            $this->saveParticipants($reservation, $participants);
             if (array_key_exists('request', $validated)) {
                 $this->saveRequest($reservation, $validated['request'] ?? []);
             }
 
             return $reservation->load(['participants', 'request', 'room']);
+
+            // $hasParticipantsKey = array_key_exists('participants', $validated);
+
+            // $updateData = [
+            //     'meeting_room_id' => $validated['meeting_room_id'],
+            //     'title'           => $validated['title'],
+            //     'description'     => $validated['description'] ?? null,
+            //     'start_time'      => $validated['start_time'],
+            //     'end_time'        => $validated['end_time'],
+            // ];
+
+            // if ($hasParticipantsKey) {
+            //     $updateData['participants'] = count($validated['participants'] ?? []);
+            // }
+
+            // $updateData['status'] = $reservation->status === 'approved'
+            //     ? $reservation->status
+            //     : ($validated['status'] ?? $reservation->status);
+
+            // $reservation->update($updateData);
+
+            // if ($hasParticipantsKey) {
+            //     $this->saveParticipants($reservation, $validated['participants'] ?? []);
+            // }
+
+            // if (array_key_exists('request', $validated)) {
+            //     $this->saveRequest($reservation, $validated['request'] ?? []);
+            // }
+
+            // return $reservation->load(['participants', 'request', 'room']);
         });
     }
 
