@@ -45,8 +45,20 @@ class NotificationService
         $isFinance = $reservation->request && $reservation->request->funds_amount > 0 && $reservation->request->status === 'waiting_finance';
 
         $messageOwner = $isFinance
-            ? "Halo {$reservation->user->name},\nReservasi ruang meeting *{$title}* di *{$room->name}* telah *disetujui oleh admin* dan *menunggu persetujuan keuangan*."
-            : "Halo {$reservation->user->name},\nReservasi ruang meeting *{$title}* telah *disetujui*.\n\n📍 *Lokasi:* {$room->name}, {$room->location}\n📅 *Tanggal:* {$tanggal}\n🕒 *Waktu:* {$waktu}";
+            ? "✅ *Reservasi Disetujui Admin!*\n\n"
+            . "🏢 *Ruangan:* {$room->name}\n"
+            . "📍 *Lokasi:* {$room->location}\n"
+            . "📝 Judul: {$title}\n"
+            . "📅 Tanggal: {$tanggal}\n"
+            . "🕐 Waktu: {$waktu}\n\n"
+            . "📊 Status: *Menunggu Persetujuan Keuangan*"
+            : "✅ *Reservasi Telah Disetujui!*\n\n"
+            . "🏢 *Ruangan:* {$room->name}\n"
+            . "📍 *Lokasi:* {$room->location}\n"
+            . "📝 Judul: {$title}\n"
+            . "📅 Tanggal: {$tanggal}\n"
+            . "🕐 Waktu: {$waktu}\n\n"
+            . "📊 Status: *Disetujui*";
 
         $this->notifyUser($reservation, 'Meeting Disetujui', $messageOwner);
 
@@ -56,7 +68,14 @@ class NotificationService
         ) {
             foreach ($reservation->participants as $participant) {
                 $name = $participant->name ?? ($participant->user->name ?? 'Peserta');
-                $messageParticipant = "Halo {$name},\nAnda dijadwalkan untuk meeting *{$title}*.\n📍 *Lokasi:* {$room->name}, {$room->location}\n📅 *Tanggal:* {$tanggal}\n🕒 *Waktu:* {$waktu}";
+                $messageParticipant =
+                    "✅ *Halo {$name}, Anda Dijadwalkan untuk Meeting!*\n\n" .
+                    "📝 *Judul:* {$title}\n" .
+                    "🏢 *Ruangan:* {$room->name}\n" .
+                    "📍 *Lokasi:* {$room->location}\n" .
+                    "📅 *Tanggal:* {$tanggal}\n" .
+                    "🕒 *Waktu:* {$waktu}\n\n" .
+                    "Terima kasih! Harap hadir tepat waktu 🙏";
 
                 $email = $participant->user->email ?? $participant->email ?? null;
                 $phone = $participant->user->profile->phone ?? $participant->whatsapp_number ?? null;

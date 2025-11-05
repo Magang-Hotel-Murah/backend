@@ -241,43 +241,12 @@ class MeetingRoomReservationService
 
             $reservation->update($updateData);
 
-            // 🔹 Simpan ulang peserta dan request
             $this->saveParticipants($reservation, $participants);
             if (array_key_exists('request', $validated)) {
                 $this->saveRequest($reservation, $validated['request'] ?? []);
             }
 
             return $reservation->load(['participants', 'request', 'room']);
-
-            // $hasParticipantsKey = array_key_exists('participants', $validated);
-
-            // $updateData = [
-            //     'meeting_room_id' => $validated['meeting_room_id'],
-            //     'title'           => $validated['title'],
-            //     'description'     => $validated['description'] ?? null,
-            //     'start_time'      => $validated['start_time'],
-            //     'end_time'        => $validated['end_time'],
-            // ];
-
-            // if ($hasParticipantsKey) {
-            //     $updateData['participants'] = count($validated['participants'] ?? []);
-            // }
-
-            // $updateData['status'] = $reservation->status === 'approved'
-            //     ? $reservation->status
-            //     : ($validated['status'] ?? $reservation->status);
-
-            // $reservation->update($updateData);
-
-            // if ($hasParticipantsKey) {
-            //     $this->saveParticipants($reservation, $validated['participants'] ?? []);
-            // }
-
-            // if (array_key_exists('request', $validated)) {
-            //     $this->saveRequest($reservation, $validated['request'] ?? []);
-            // }
-
-            // return $reservation->load(['participants', 'request', 'room']);
         });
     }
 
@@ -493,7 +462,15 @@ class MeetingRoomReservationService
             }
         }
 
-        return collect($participants)->unique('user_id')->values()->toArray();
+        $participantCollection = collect($participants);
+
+        $externalGuests = $participantCollection->whereNull('user_id');
+
+        $internalUsers = $participantCollection
+            ->whereNotNull('user_id')
+            ->unique('user_id');
+
+        return $externalGuests->merge($internalUsers)->values()->toArray();
     }
 
     public function checkConflict(

@@ -38,6 +38,8 @@ return [
     'whatsapp' => [
         'phone_number_id' => env('WA_PHONE_ID'),
         'access_token'    => env('WHATSAPP_TOKEN'),
+        'verify_token'    => env('WHATSAPP_VERIFY_TOKEN'),
+        'api_version' => env('WHATSAPP_API_VERSION', 'v22.0'),
     ],
 
 
