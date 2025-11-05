@@ -28,9 +28,9 @@ Route::get('/verify-email/{id}/{hash}', [AuthController::class, 'verifyEmail'])
 
 Route::post('/activate-account', [InviteController::class, 'activate']);
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('auth:sanctum', 'refresh.token')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
-
+    Route::get('/auth/me', [AuthController::class, 'getMe']);
     Route::get('/users/list', [UserController::class, 'listLimited']);
 
     Route::middleware('role:company_admin,super_admin')->group(function () {

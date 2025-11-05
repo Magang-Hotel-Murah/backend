@@ -14,7 +14,12 @@ $app = Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
+            'check.token.expiry' => \App\Http\Middleware\CheckTokenExpiry::class,
             'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'refresh.token' => \App\Http\Middleware\RefreshTokenExpiry::class, // 👈 tambahkan ini
+        ]);
+        $middleware->api(prepend: [
+            \App\Http\Middleware\CheckTokenExpiry::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

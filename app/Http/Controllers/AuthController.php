@@ -16,6 +16,24 @@ use App\Mail\ForgotPasswordMail;
 
 class AuthController extends Controller
 {
+    public function getMe(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'Unauthorized or session expired.',
+            ], 401);
+        }
+
+        $token = $user->currentAccessToken();
+
+        return response()->json([
+            'message' => 'User session is valid.',
+            'data' => $user,
+            'token_expired_at' => $token?->expires_at,
+        ]);
+    }
 
     public function registerAdmin(Request $request)
     {
@@ -125,12 +143,22 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
+        $tokenModel = $user->tokens()->latest('id')->first();
+
+        $tokenModel->expires_at = now()->addHours(8);
+        $tokenModel->save();
+
         if (!$user->hasVerifiedEmail()) {
-            $token = $user->createToken('verify_token', ['verify-email'])->plainTextToken;
+            $verifyToken = $user->createToken('verify_token', ['verify-email'])->plainTextToken;
+
+            $verifyModel = $user->tokens()->latest('id')->first();
+            $verifyModel->expires_at = now()->addMinutes(15);
+            $verifyModel->save();
+
             return response()->json([
                 'success' => false,
                 'message' => 'Please verify your email address',
-                'token' => $token
+                'token' => $verifyToken
             ], 403);
         }
 
