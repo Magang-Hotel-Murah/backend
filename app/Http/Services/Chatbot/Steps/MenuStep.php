@@ -28,6 +28,7 @@ class MenuStep extends StepHandler
             . "Selamat datang di Sistem Reservasi Meeting Room.\n\n"
             . "🔹 Ketik '1' untuk mulai reservasi (step by step)\n"
             . "🔹 Ketik '2' untuk template form cepat\n"
+            . "🔹 Ketik 'list [filter]' untuk cek reservasi Anda\n"
             . "🔹 Ketik 'help' untuk panduan lengkap";
     }
 

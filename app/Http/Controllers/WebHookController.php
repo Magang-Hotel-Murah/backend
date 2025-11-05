@@ -66,7 +66,7 @@ class WebHookController extends Controller
             $message = $data['entry'][0]['changes'][0]['value']['messages'][0] ?? null;
 
             if (!$message) {
-                Log::info('Webhook received without message');
+                Log::info('Webhook received without message data: ' . json_encode($data));
                 return response()->json(['status' => 'ok']);
             }
 

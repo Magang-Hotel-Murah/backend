@@ -14,6 +14,7 @@ use App\Http\Services\Chatbot\Steps\DescriptionStep;
 use App\Http\Services\Chatbot\Steps\ParticipantsDetailStep;
 use App\Http\Services\Chatbot\Steps\RequestStep;
 use App\Http\Services\Chatbot\Parsers\QuickFormParser;
+use App\Http\Services\MeetingRoomReservationService;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -123,6 +124,7 @@ class ChatbotFlowHandler
                 return "✅ Chat berhasil direset.\n\n"
                     . "🔹 Ketik '1' untuk reservasi step by step\n"
                     . "🔹 Ketik '2' untuk template form cepat\n"
+                    . "🔹 Ketik 'list [filter]' untuk cek reservasi Anda\n"
                     . "🔹 Ketik 'help' untuk panduan lengkap";
 
             case 'menu':
@@ -132,14 +134,28 @@ class ChatbotFlowHandler
                     . "Selamat datang di Sistem Reservasi Meeting Room.\n\n"
                     . "🔹 Ketik '1' untuk mulai reservasi (step by step)\n"
                     . "🔹 Ketik '2' untuk template form cepat\n"
+                    . "🔹 Ketik 'list [filter]' untuk cek reservasi Anda\n"
                     . "🔹 Ketik 'help' untuk panduan lengkap";
 
             case 'help':
+            case 'panduan':
+            case 'tolong':
             case 'bantuan':
                 return $this->getHelpMessage();
 
             case 'status':
                 return $this->getUserStatus($userId);
+
+            case str_starts_with($command, 'list'):
+            case str_starts_with($command, 'reservasi'):
+            case str_starts_with($command, 'reservasi saya'):
+                Log::info('User checking reservation list', ['user_id' => $userId, 'command' => $command]);
+
+                // Misal input: "list approved"
+                $parts = explode(' ', strtolower($command));
+                $filter = $parts[1] ?? 'all';
+
+                return $this->getUserReservations($userId, $filter);
 
             default:
                 return null;
@@ -196,6 +212,7 @@ class ChatbotFlowHandler
             . "🎯 *Perintah Utama:*\n"
             . "• Ketik '1' - Reservasi step by step\n"
             . "• Ketik '2' - Tampilkan template form cepat\n"
+            . "• Ketik 'list [filter]' - Cek reservasi Anda\n"
             . "• Ketik 'menu' - Kembali ke menu utama\n"
             . "• Ketik 'reset' - Batalkan & mulai ulang\n"
             . "• Ketik 'status' - Cek status percakapan\n\n"
@@ -216,7 +233,8 @@ class ChatbotFlowHandler
             . "💡 *Tips:*\n"
             . "• Deskripsi, Daftar Peserta & Request boleh dikosongkan\n"
             . "• Gunakan '-' di depan nama peserta\n"
-            . "• Request pisahkan dengan koma";
+            . "• Request pisahkan dengan koma\n"
+            . "• filter: 'all', 'approved', 'rejected', 'pending', 'upcoming', 'finished', 'today'";
     }
 
     /**
@@ -253,5 +271,74 @@ class ChatbotFlowHandler
             . "📝 Data tersimpan: " . count($progress) . " field\n\n"
             . "💡 Ketik 'reset' untuk membatalkan dan mulai ulang\n"
             . "💡 Ketik 'menu' untuk kembali ke menu utama";
+    }
+
+    /**
+     * Get user's active reservation list
+     */
+    private function getUserReservations(string $userId, string $filter = 'all'): string
+    {
+        $user = $this->userValidator->validateUser($userId);
+        if (!$user) {
+            return "❌ Anda belum terdaftar.";
+        }
+
+        Log::info('Getting user reservations', [
+            'user_id' => $user->id,
+            'filter' => $filter,
+        ]);
+
+        $query = \App\Models\MeetingRoomReservation::where('user_id', $user->id)
+            ->with('room')
+            ->orderBy('start_time', 'asc');
+
+        // 🔹 Filter berdasarkan status
+        switch (strtolower($filter)) {
+            case 'approved':
+                $query->where('status', 'approved');
+                break;
+            case 'rejected':
+                $query->where('status', 'rejected');
+                break;
+            case 'pending':
+                $query->where('status', 'pending');
+                break;
+            case 'today':
+                $query->whereDate('start_time', now()->toDateString())->where('status', 'approved');
+                break;
+            case 'upcoming':
+                $query->where('start_time', '>=', now()->startOfDay())->where('status', 'approved');
+                break;
+            case 'finished':
+                $query->where('end_time', '<=', now()->startOfDay())->where('status', 'approved');
+                break;
+            case 'all':
+            default:
+                // tidak ada tambahan filter
+                break;
+        }
+
+        $reservations = $query->limit(15)->get();
+
+        if ($reservations->isEmpty()) {
+            return "ℹ️ Tidak ada reservasi dengan filter *{$filter}*.";
+        }
+
+        $responseMessage = "🗓️ *Daftar Reservasi ({$filter}):*\n\n";
+
+        foreach ($reservations as $res) {
+            $responseMessage .=
+                "• *{$res->title}*\n" .
+                "📋 ID Reservasi: {$res->id}\n" .
+                "🏢 Ruangan: {$res->room->name}\n" .
+                "📍 Lokasi: {$res->room->location}\n" .
+                "📅 Tanggal: {$res->start_time->translatedFormat('l, d F Y')}\n" .
+                "🕐 Waktu: {$res->start_time->format('H:i')} - {$res->end_time->format('H:i')}\n" .
+                "📊 Status: *{$res->status}*\n\n";
+        }
+
+        $responseMessage .= "💡 Ketik 'menu' untuk kembali ke menu utama.";
+
+        return $responseMessage;
     }
 }
