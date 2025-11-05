@@ -10,6 +10,20 @@ class CheckTokenExpiry
 {
     public function handle(Request $request, Closure $next)
     {
+        if ($request->is(
+            'api/webhook/whatsapp',
+            'api/meeting-display/*',
+            'api/register/admin',
+            'api/register/user',
+            'api/login',
+            'api/forgot-password',
+            'api/reset-password',
+            'api/verify-email/*',
+            'api/activate-account'
+        )) {
+            return $next($request);
+        }
+
         $bearer = $request->bearerToken();
         if (!$bearer) {
             return response()->json(['message' => 'Missing token.'], 401);

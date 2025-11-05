@@ -17,10 +17,16 @@ class RefreshTokenExpiry
         if ($token && $token->expires_at) {
             $expiresInMinutes = now()->diffInMinutes($token->expires_at, false);
 
-            if ($expiresInMinutes < 30) {
-                $token->expires_at = now()->addHours(2);
-                $token->save();
+            $remember = in_array('remember', $token->abilities ?? []);
+            $maxExpiry = $remember ? $token->created_at->addDays(30) : $token->created_at->addHours(8);
+
+            $newExpiry = now()->addHours(2);
+            if ($newExpiry->gt($maxExpiry)) {
+                $newExpiry = $maxExpiry;
             }
+
+            $token->expires_at = $newExpiry;
+            $token->save();
         }
 
         return $response;

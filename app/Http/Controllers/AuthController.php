@@ -32,6 +32,7 @@ class AuthController extends Controller
             'message' => 'User session is valid.',
             'data' => $user,
             'token_expired_at' => $token?->expires_at,
+            'remember' => in_array('remember', $token?->abilities ?? []),
         ]);
     }
 
@@ -125,9 +126,11 @@ class AuthController extends Controller
     {
         $request->validate([
             'email' => 'required|email',
-            'password' => 'required'
+            'password' => 'required',
+            'remember' => 'boolean'
         ]);
 
+        $remember = $request->boolean('remember', false);
         $user = User::where('email', $request->email)->with(
             'profile.division:id,name',
             'profile.position:id,name',
@@ -141,11 +144,13 @@ class AuthController extends Controller
             ], 401);
         }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
-
+        $abilities = $remember ? ['remember'] : [];
+        $token = $user->createToken('auth_token', $abilities)->plainTextToken;
         $tokenModel = $user->tokens()->latest('id')->first();
 
-        $tokenModel->expires_at = now()->addHours(8);
+        $expiry = $remember ? now()->addDays(30) : now()->addHours(8);
+
+        $tokenModel->expires_at = $expiry;
         $tokenModel->save();
 
         if (!$user->hasVerifiedEmail()) {
