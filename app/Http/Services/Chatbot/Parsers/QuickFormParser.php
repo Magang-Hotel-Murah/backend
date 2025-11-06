@@ -486,10 +486,10 @@ class QuickFormParser
     {
         return "✅ *Reservasi Berhasil Dibuat!*\n\n"
             . "📋 ID Reservasi: {$reservation->id}\n"
-            . "🏢 Ruangan ID: {$data['room_id']}\n"
+            . "📝 Judul: {$data['title']}\n\n"
+            . "🏢 Ruangan : {$reservation->room->name}\n"
             . "📅 Tanggal: {$data['date']}\n"
             . "🕐 Waktu: {$startTime} - {$endTime}\n"
-            . "📝 Judul: {$data['title']}\n\n"
             . "Terima kasih ketik 'menu' untuk kembali ke menu utama.";
     }
 }
