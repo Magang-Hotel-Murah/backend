@@ -307,10 +307,10 @@ class ChatbotFlowHandler
                 $query->whereDate('start_time', now()->toDateString())->where('status', 'approved');
                 break;
             case 'upcoming':
-                $query->where('start_time', '>=', now()->startOfDay())->where('status', 'approved');
+                $query->where('start_time', '>=', now())->where('status', 'approved');
                 break;
             case 'finished':
-                $query->where('end_time', '<=', now()->startOfDay())->where('status', 'approved');
+                $query->where('end_time', '<=', now())->where('status', 'approved');
                 break;
             case 'all':
             default:
@@ -328,7 +328,7 @@ class ChatbotFlowHandler
 
         foreach ($reservations as $res) {
             $responseMessage .=
-                "• *{$res->title}*\n" .
+                "📝 Judul: *{$res->title}*\n" .
                 "📋 ID Reservasi: {$res->id}\n" .
                 "🏢 Ruangan: {$res->room->name}\n" .
                 "📍 Lokasi: {$res->room->location}\n" .

@@ -84,7 +84,6 @@ class RequestStep extends StepHandler
             return "✅ *Reservasi Berhasil Dibuat!*\n\n"
                 . "📋 ID Reservasi: {$reservation->id}\n"
                 . "🏢 Ruangan: {$data['room_name']}\n"
-                . "📍 Lokasi: {$data['room_location']}\n"
                 . "📅 Tanggal: {$data['date']}\n"
                 . "🕐 Waktu: {$data['start_time']} - {$data['end_time']}\n"
                 . "📝 Judul: {$data['title']}\n\n"

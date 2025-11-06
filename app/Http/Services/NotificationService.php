@@ -46,16 +46,16 @@ class NotificationService
 
         $messageOwner = $isFinance
             ? "✅ *Reservasi Disetujui Admin!*\n\n"
+            . "📝 Judul: {$title}\n"
             . "🏢 *Ruangan:* {$room->name}\n"
             . "📍 *Lokasi:* {$room->location}\n"
-            . "📝 Judul: {$title}\n"
             . "📅 Tanggal: {$tanggal}\n"
             . "🕐 Waktu: {$waktu}\n\n"
             . "📊 Status: *Menunggu Persetujuan Keuangan*"
             : "✅ *Reservasi Telah Disetujui!*\n\n"
+            . "📝 Judul: {$title}\n"
             . "🏢 *Ruangan:* {$room->name}\n"
             . "📍 *Lokasi:* {$room->location}\n"
-            . "📝 Judul: {$title}\n"
             . "📅 Tanggal: {$tanggal}\n"
             . "🕐 Waktu: {$waktu}\n\n"
             . "📊 Status: *Disetujui*";
