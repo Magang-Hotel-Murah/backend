@@ -49,7 +49,17 @@ class MeetingRoomReservationService
 
     public function getMeetingDisplay($request)
     {
-        $company = Company::where('code', $request->company_code)->firstOrFail();
+        $company = Company::where('code', $request->company_code)->first();
+
+        if (!$company) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kode perusahaan tidak ditemukan',
+                'reservations' => [],
+                'all_rooms' => [],
+            ], 404);
+        }
+
         $companyId = $company->id;
 
         [$startDate, $endDate, $filter] = $this->getDateRange($request);
@@ -71,6 +81,8 @@ class MeetingRoomReservationService
 
         $reservations = $query->orderBy('start_time', 'asc')->get();
 
+        $allRooms = MeetingRoom::where('company_id', $companyId)->select('id', 'name', 'company_id')->get();
+
         return [
             'now' => Carbon::now()->toDateTimeString(),
             'filter' => $filter,
@@ -79,6 +91,7 @@ class MeetingRoomReservationService
                 'end'   => $endDate->toDateTimeString(),
             ],
             'total' => $reservations->count(),
+            'all_rooms' => $allRooms,
             'reservations' => $reservations,
         ];
     }
