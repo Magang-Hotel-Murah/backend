@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use App\Http\Services\CloudinaryService;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -14,6 +15,13 @@ use Illuminate\Support\Facades\Log;
  */
 class MeetingRoomController extends Controller
 {
+    protected $cloudinary;
+
+    public function __construct(CloudinaryService $cloudinary)
+    {
+        $this->cloudinary = $cloudinary;
+    }
+
     public function index(Request $request)
     {
         $validated = $request->validate([
@@ -42,7 +50,6 @@ class MeetingRoomController extends Controller
         return response()->json($rooms);
     }
 
-
     public function show($id)
     {
         $room = MeetingRoom::with(
@@ -53,7 +60,7 @@ class MeetingRoomController extends Controller
 
     public function update(Request $request, $id)
     {
-        $room = MeetingRoom::findOrFail($id);
+        $room = MeetingRoom::find($id);
 
         $request->validate([
             'name' => 'sometimes|string|max:255',
@@ -105,6 +112,11 @@ class MeetingRoomController extends Controller
             'facilities' => 'sometimes|array',
             'facilities.*' => 'string|max:100',
             'capacity' => 'sometimes|integer|min:1',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpg,jpeg,png|max:2048',
+            'images_to_remove' => 'nullable|array',
+            'images_to_remove.*' => 'string',
+            'replace_images' => 'nullable',
         ]);
 
         $data = $request->only([
@@ -116,6 +128,31 @@ class MeetingRoomController extends Controller
             'capacity',
         ]);
 
+        $existingImages = $room->images ?? [];
+
+        if ($request->filled('images_to_remove')) {
+            $imagesToRemove = $request->input('images_to_remove', []);
+            $existingImages = array_values(array_diff($existingImages, $imagesToRemove));
+
+            foreach ($imagesToRemove as $url) {
+                $this->cloudinary->destroy($url);
+            }
+        }
+
+        $uploadedUrls = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $upload = $this->cloudinary->upload($image, 'meeting_rooms');
+                $uploadedUrls[] = $upload['url'] ?? $upload;
+            }
+        }
+
+        if ($request->replace_images === 'true') {
+            $data['images'] = $uploadedUrls;
+        } else {
+            $data['images'] = array_merge($existingImages, $uploadedUrls);
+        }
+
         $room->update($data);
 
         return response()->json([
@@ -123,6 +160,7 @@ class MeetingRoomController extends Controller
             'data' => $room->fresh(),
         ]);
     }
+
 
     public function store(Request $request)
     {
@@ -165,6 +203,8 @@ class MeetingRoomController extends Controller
             'facilities' => 'nullable|array',
             'facilities.*' => 'string|max:100',
             'capacity' => 'required|integer|min:1',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $data = $request->only([
@@ -176,6 +216,18 @@ class MeetingRoomController extends Controller
             'capacity'
         ]);
 
+        $uploadedUrls = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $upload = $this->cloudinary->upload($image, 'meeting_rooms');
+                $uploadedUrls[] = $upload['url'] ?? $upload;
+            }
+        }
+
+        if (!empty($uploadedUrls)) {
+            $data['images'] = $uploadedUrls;
+        }
+
         $room = MeetingRoom::create($data);
 
         return response()->json([
@@ -186,8 +238,18 @@ class MeetingRoomController extends Controller
 
     public function destroy($id)
     {
+        $user = Auth::user();
 
-        $room = MeetingRoom::withTrashed()->findOrFail($id);
+        $room = MeetingRoom::withTrashed()
+            ->where('id', $id)
+            ->where('company_id', $user->company_id)
+            ->first();
+
+        if (!$room) {
+            return response()->json([
+                'message' => 'Ruangan tidak ditemukan untuk perusahaan Anda.'
+            ], 404);
+        }
 
         if ($room->type === 'main') {
             $hasSubRooms = MeetingRoom::where('parent_id', $room->id)->exists();

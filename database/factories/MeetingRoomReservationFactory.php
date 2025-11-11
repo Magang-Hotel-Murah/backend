@@ -7,6 +7,7 @@ use App\Models\MeetingRoom;
 use App\Models\MeetingRoomReservation;
 use App\Models\Company;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Carbon\Carbon;
 
 class MeetingRoomReservationFactory extends Factory
 {
@@ -14,8 +15,16 @@ class MeetingRoomReservationFactory extends Factory
 
     public function definition(): array
     {
-        $start = $this->faker->dateTimeBetween('+0 days', '+5 days');
-        $end   = (clone $start)->modify('+1 hour');
+        $date = $this->faker->dateTimeBetween('-3 days', '+5 days');
+
+        $startHour = $this->faker->numberBetween(9, 16);
+        $startMinute = $this->faker->randomElement([0, 15, 30, 45]); // lebih realistis (kelipatan 15 menit)
+        $start = Carbon::instance($date)->setTime($startHour, $startMinute);
+
+        $end = (clone $start)->addHours($this->faker->numberBetween(1, 2));
+        if ($end->hour > 17) {
+            $end->setTime(17, 0);
+        }
 
         return [
             'company_id'       => Company::factory(),

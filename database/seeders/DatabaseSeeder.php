@@ -137,12 +137,24 @@ class DatabaseSeeder extends Seeder
             ->create();
 
         // 9. Meeting rooms
-        $rooms = MeetingRoom::factory(5)->create([
-            'company_id' => $company->id,
-        ]);
+        $mainRooms = MeetingRoom::factory(5)
+            ->state(['type' => 'main'])
+            ->forCompany($company)
+            ->create();
+
+        $subRooms = MeetingRoom::factory(8)
+            ->state(['type' => 'sub'])
+            ->forCompany($company)
+            ->make()
+            ->each(function ($room) use ($mainRooms, $company) {
+                $room->parent_id = $mainRooms->random()->id;
+                $room->save();
+            });
+
+        $rooms = $mainRooms->concat($subRooms);
 
         // 10. Meeting reservations + participants + requests
-        MeetingRoomReservation::factory(20)->make()->each(function ($reservation) use ($allUsers, $rooms, $divisionIds, $positionIds, $company) {
+        MeetingRoomReservation::factory(40)->make()->each(function ($reservation) use ($allUsers, $rooms, $divisionIds, $positionIds, $company) {
             $reservation->user_id = $allUsers->random()->id;
             $reservation->meeting_room_id = $rooms->random()->id;
             $reservation->company_id = $company->id;

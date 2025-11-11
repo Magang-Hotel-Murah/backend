@@ -16,6 +16,7 @@ class MeetingRoom extends Model
         'name',
         'capacity',
         'facilities',
+        'images',
         'location',
         'type',
         'parent_id',
@@ -24,6 +25,7 @@ class MeetingRoom extends Model
 
     protected $casts = [
         'facilities' => 'array',
+        'images' => 'array',
     ];
 
     protected static function booted()
