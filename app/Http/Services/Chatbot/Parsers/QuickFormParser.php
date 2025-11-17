@@ -3,6 +3,7 @@
 namespace App\Http\Services\Chatbot\Parsers;
 
 use App\Models\User;
+use App\Models\MeetingRoom;
 use App\Http\Services\MeetingRoomReservationService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -284,6 +285,22 @@ class QuickFormParser
         // Parse request/facilities
         $request = $this->parseRequestData($data['request'] ?? '-');
 
+        $room = MeetingRoom::find($data['room_id']);
+
+        if (!$room) {
+            return [
+                'success' => false,
+                'error' => 'Ruangan tidak ditemukan'
+            ];
+        }
+
+        if ($data['participants_count'] > $room->capacity) {
+            return [
+                'success' => false,
+                'error' => "Gagal membuat reservasi: Kapasitas ruangan tidak mencukupi. Kapasitas maksimal {$room->capacity}, total peserta {$data['participants_count']}."
+            ];
+        }
+
         // Build reservation data
         $reservationData = [
             'meeting_room_id' => $data['room_id'],
@@ -423,20 +440,15 @@ class QuickFormParser
     }
 
     /**
-     * Parse request/facilities data
+     * Parse request data from user-friendly format
      */
     private function parseRequestData(string $requestStr): array
     {
-        if (empty($requestStr) || $requestStr === '-') {
+        if (empty($requestStr) || trim($requestStr) === '-') {
             return [];
         }
 
-        // Simple comma-separated list (e.g., "Proyektor, Snack, Kopi")
-        $items = array_filter(array_map('trim', explode(',', $requestStr)));
-
-        // Try to categorize items
-        $snackKeywords = ['snack', 'kopi', 'teh', 'makanan', 'minuman', 'coffee', 'tea'];
-        $equipmentKeywords = ['proyektor', 'projector', 'mic', 'speaker', 'laptop', 'whiteboard', 'marker'];
+        $segments = array_map('trim', explode(';', $requestStr));
 
         $request = [
             'funds_amount' => null,
@@ -445,48 +457,40 @@ class QuickFormParser
             'equipment' => [],
         ];
 
-        foreach ($items as $item) {
-            $itemLower = strtolower($item);
-            $isSnack = false;
-            $isEquipment = false;
+        $firstSegment = $segments[0] ?? '';
+        $isFundSegment = preg_match('/^[\d.,]+/', $firstSegment); // diawali angka
 
-            // Check if it's a snack
-            foreach ($snackKeywords as $keyword) {
-                if (stripos($itemLower, $keyword) !== false) {
-                    $request['snacks'][] = $item;
-                    $isSnack = true;
-                    break;
-                }
+        $snackIndex = $isFundSegment ? 1 : 0;
+        $equipmentIndex = $isFundSegment ? 2 : 1;
+
+        if ($isFundSegment && !empty($firstSegment)) {
+            $fundParts = array_map('trim', explode(',', $firstSegment));
+
+            if (!empty($fundParts[0]) && is_numeric(str_replace(['.', ','], '', $fundParts[0]))) {
+                $request['funds_amount'] = (float) str_replace(['.', ','], '', $fundParts[0]);
             }
 
-            // Check if it's equipment
-            if (!$isSnack) {
-                foreach ($equipmentKeywords as $keyword) {
-                    if (stripos($itemLower, $keyword) !== false) {
-                        $request['equipment'][] = $item;
-                        $isEquipment = true;
-                        break;
-                    }
-                }
+            if (isset($fundParts[1]) && !empty($fundParts[1])) {
+                $request['funds_reason'] = $fundParts[1];
             }
+        }
 
-            // If not categorized, add to equipment by default
-            if (!$isSnack && !$isEquipment) {
-                $request['equipment'][] = $item;
-            }
+        if (isset($segments[$snackIndex]) && !empty(trim($segments[$snackIndex]))) {
+            $request['snacks'] = array_filter(array_map('trim', explode(',', $segments[$snackIndex])));
+        }
+
+        if (isset($segments[$equipmentIndex]) && !empty(trim($segments[$equipmentIndex]))) {
+            $request['equipment'] = array_filter(array_map('trim', explode(',', $segments[$equipmentIndex])));
         }
 
         return $request;
     }
 
-    /**
-     * Format success message
-     */
     private function formatSuccessMessage($reservation, array $data, string $startTime, string $endTime): string
     {
         return "✅ *Reservasi Berhasil Dibuat!*\n\n"
             . "📋 ID Reservasi: {$reservation->id}\n"
-            . "📝 Judul: {$data['title']}\n\n"
+            . "📝 Judul: {$data['title']}\n"
             . "🏢 Ruangan : {$reservation->room->name}\n"
             . "📅 Tanggal: {$data['date']}\n"
             . "🕐 Waktu: {$startTime} - {$endTime}\n"

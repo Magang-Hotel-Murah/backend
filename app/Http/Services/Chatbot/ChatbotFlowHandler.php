@@ -184,7 +184,7 @@ class ChatbotFlowHandler
                 $this->stateManager->resetUser($userId);
                 return $result['message'];
             } else {
-                return "❌ " . $result['error'] . "\n\n💡 Gunakan format: YYYY-MM-DD;jumlah_peserta;room_id;HH:MM-HH:MM;judul;deskripsi;peserta;request";
+                return "❌ " . $result['error'] . "\n\n💡 Gunakan format yang sudah di berikan";
             }
         } catch (\Exception $e) {
             Log::error('Quick form parsing failed', [
@@ -222,14 +222,17 @@ class ChatbotFlowHandler
             . "Ketik '2' untuk mendapat template, isi, dan kirim kembali.\n\n"
             . "Format:\n"
             . "Tanggal: YYYY-MM-DD\n"
-            . "Peserta: [jumlah]\n"
-            . "Ruangan: [ID]\n"
-            . "Waktu: HH:MM-HH:MM\n"
-            . "Judul: [judul]\n"
-            . "Deskripsi: [deskripsi]\n"
+            . "Peserta: [jumlah peserta]\n"
+            . "Ruangan: [ID ruangan]\n"
+            . "Waktu: [HH:MM-HH:MM]\n"
+            . "Judul: [judul meeting]\n"
+            . "Deskripsi: [deskripsi meeting]\n"
             . "Daftar Peserta:\n"
-            . "- Nama (email/telp)\n"
-            . "Request: item1, item2\n\n"
+            . "- [Nama] ([email/telp])\n"
+            . "- [Nama] ([email/telp])\n"
+            . "Request: [dana,alasan];[snack1,snack2];[alat1,alat2]\n"
+            . "```\n\n"
+            . "Request: dana,alasan;snack1,snack2;alat1,alat2\n\n"
             . "💡 *Tips:*\n"
             . "• Deskripsi, Daftar Peserta & Request boleh dikosongkan\n"
             . "• Gunakan '-' di depan nama peserta\n"
