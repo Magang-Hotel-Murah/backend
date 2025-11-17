@@ -49,7 +49,7 @@ class AuthController extends Controller
 
         try {
             $code = strtoupper(Str::random(6));
-            $host = env('APP_URL');
+            $host = env('FRONTEND_URL, http://localhost:5173');
 
             $company = Company::create([
                 'name' => $validated['company_name'],

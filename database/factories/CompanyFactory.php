@@ -16,7 +16,7 @@ class CompanyFactory extends Factory
     public function definition(): array
     {
         $code = strtoupper(Str::random(6));
-        $host = env('APP_URL');
+        $host = env('FRONTEND_URL, http://localhost:5173');
         return [
             'name' => fake()->company(),
             'code' => $code, // kode unik 6 huruf
