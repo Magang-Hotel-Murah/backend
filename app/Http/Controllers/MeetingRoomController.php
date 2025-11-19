@@ -284,14 +284,14 @@ class MeetingRoomController extends Controller
             'facilities' => 'array',
         ]);
 
-        if (!empty($validated['end_time'])) {
-            $endTime = Carbon::parse($validated['end_time']);
-            if ($endTime->gt(Carbon::parse('17:00'))) {
-                return response()->json([
-                    'message' => 'Jam selesai tidak boleh lebih dari jam 17:00.',
-                ], 422);
-            }
-        }
+        // if (!empty($validated['end_time'])) {
+        //     $endTime = Carbon::parse($validated['end_time']);
+        //     if ($endTime->gt(Carbon::parse('17:00'))) {
+        //         return response()->json([
+        //             'message' => 'Jam selesai tidak boleh lebih dari jam 17:00.',
+        //         ], 422);
+        //      }
+        // }
 
         if (!empty($validated['start_time']) && $validated['date'] === now()->toDateString()) {
             $startDateTime = Carbon::parse("{$validated['date']} {$validated['start_time']}");
@@ -333,7 +333,7 @@ class MeetingRoomController extends Controller
             })
             ->get();
 
-        $generateFreeSlots = function ($reservations, $date, $dayStart = '08:00', $dayEnd = '17:00', $bufferMinutes = 15) {
+        $generateFreeSlots = function ($reservations, $date, $dayStart = '00:00', $dayEnd = '23:59', $bufferMinutes = 15) {
             $slots = [];
 
             if ($date === now()->toDateString()) {
