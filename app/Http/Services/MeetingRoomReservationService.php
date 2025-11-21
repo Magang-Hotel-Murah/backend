@@ -13,6 +13,7 @@ use App\Models\Company;
 use App\Models\Scopes\CompanyScope;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class MeetingRoomReservationService
 {
@@ -49,7 +50,9 @@ class MeetingRoomReservationService
 
     public function getMeetingDisplay($request)
     {
-        $company = Company::where('code', $request->company_code)->first();
+        $company = Cache::remember("company_code_" . $request->company_code, 300, function () use ($request) {
+            return Company::where('code', $request->company_code)->first();
+        });
 
         if (!$company) {
             return response()->json([
@@ -61,30 +64,28 @@ class MeetingRoomReservationService
         }
 
         $companyId = $company->id;
-
         [$startDate, $endDate, $filter] = $this->getDateRange($request);
+        $now = Carbon::now();
 
         $query = MeetingRoomReservation::withoutGlobalScope(CompanyScope::class)
-            ->select('id', 'user_id', 'company_id', 'title', 'meeting_room_id', 'start_time', 'end_time', 'status')
             ->with([
-                'user:id,name',
-                'user.profile:id,user_id,division_id,position_id',
-                'user.profile.division:id,name',
-                'user.profile.position:id,name',
-                'room:id,name',
-                'company:id,code,name',
+                'user.profile.division',
+                'user.profile.position',
+                'room',
             ])
             ->where('company_id', $companyId)
             ->whereBetween('start_time', [$startDate, $endDate]);
 
-        $this->applyFilters($query, $request, Carbon::now());
+        $this->applyFilters($query, $request, $now);
 
         $reservations = $query->orderBy('start_time', 'asc')->get();
 
-        $allRooms = MeetingRoom::where('company_id', $companyId)->select('id', 'name', 'company_id')->get();
+        $allRooms = Cache::remember("company_rooms_{$companyId}", 300, function () use ($companyId) {
+            return MeetingRoom::where('company_id', $companyId)->select('id', 'name', 'company_id')->get();
+        });
 
         return [
-            'now' => Carbon::now()->toDateTimeString(),
+            'now' => $now->toDateTimeString(),
             'filter' => $filter,
             'date_range' => [
                 'start' => $startDate->toDateTimeString(),
@@ -93,6 +94,7 @@ class MeetingRoomReservationService
             'total' => $reservations->count(),
             'all_rooms' => $allRooms,
             'reservations' => $reservations,
+            'company_name' => $company->name,
         ];
     }
 
