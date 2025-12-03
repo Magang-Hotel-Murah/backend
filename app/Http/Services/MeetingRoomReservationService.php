@@ -25,7 +25,7 @@ class MeetingRoomReservationService
 
         $query = MeetingRoomReservation::with([
             'user:id,name',
-            'room:id,name',
+            'room',
         ]);
 
         if ($role === 'support_staff') {
