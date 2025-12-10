@@ -322,7 +322,7 @@ class MeetingRoomController extends Controller
                 });
             }
         }])
-            ->select('id', 'name', 'capacity', 'facilities', 'location', 'type', 'company_id')
+            ->select('id', 'name', 'capacity', 'facilities', 'location', 'type', 'company_id', 'images')
             ->where('capacity', '>=', $validated['participants_count'])
             ->when(!empty($validated['facilities']), function ($query) use ($validated) {
                 $query->where(function ($q) use ($validated) {

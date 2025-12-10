@@ -22,6 +22,7 @@ class MeetingRoomReservationService
         $user = Auth::user();
         $role = $user->role;
         $perPage = $request->get('per_page', 10);
+        $all = $request->get('all', false);
 
         $query = MeetingRoomReservation::with([
             'user:id,name',
@@ -44,6 +45,10 @@ class MeetingRoomReservationService
         }
 
         $query->orderBy('start_time', 'asc');
+
+        if ($all) {
+            return $query->get();
+        }
 
         return $query->paginate($perPage);
     }
