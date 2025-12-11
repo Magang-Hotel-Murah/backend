@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Http\Services\MeetingRoomReservationService;
+use App\Models\MeetingRoomReservation;
 
 class MeetingRequestController extends Controller
 {
@@ -157,6 +158,11 @@ class MeetingRequestController extends Controller
         ];
 
         if ($request->status === 'rejected') {
+            MeetingRoomReservation::where('id', $meetingRequest->reservation_id)->update([
+                'status' => 'rejected',
+                'approved_by' => Auth::id(),
+                'rejection_reason' => 'Ditolak Karena permintaan dana tidak disetujui oleh finance',
+            ]);
             $updateData['rejection_reason'] = $request->rejection_reason ?? 'Ditolak oleh finance.';
             $reservation = $meetingRequest->reservation()
                 ->with([
