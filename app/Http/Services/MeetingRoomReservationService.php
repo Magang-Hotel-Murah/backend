@@ -40,7 +40,7 @@ class MeetingRoomReservationService
             $query->where('user_id', $user->id);
         }
 
-        if ($request->has('status')) {
+        if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 

@@ -282,16 +282,8 @@ class MeetingRoomController extends Controller
             'end_time' => 'nullable|date_format:H:i|after:start_time',
             'participants_count' => 'required|integer|min:1',
             'facilities' => 'array',
+            'room_id' => 'nullable|integer|exists:meeting_rooms,id',
         ]);
-
-        // if (!empty($validated['end_time'])) {
-        //     $endTime = Carbon::parse($validated['end_time']);
-        //     if ($endTime->gt(Carbon::parse('17:00'))) {
-        //         return response()->json([
-        //             'message' => 'Jam selesai tidak boleh lebih dari jam 17:00.',
-        //         ], 422);
-        //      }
-        // }
 
         if (!empty($validated['start_time']) && $validated['date'] === now()->toDateString()) {
             $startDateTime = Carbon::parse("{$validated['date']} {$validated['start_time']}");
@@ -302,14 +294,19 @@ class MeetingRoomController extends Controller
             }
         }
 
+        $hasRoomId = !empty($validated['room_id']);
         $hasTime = !empty($validated['start_time']) && !empty($validated['end_time']);
         $startDateTime = $hasTime ? Carbon::parse("{$validated['date']} {$validated['start_time']}") : null;
         $endDateTime = $hasTime ? Carbon::parse("{$validated['date']} {$validated['end_time']}") : null;
 
-        $rooms = MeetingRoom::with(['reservations' => function ($q) use ($validated, $hasTime, $startDateTime, $endDateTime) {
+        $rooms = MeetingRoom::with(['reservations' => function ($q) use ($validated, $hasTime, $startDateTime, $endDateTime, $hasRoomId) {
             $q->select('id', 'meeting_room_id', 'title', 'start_time', 'end_time')
                 ->where('status', 'approved')
                 ->whereDate('start_time', $validated['date']);
+
+            if ($hasRoomId) {
+                $q->where('meeting_room_id', $validated['room_id']);
+            }
 
             if ($hasTime) {
                 $q->where(function ($q2) use ($startDateTime, $endDateTime) {
@@ -323,6 +320,9 @@ class MeetingRoomController extends Controller
             }
         }])
             ->select('id', 'name', 'capacity', 'facilities', 'location', 'type', 'company_id', 'images')
+            ->when($hasRoomId, function ($q) use ($validated) {
+                $q->where('id', $validated['room_id']);
+            })
             ->where('capacity', '>=', $validated['participants_count'])
             ->when(!empty($validated['facilities']), function ($query) use ($validated) {
                 $query->where(function ($q) use ($validated) {
@@ -331,6 +331,7 @@ class MeetingRoomController extends Controller
                     }
                 });
             })
+            ->orderBy('capacity', 'asc')
             ->get();
 
         $generateFreeSlots = function ($reservations, $date, $dayStart = '00:00', $dayEnd = '23:59', $bufferMinutes = 15) {
@@ -394,6 +395,7 @@ class MeetingRoomController extends Controller
                     ->where('status', 'approved')
                     ->whereDate('start_time', $validated['date']);
             }])
+                ->select('id', 'name', 'capacity', 'facilities', 'location', 'type', 'company_id', 'images')
                 ->orderBy('capacity', 'desc')
                 ->first(['id', 'name', 'capacity', 'facilities', 'location', 'type', 'company_id']);
 
