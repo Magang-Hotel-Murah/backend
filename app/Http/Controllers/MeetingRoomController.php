@@ -302,7 +302,10 @@ class MeetingRoomController extends Controller
         $rooms = MeetingRoom::with(['reservations' => function ($q) use ($validated, $hasTime, $startDateTime, $endDateTime, $hasRoomId) {
             $q->select('id', 'meeting_room_id', 'title', 'start_time', 'end_time')
                 ->where('status', 'approved')
-                ->whereDate('start_time', $validated['date']);
+                ->where(function ($q) use ($validated) {
+                    $q->whereDate('start_time', '<=', $validated['date'])
+                        ->whereDate('end_time', '>=', $validated['date']);
+                });
 
             if ($hasRoomId) {
                 $q->where('meeting_room_id', $validated['room_id']);
@@ -350,8 +353,12 @@ class MeetingRoomController extends Controller
             $dayEndTime = Carbon::parse("{$date} {$dayEnd}");
 
             $reservations = $reservations
-                ->filter(fn($res) => Carbon::parse($res->start_time)->toDateString() === $date)
+                ->filter(function ($res) use ($date) {
+                    return Carbon::parse($res->start_time)->toDateString() <= $date
+                        && Carbon::parse($res->end_time)->toDateString() >= $date;
+                })
                 ->sortBy('start_time');
+
 
             foreach ($reservations as $res) {
                 $resStart = Carbon::parse($res->start_time)->subMinutes($bufferMinutes);
@@ -393,7 +400,10 @@ class MeetingRoomController extends Controller
             $largestRoom = MeetingRoom::with(['reservations' => function ($q) use ($validated) {
                 $q->select('id', 'meeting_room_id', 'title', 'start_time', 'end_time')
                     ->where('status', 'approved')
-                    ->whereDate('start_time', $validated['date']);
+                    ->where(function ($q) use ($validated) {
+                        $q->whereDate('start_time', '<=', $validated['date'])
+                            ->whereDate('end_time', '>=', $validated['date']);
+                    });
             }])
                 ->select('id', 'name', 'capacity', 'facilities', 'location', 'type', 'company_id', 'images')
                 ->orderBy('capacity', 'desc')
