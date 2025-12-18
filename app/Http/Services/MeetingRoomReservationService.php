@@ -44,6 +44,10 @@ class MeetingRoomReservationService
             $query->where('status', $request->status);
         }
 
+        if ($request->filled('room_id')) {
+            $query->where('meeting_room_id', $request->room_id);
+        }
+
         $query->orderBy('start_time', 'asc');
 
         if ($all) {
