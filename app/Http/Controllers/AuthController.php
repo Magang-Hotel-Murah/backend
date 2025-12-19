@@ -148,14 +148,17 @@ class AuthController extends Controller
         $token = $user->createToken('auth_token', $abilities)->plainTextToken;
         $tokenModel = $user->tokens()->latest('id')->first();
 
-        $expiry = $remember ? now()->addDays(30) : now()->addHours(8);
+        if ($remember) {
+            $expiry = \Carbon\Carbon::now()->addDays(30);
+        } else {
+            $expiry = \Carbon\Carbon::now()->addHours(8);
+        }
 
         $tokenModel->expires_at = $expiry;
         $tokenModel->save();
 
         if (!$user->hasVerifiedEmail()) {
             $verifyToken = $user->createToken('verify_token', ['verify-email'])->plainTextToken;
-
             $verifyModel = $user->tokens()->latest('id')->first();
             $verifyModel->expires_at = now()->addMinutes(15);
             $verifyModel->save();
@@ -170,7 +173,8 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'user' => $user,
-            'token' => $token
+            'token' => $token,
+            'expires_at' => $expiry->toIso8601String()
         ], 200);
     }
 
